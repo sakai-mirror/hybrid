@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.component.cover.ServerConfigurationService;
-import org.sakaiproject.util.Signature;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.user.api.UserNotDefinedException;
@@ -130,32 +129,38 @@ public class TrustedLoginFilter implements Filter {
 			final String host = req.getRemoteHost();
 			if (safeHosts.indexOf(host) < 0) {
 				LOG.warn("Ignoring Trusted Token request from: " + host);
+				chain.doFilter(req, resp);
+				return;
 			} else {
 				final String token = hreq.getHeader("x-sakai-token");
 				Session currentSession = null;
 				Session requestSession = null;
 				if (token != null) {
-					final String user = decodeToken(token);
-					if (user != null) {
+					final String trustedUserName = decodeToken(token);
+					if (trustedUserName != null) {
 						currentSession = sessionManager.getCurrentSession();
-						if (!user.equals(currentSession.getUserEid())) {
-							requestSession = sessionManager.startSession();
-							org.sakaiproject.user.api.User usr;
+						if (!trustedUserName
+								.equals(currentSession.getUserEid())) {
+							org.sakaiproject.user.api.User user = null;
 							try {
-								usr = org.sakaiproject.user.cover.UserDirectoryService
-										.getUserByEid(user);
-								requestSession.setUserEid(usr.getEid());
-								requestSession.setUserId(usr.getId());
-								requestSession.setActive();
+								user = org.sakaiproject.user.cover.UserDirectoryService
+										.getUserByEid(trustedUserName);
 							} catch (UserNotDefinedException e) {
-								LOG.error(e.getLocalizedMessage(), e);
-								throw new Error(e);
+								LOG.warn(trustedUserName + " not found!");
 							}
-							sessionManager.setCurrentSession(requestSession);
-							// wrap the request so that we can get the user via
-							// getRemoteUser() in other places.
-							if (!(hreq instanceof ToolRequestWrapper)) {
-								hreq = new ToolRequestWrapper(hreq, user);
+							if (user != null) {
+								requestSession = sessionManager.startSession();
+								requestSession.setUserEid(user.getEid());
+								requestSession.setUserId(user.getId());
+								requestSession.setActive();
+								sessionManager
+										.setCurrentSession(requestSession);
+								// wrap the request so that we can get the user
+								// via getRemoteUser() in other places.
+								if (!(hreq instanceof ToolRequestWrapper)) {
+									hreq = new ToolRequestWrapper(hreq,
+											trustedUserName);
+								}
 							}
 						}
 					}
@@ -164,13 +169,16 @@ public class TrustedLoginFilter implements Filter {
 					chain.doFilter(hreq, resp);
 				} finally {
 					if (requestSession != null) {
-						if (currentSession != null) {
-							sessionManager.setCurrentSession(currentSession);
-						}
 						requestSession.invalidate();
+					}
+					if (currentSession != null) {
+						sessionManager.setCurrentSession(currentSession);
 					}
 				}
 			}
+		} else {
+			chain.doFilter(req, resp);
+			return;
 		}
 	}
 
