@@ -19,7 +19,6 @@ package org.sakaiproject.hybrid.tool;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletConfig;
@@ -82,8 +81,7 @@ public class SitesServlet extends HttpServlet {
 				siteJson.element("siteType", site.getType());
 				// TODO ISO8601 date format or other?
 				siteJson.element("creationDate", new SimpleDateFormat(
-						"yyyy-MM-dd").format(new Date(site.getCreatedTime()
-						.getTime())));
+						"yyyy-MM-dd").format(site.getCreatedDate()));
 				sites.add(siteJson);
 			}
 			json.element("sites", sites);
