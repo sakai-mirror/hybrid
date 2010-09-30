@@ -30,9 +30,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.SessionManager;
+import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
 
 /**
@@ -100,6 +102,7 @@ public class TrustedLoginFilter implements Filter {
 	private static final String TOKEN_SEPARATOR = ";";
 
 	private SessionManager sessionManager;
+	private UserDirectoryService userDirectoryService;
 
 	/**
 	 * Property to contain the shared secret used by all trusted servers. The
@@ -121,7 +124,6 @@ public class TrustedLoginFilter implements Filter {
 	 * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
 	 *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
 	 */
-	@SuppressWarnings("deprecation")
 	public void doFilter(ServletRequest req, ServletResponse resp,
 			FilterChain chain) throws IOException, ServletException {
 		if (enabled) {
@@ -143,7 +145,7 @@ public class TrustedLoginFilter implements Filter {
 								.equals(currentSession.getUserEid())) {
 							org.sakaiproject.user.api.User user = null;
 							try {
-								user = org.sakaiproject.user.cover.UserDirectoryService
+								user = userDirectoryService
 										.getUserByEid(trustedUserName);
 							} catch (UserNotDefinedException e) {
 								LOG.warn(trustedUserName + " not found!");
@@ -214,10 +216,17 @@ public class TrustedLoginFilter implements Filter {
 	/**
 	 * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
 	 */
-	@SuppressWarnings("deprecation")
 	public void init(FilterConfig config) throws ServletException {
-		sessionManager = org.sakaiproject.tool.cover.SessionManager
-				.getInstance();
+		sessionManager = (SessionManager) ComponentManager
+				.get(org.sakaiproject.tool.api.SessionManager.class);
+		if (sessionManager == null) {
+			throw new IllegalStateException("SessionManager == null");
+		}
+		userDirectoryService = (UserDirectoryService) ComponentManager
+				.get(org.sakaiproject.user.api.UserDirectoryService.class);
+		if (userDirectoryService == null) {
+			throw new IllegalStateException("UserDirectoryService == null");
+		}
 		// default to true - enabled
 		enabled = ServerConfigurationService.getBoolean(
 				ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_ENABLED, enabled);
