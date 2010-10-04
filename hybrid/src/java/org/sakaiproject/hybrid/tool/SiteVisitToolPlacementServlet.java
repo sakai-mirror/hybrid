@@ -68,11 +68,11 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 			.getLog(SiteVisitToolPlacementServlet.class);
 	private static final String SITE_ID = "siteId";
 
-	private transient SessionManager sessionManager;
-	private transient SiteService siteService;
-	private transient EventTrackingService eventTrackingService;
-	private transient ToolHelperImpl toolHelper;
-	private transient AuthzGroupService authzGroupService;
+	protected transient SessionManager sessionManager;
+	protected transient SiteService siteService;
+	protected transient EventTrackingService eventTrackingService;
+	protected transient ToolHelperImpl toolHelper;
+	protected transient AuthzGroupService authzGroupService;
 
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
@@ -108,13 +108,13 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 		try {
 			site = siteService.getSiteVisit(siteId);
 		} catch (IdUnusedException e) {
-			LOG.warn("Site not found: " + siteId, e);
+			LOG.debug("Site not found: " + siteId, e);
 			sendError(resp, HttpServletResponse.SC_NOT_FOUND,
 					"HttpServletResponse.SC_NOT_FOUND: " + siteId);
 			return;
 		} catch (PermissionException e) {
 			LOG.warn("Permission denied: " + principal
-					+ " could not access site " + siteId, e);
+					+ " could not access site " + siteId);
 			sendError(resp, HttpServletResponse.SC_FORBIDDEN,
 					"HttpServletResponse.SC_FORBIDDEN");
 			return;
@@ -183,7 +183,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 					rolesArray.add(roleJson);
 				}
 			} catch (GroupNotDefinedException e) {
-				LOG.warn("No AuthzGroup found for site: " + siteId, e);
+				LOG.warn("No AuthzGroup found for site: " + siteId);
 			}
 			siteJson.element("roles", rolesArray);
 
