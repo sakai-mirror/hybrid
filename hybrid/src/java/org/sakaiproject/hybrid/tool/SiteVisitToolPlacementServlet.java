@@ -36,6 +36,7 @@ import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
 import org.sakaiproject.authz.api.Role;
+import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.event.api.Event;
 import org.sakaiproject.event.api.EventTrackingService;
@@ -73,6 +74,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	protected transient EventTrackingService eventTrackingService;
 	protected transient ToolHelperImpl toolHelper;
 	protected transient AuthzGroupService authzGroupService;
+	protected transient SecurityService securityService;
 
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
@@ -144,9 +146,11 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 					// get list of tools for the page
 					List<ToolConfiguration> tools = page.getTools();
 					if (tools != null && !tools.isEmpty()) {
-						pageJson.element("iconclass", "icon-"
-								+ tools.get(0).getToolId().replaceAll("[.]",
-										"-"));
+						pageJson.element(
+								"iconclass",
+								"icon-"
+										+ tools.get(0).getToolId()
+												.replaceAll("[.]", "-"));
 						final JSONArray toolsArray = new JSONArray();
 						for (ToolConfiguration toolConfig : tools) {
 							// for each toolConfig
@@ -156,8 +160,8 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 								final Tool tool = toolConfig.getTool();
 								if (tool != null && tool.getId() != null) {
 									toolJson.element("title", tool.getTitle());
-									toolJson.element("layouthint", toolConfig
-											.getLayoutHints());
+									toolJson.element("layouthint",
+											toolConfig.getLayoutHints());
 								} else {
 									toolJson.element("title", page.getTitle());
 								}
@@ -275,6 +279,11 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 		if (authzGroupService == null) {
 			throw new IllegalStateException("AuthzGroupService == null");
 		}
-		toolHelper = new ToolHelperImpl();
+		securityService = (SecurityService) ComponentManager
+				.get(SecurityService.class);
+		if (securityService == null) {
+			throw new IllegalStateException("SecurityService == null");
+		}
+		toolHelper = new ToolHelperImpl(securityService);
 	}
 }

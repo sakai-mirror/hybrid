@@ -113,6 +113,7 @@ public class SitesServletTest extends TestCase {
 		try {
 			when(response.getWriter()).thenThrow(new IOException());
 			sitesServlet.doGet(request, response);
+			fail("Should not be reached");
 		} catch (ServletException e) {
 			assertNull("ServletException should not be thrown", e);
 		} catch (IOException e) {

@@ -22,7 +22,6 @@ import java.util.Arrays;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.authz.api.SecurityService;
-import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.tool.api.Placement;
 
@@ -35,9 +34,24 @@ import org.sakaiproject.tool.api.Placement;
  * Inclusion helps avoid class loader issue with sakai-portal-impl.
  */
 public class ToolHelperImpl {
+	SecurityService securityService;
+
 	private static final Log log = LogFactory.getLog(ToolHelperImpl.class);
 
 	public static final String TOOLCONFIG_REQUIRED_PERMISSIONS = "functions.require";
+
+	/**
+	 * 
+	 * @param securityService
+	 *            Required
+	 */
+	public ToolHelperImpl(SecurityService securityService) {
+		if (securityService == null) {
+			throw new IllegalArgumentException(
+					"SecurityService cannot be null!");
+		}
+		this.securityService = securityService;
+	}
 
 	/**
 	 * The optional tool configuration tag "functions.require" describes a set
@@ -62,9 +76,6 @@ public class ToolHelperImpl {
 		if (placement == null || site == null)
 			return true;
 
-		final SecurityService ss = (SecurityService) ComponentManager
-				.get(SecurityService.class);
-
 		String requiredPermissionsString = placement.getConfig().getProperty(
 				TOOLCONFIG_REQUIRED_PERMISSIONS);
 		if (log.isDebugEnabled())
@@ -84,7 +95,7 @@ public class ToolHelperImpl {
 						+ Arrays.asList(requiredPermissions));
 			boolean gotAllInList = true;
 			for (int j = 0; j < requiredPermissions.length; j++) {
-				if (!ss.unlock(requiredPermissions[j].trim(),
+				if (!securityService.unlock(requiredPermissions[j].trim(),
 						site.getReference())) {
 					gotAllInList = false;
 					break;
