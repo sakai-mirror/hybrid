@@ -26,14 +26,11 @@ public class ToolRequestWrapper extends HttpServletRequestWrapper {
 
 	public ToolRequestWrapper(HttpServletRequest request) {
 		super(request);
+		remoteUser = request.getRemoteUser();
 	}
 
 	public ToolRequestWrapper(HttpServletRequest request, String user) {
 		super(request);
-		setRemoteUser(user);
-	}
-
-	public void setRemoteUser(String user) {
 		remoteUser = user;
 	}
 
