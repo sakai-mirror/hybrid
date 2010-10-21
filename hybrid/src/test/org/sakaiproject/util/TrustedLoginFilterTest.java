@@ -19,8 +19,6 @@ package org.sakaiproject.util;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -32,47 +30,54 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
 
-import org.mockito.InOrder;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TrustedLoginFilterTest extends TestCase {
 	TrustedLoginFilter trustedLoginFilter;
+	@Mock
 	HttpServletRequest request;
+	@Mock
 	HttpServletResponse response;
+	@Mock
 	FilterChain chain;
+	@Mock
 	SessionManager sessionManager;
+	@Mock
 	UserDirectoryService userDirectoryService;
+	@Mock
 	Session existingSession;
+	@Mock
 	Session newSession;
+	@Mock
+	User user;
 
 	/**
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		super.setUp();
 		trustedLoginFilter = new TrustedLoginFilter();
-		request = mock(HttpServletRequest.class);
-		response = mock(HttpServletResponse.class);
 		when(request.getRemoteHost()).thenReturn("localhost");
-		chain = mock(FilterChain.class);
 		when(request.getHeader("x-sakai-token")).thenReturn(
 				"sw9TTTqlEbGQkELqQuQPq92ydr4=;username;nonce");
 		trustedLoginFilter.sharedSecret = "e2KS54H35j6vS5Z38nK40";
-		sessionManager = mock(SessionManager.class);
 		trustedLoginFilter.sessionManager = sessionManager;
-		existingSession = mock(Session.class, "existing Session");
 		// default to non-existing session to exercise more code
 		when(existingSession.getUserEid()).thenReturn(null);
 		when(sessionManager.getCurrentSession()).thenReturn(existingSession);
-		userDirectoryService = mock(UserDirectoryService.class);
 		trustedLoginFilter.userDirectoryService = userDirectoryService;
-		newSession = mock(Session.class, "new Session");
 		when(sessionManager.startSession()).thenReturn(newSession);
-		User user = mock(User.class);
 		when(user.getEid()).thenReturn("username");
 		when(user.getId()).thenReturn("uuid1234567890");
 		when(userDirectoryService.getUserByEid("username")).thenReturn(user);
@@ -83,13 +88,13 @@ public class TrustedLoginFilterTest extends TestCase {
 	 * {@link org.sakaiproject.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
 	 * .
 	 */
+	@Test
 	public void testDoFilterDefaultBehaviorNewSession() {
 		try {
-			InOrder inOrder = inOrder(sessionManager);
 			trustedLoginFilter.doFilter(request, response, chain);
 			verify(sessionManager).startSession();
-			inOrder.verify(sessionManager).setCurrentSession(newSession);
-			inOrder.verify(sessionManager).setCurrentSession(existingSession);
+			verify(sessionManager).setCurrentSession(newSession);
+			verify(sessionManager).setCurrentSession(existingSession);
 			verify(sessionManager, times(2)).setCurrentSession(
 					any(Session.class));
 			verify(newSession).setActive();
@@ -107,6 +112,7 @@ public class TrustedLoginFilterTest extends TestCase {
 	 * {@link org.sakaiproject.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
 	 * .
 	 */
+	@Test
 	public void testDoFilterDefaultBehaviorExistingSession() {
 		// eid of existing session should match; i.e. reuse existing session.
 		when(existingSession.getUserEid()).thenReturn("username");
@@ -127,6 +133,7 @@ public class TrustedLoginFilterTest extends TestCase {
 	 * {@link org.sakaiproject.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
 	 * .
 	 */
+	@Test
 	public void testDoFilterUnsafeHost() {
 		when(request.getRemoteHost()).thenReturn("big.bad.hacker.com");
 		try {
@@ -143,6 +150,7 @@ public class TrustedLoginFilterTest extends TestCase {
 	 * {@link org.sakaiproject.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
 	 * .
 	 */
+	@Test
 	public void testDoFilterNullToken() {
 		when(request.getHeader("x-sakai-token")).thenReturn(null);
 		try {
@@ -159,6 +167,7 @@ public class TrustedLoginFilterTest extends TestCase {
 	 * {@link org.sakaiproject.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
 	 * .
 	 */
+	@Test
 	public void testDoFilterBadHmac() {
 		when(request.getHeader("x-sakai-token")).thenReturn(
 				"badhash;username;nonce");
@@ -176,6 +185,7 @@ public class TrustedLoginFilterTest extends TestCase {
 	 * {@link org.sakaiproject.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
 	 * .
 	 */
+	@Test
 	public void testDoFilterUserNotDefinedException() {
 		try {
 			when(userDirectoryService.getUserByEid("username")).thenThrow(
@@ -193,6 +203,7 @@ public class TrustedLoginFilterTest extends TestCase {
 	 * {@link org.sakaiproject.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
 	 * .
 	 */
+	@Test
 	public void testDoFilterDisabled() {
 		trustedLoginFilter.enabled = false;
 		try {
