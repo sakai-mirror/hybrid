@@ -80,8 +80,8 @@ public class SitesServlet extends HttpServlet {
 				siteJson.element("description", site.getDescription());
 				siteJson.element("siteType", site.getType());
 				// TODO ISO8601 date format or other?
-				siteJson.element("creationDate", new SimpleDateFormat(
-						"yyyy-MM-dd").format(site.getCreatedDate()));
+				// siteJson.element("creationDate", new SimpleDateFormat(
+				// "yyyy-MM-dd").format(site.getCreatedDate()));
 				sites.add(siteJson);
 			}
 			json.element("sites", sites);

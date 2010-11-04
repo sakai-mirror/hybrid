@@ -79,7 +79,7 @@ public class SitesServletTest extends TestCase {
 		when(site.getMembers()).thenReturn(members);
 		when(site.getDescription()).thenReturn("Administration Workspace");
 		when(site.getType()).thenReturn(null);
-		when(site.getCreatedDate()).thenReturn(new Date());
+		// when(site.getCreatedDate()).thenReturn(new Date());
 		List<Site> siteList = new ArrayList<Site>();
 		siteList.add(site);
 		when(
