@@ -4,11 +4,7 @@
 	<parent>
 		<artifactId>sakai-standard-tool</artifactId>
 		<groupId>org.sakaiproject.purepoms</groupId>
-		<version>2.8.0-a01</version>
-		<relativePath>../pom.xml</relativePath>
-		<!--
-			<version>M2</version> <relativePath>../master/pom.xml</relativePath>
-		-->
+		<version>2.7.9</version>
 	</parent>
 	<name>Sakai Nakamura :: Sakai 2/3 Hybrid Base</name>
 	<groupId>org.sakaiproject.hybrid</groupId>
@@ -156,5 +152,20 @@
 			</roles>
 			<timezone>-4</timezone>
 		</developer>
+        <developer>
+            <id>arwhyte</id>
+            <name>Anthony Whyte</name>
+            <email>arwhyte@umich.edu</email>
+            <organization>
+                Sakai Foundation/University of Michigan
+            </organization>
+            <organizationUrl>
+                http://sakaiproject.org
+            </organizationUrl>
+            <roles>
+                <role>pom plumber</role>
+            </roles>
+            <timezone>-5</timezone>
+        </developer>
 	</developers>
 </project>
