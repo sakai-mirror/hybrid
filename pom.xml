@@ -13,11 +13,11 @@
 	<name>Sakai Nakamura :: Sakai 2/3 Hybrid Base</name>
 	<groupId>org.sakaiproject.hybrid</groupId>
 	<artifactId>hybrid</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.1-SNAPSHOT</version>
 	<scm>
-		<connection>scm:svn:https://source.sakaiproject.org/svn/hybrid/branches/hybrid-1.0.x</connection>
-		<developerConnection>scm:svn:https://source.sakaiproject.org/svn/hybrid/branches/hybrid-1.0.x</developerConnection>
-		<url>https://source.sakaiproject.org/svn/hybrid/branches/hybrid-1.0.x</url>
+		<connection>scm:svn:https://source.sakaiproject.org/svn/hybrid/trunk</connection>
+		<developerConnection>scm:svn:https://source.sakaiproject.org/svn/hybrid/trunk</developerConnection>
+		<url>https://source.sakaiproject.org/svn/hybrid/trunk</url>
 	</scm>
 	<organization>
 		<name>Sakai Project</name>
