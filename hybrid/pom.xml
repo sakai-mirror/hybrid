@@ -33,9 +33,9 @@
           <artifactId>sakai-component-manager</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.sakaiproject.hybrid</groupId>
+          <groupId>${project.groupId}</groupId>
           <artifactId>sakai-hybrid-util</artifactId>
-          <version>1.0-SNAPSHOT</version>
+          <version>${project.version}</version>
         </dependency>
       </dependencies>
     </profile>

@@ -21,7 +21,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.sakaiproject.hybrid</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>sakai-hybrid</artifactId>
             <version>${project.version}</version>
             <type>war</type>
