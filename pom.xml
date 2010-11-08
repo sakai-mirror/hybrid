@@ -51,7 +51,27 @@
 	<properties>
 		<url.localsite>scp://source.sakaiproject.org/var/www/html/release/hybrid/${project.version}</url.localsite>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
 	</properties>
+  <build>
+    <defaultGoal>install</defaultGoal>
+    <plugins>
+       <plugin>
+         <groupId>org.codehaus.mojo</groupId>
+         <artifactId>ianal-maven-plugin</artifactId>
+         <executions>
+            <execution>
+               <goals>
+                  <goal>verify-legal-files</goal>
+               </goals>
+               <configuration>
+                  <strict>true</strict>
+               </configuration>
+            </execution>
+         </executions>
+      </plugin>
+    </plugins>
+  </build>
   <repositories>
     <repository>
       <id>sakai-releases</id>

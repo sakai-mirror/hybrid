@@ -7,7 +7,7 @@
     <version>1.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <name>Sakai Nakamura :: Sakai 2/3 Hybrid Project</name>
+  <name>Sakai Nakamura :: Sakai 2/3 Hybrid Web App</name>
   <groupId>org.sakaiproject.hybrid</groupId>
   <artifactId>sakai-hybrid</artifactId>
   <organization>
@@ -17,30 +17,20 @@
   <inceptionYear>2009</inceptionYear>
   <packaging>war</packaging>
 
-  <profiles>
-    <profile>
-      <id>hybrid</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.sakaiproject.kernel</groupId>
-          <artifactId>sakai-kernel-api</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.sakaiproject.kernel</groupId>
-          <artifactId>sakai-component-manager</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>sakai-hybrid-util</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
   <dependencies>
+    <dependency>
+      <groupId>org.sakaiproject.kernel</groupId>
+      <artifactId>sakai-kernel-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sakaiproject.kernel</groupId>
+      <artifactId>sakai-component-manager</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>sakai-hybrid-util</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   	<dependency>
   		<groupId>org.mockito</groupId>
   		<artifactId>mockito-all</artifactId>
@@ -56,4 +46,21 @@
   		<scope>test</scope>
   	</dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.1.1</version>
+        <configuration>
+          <webResources>
+            <resource>
+              <!-- this is relative to the pom.xml directory -->
+              <directory>src/main/resources</directory>
+            </resource>
+          </webResources>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
