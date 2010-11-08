@@ -18,8 +18,9 @@
 package org.sakaiproject.hybrid.tool;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -32,6 +33,7 @@ import net.sf.json.JSONObject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
@@ -49,8 +51,11 @@ import org.sakaiproject.tool.api.SessionManager;
 public class SitesServlet extends HttpServlet {
 	private static final long serialVersionUID = 7907409301065984518L;
 	private static final Log LOG = LogFactory.getLog(SitesServlet.class);
+	private static final String CATEGORIZED = "categorized";
 	protected transient SessionManager sessionManager;
 	protected transient SiteService siteService;
+	protected transient ServerConfigurationService serverConfigurationService;
+	protected transient MoreSiteViewImpl moreSiteViewImpl;
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -59,37 +64,80 @@ public class SitesServlet extends HttpServlet {
 			LOG.debug("doGet(HttpServletRequest " + req
 					+ ", HttpServletResponse " + resp + ")");
 		}
+		// TODO remove categorizedParam once debugged
+		final String categorizedParam = req.getParameter(CATEGORIZED);
+		boolean categorized = false;
+		if (categorizedParam != null) {
+			categorized = Boolean.parseBoolean(req.getParameter(CATEGORIZED));
+		}
 		// sites for current user
 		final JSONObject json = new JSONObject();
-		json.element("principal", sessionManager.getCurrentSession()
-				.getUserEid());
+		final String principal = sessionManager.getCurrentSession()
+				.getUserEid();
+		if (principal == null || "".equals(principal)) {
+			json.element("principal", "anonymous");
+		} else {
+			json.element("principal", principal);
+		}
 		final List<Site> siteList = siteService.getSites(
 				org.sakaiproject.site.api.SiteService.SelectionType.ACCESS,
 				null, null, null,
 				org.sakaiproject.site.api.SiteService.SortType.TITLE_ASC, null);
 		if (siteList != null) {
-			final JSONArray sites = new JSONArray();
-			for (Site site : siteList) {
-				final JSONObject siteJson = new JSONObject();
-				siteJson.element("title", site.getTitle());
-				siteJson.element("id", site.getId());
-				siteJson.element("url", site.getUrl());
-				siteJson.element("iconUrl", site.getIconUrl());
-				siteJson.element("owner", site.getCreatedBy().getDisplayName());
-				siteJson.element("members", site.getMembers().size());
-				siteJson.element("description", site.getDescription());
-				siteJson.element("siteType", site.getType());
-				// TODO ISO8601 date format or other?
-				siteJson.element("creationDate", new SimpleDateFormat(
-						"yyyy-MM-dd").format(site.getCreatedDate()));
-				sites.add(siteJson);
+			if (categorized) {
+				List<Map<String, List<Site>>> categorizedSitesList = moreSiteViewImpl
+						.processMySites(siteList);
+				final JSONArray categoriesArrayJson = new JSONArray();
+				for (final Map<String, List<Site>> map : categorizedSitesList) {
+					if (map.size() != 1) {
+						throw new IllegalStateException(
+								"The categorized maps must contain only one key per map!");
+					}
+					for (final Entry<String, List<Site>> entry : map.entrySet()) {
+						final String category = entry.getKey();
+						final List<Site> sortedSites = entry.getValue();
+						final JSONObject categoryJson = new JSONObject();
+						categoryJson.element("category", category);
+						categoryJson.element("size", sortedSites.size());
+						final JSONArray sitesArrayJson = new JSONArray();
+						for (final Site site : sortedSites) {
+							sitesArrayJson.add(renderSiteJson(site));
+						}
+						categoryJson.element("sites", sitesArrayJson);
+						categoriesArrayJson.add(categoryJson);
+					}
+					json.element("categories", categoriesArrayJson);
+				}
+			} else { // not categorized
+				final JSONArray sitesArrayJson = new JSONArray();
+				for (Site site : siteList) {
+					sitesArrayJson.add(renderSiteJson(site));
+				}
+				json.element("sites", sitesArrayJson);
 			}
-			json.element("sites", sites);
 		}
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
 		resp.setStatus(HttpServletResponse.SC_OK);
 		json.write(resp.getWriter());
+	}
+
+	private JSONObject renderSiteJson(Site site) {
+		final JSONObject siteJson = new JSONObject();
+		siteJson.element("title", site.getTitle());
+		siteJson.element("id", site.getId());
+		siteJson.element("url", site.getUrl());
+		siteJson.element("description", site.getDescription());
+		// siteJson.element("iconUrl", site.getIconUrl());
+		// siteJson.element("owner",
+		// site.getCreatedBy().getDisplayName());
+		// siteJson.element("members", site.getMembers().size());
+		// siteJson.element("siteType", site.getType());
+		// TODO ISO8601 date format or other?
+		// siteJson.element("creationDate", new
+		// SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz")
+		// .format(site.getCreatedDate()));
+		return siteJson;
 	}
 
 	@Override
@@ -105,5 +153,12 @@ public class SitesServlet extends HttpServlet {
 		if (siteService == null) {
 			throw new IllegalStateException("SiteService == null");
 		}
+		serverConfigurationService = (ServerConfigurationService) ComponentManager
+				.get(org.sakaiproject.component.api.ServerConfigurationService.class);
+		if (serverConfigurationService == null) {
+			throw new IllegalStateException(
+					"ServerConfigurationService == null");
+		}
+		moreSiteViewImpl = new MoreSiteViewImpl(serverConfigurationService);
 	}
 }
