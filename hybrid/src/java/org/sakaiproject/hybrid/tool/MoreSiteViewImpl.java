@@ -17,12 +17,11 @@
  */
 package org.sakaiproject.hybrid.tool;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
@@ -41,14 +40,48 @@ import org.sakaiproject.site.api.Site;
  * <p>
  * Object is thread safe.
  */
-public class MoreSiteViewImpl {
+class MoreSiteViewImpl {
 	private static final Log LOG = LogFactory.getLog(MoreSiteViewImpl.class);
 
 	/**
 	 * How much additional capacity will the Map&lt String, List&lt Site&gt&gt
-	 * terms require? For example: All, Portfolio Project, Other.
+	 * terms require? For example: All sites, Portfolio, Project, Other.
 	 */
-	protected static int ADDITIONAL_TERMS_CAPACITY = 5;
+	protected static int ADDITIONAL_TERMS_CAPACITY = 6;
+
+	// key naming scheme allows for natural sort order if no
+	// sakai.properties->portal.term.order is supplied.
+	/**
+	 * i18n key for "All sites"
+	 */
+	public static final String I18N_ALL_SITES = "i18n_moresite_01_all_sites";
+	/**
+	 * i18n key for "(unknown academic term)"
+	 */
+	public static final String I18N_UNKNOWN_COURSE_TERM_SITES = "i18n_moresite_02_unknown_term";
+	/**
+	 * i18n key for "Portfolios"
+	 */
+	public static final String I18N_PORTFOLIO_SITES = "i18n_moresite_03_portfolios";
+	/**
+	 * i18n key for "Other"
+	 */
+	public static final String I18N_OTHER_SITES = "i18n_moresite_04_other";
+	/**
+	 * i18n key for "Projects"
+	 */
+	public static final String I18N_PROJECT_SITES = "i18n_moresite_05_projects";
+	/**
+	 * i18n key for "Administration"
+	 */
+	public static final String I18N_ADMIN_SITES = "i18n_moresite_06_administration";
+
+	/**
+	 * Helper for proper sorting.
+	 */
+	private static final String[] DEFAULT_SORT_ORDER = {
+			I18N_UNKNOWN_COURSE_TERM_SITES, I18N_PORTFOLIO_SITES,
+			I18N_PROJECT_SITES, I18N_OTHER_SITES, I18N_ADMIN_SITES };
 
 	/**
 	 * Injected via constructor
@@ -78,20 +111,21 @@ public class MoreSiteViewImpl {
 	 * Process a site list into categories based on term and sorted by title.
 	 * 
 	 * @param siteList
-	 *            Note: the List will be mutated by sorting.
+	 *            Note: it is assumed that the passed siteList will already be
+	 *            sorted by title ascending.
 	 * @return
 	 */
-	public List<Map<String, List<Site>>> processMySites(
+	public List<Map<String, List<Site>>> categorizeSites(
 			final List<Site> siteList) {
 		if (LOG.isDebugEnabled()) {
-			LOG.debug("processMySites(final List<Site> siteList)");
+			LOG.debug("categorizeSites(final List<Site> siteList)");
 		}
 		if (siteList == null) {
 			throw new IllegalArgumentException("Illegal siteList parameter!");
 		}
 		// first sort by site titles (should only have to sort once)
-		// FIXME sites may be coming back sorted already - may not be necessary.
-		// Collections.sort(siteList, new TitleSorter());
+		// FYI sites ARE being sorted by title ascending in the SQL query.
+		// Collections.sort(siteList, new TitleSorter()); // not needed
 
 		// Order term column headers according to order specified in
 		// portal.term.order
@@ -123,16 +157,17 @@ public class MoreSiteViewImpl {
 			if ("course".equals(type)) {
 				term = site.getProperties().getProperty("term");
 				if (term == null) {
-					term = "i18n.moresite_unknown_term";
+					term = I18N_UNKNOWN_COURSE_TERM_SITES;
 				}
 			} else if ("project".equals(type)) {
-				term = "i18n.moresite_projects";
+				term = I18N_PROJECT_SITES;
 			} else if ("portfolio".equals(type)) {
-				term = "i18n.moresite_portfolios";
-			} else if ("admin".equals(type)) {
-				term = "i18n.moresite_administration";
+				term = I18N_PORTFOLIO_SITES;
+			} else if ("admin".equals(type) || "portfolioAdmin".equals(type)
+					|| "citationsAdmin".equals(site.getId())) {
+				term = I18N_ADMIN_SITES;
 			} else {
-				term = "i18n.moresite_other";
+				term = I18N_OTHER_SITES;
 			}
 			// get list of sites for term
 			List<Site> termSites = terms.get(term);
@@ -149,17 +184,35 @@ public class MoreSiteViewImpl {
 		// first add all available sites to sortedTerms
 		final Map<String, List<Site>> allSites = new HashMap<String, List<Site>>(
 				1);
-		allSites.put("i18n.moresite_all_sites", siteList);
+		allSites.put(I18N_ALL_SITES, siteList);
 		sortedTerms.add(allSites);
-		if (termOrder != null && termOrder.length > 0) {
+		if (termOrder != null) {
 			// admin specified policy applies.
-			// only specified terms and in specified order
+			// only add specified terms and in specified order
+			/*
+			 * Note: if the system administrator defines an empty
+			 * sakai.properties->portal.term.order, then all course sites will
+			 * be effectively hidden from the caller (with the exception of
+			 * unknown academic terms).
+			 */
 			for (final String term : termOrder) {
 				addSitesToTerm(term, terms, sortedTerms);
 			}
+			// now add all remaining categories
+			for (final String category : DEFAULT_SORT_ORDER) {
+				addSitesToTerm(category, terms, sortedTerms);
+			}
 		} else { // default sort ordering
 			// display all found terms
-			for (final String term : new TreeSet<String>(terms.keySet())) {
+			/*
+			 * Since terms tend to begin with upper-case characters, the natural
+			 * sort order actually meets the specification. If terms begin with
+			 * lower-case characters, this logic needs to be revisited. Sort
+			 * order should be: 0) All sites, 1) course sites, 2) unknown
+			 * academic term, 3) portfolios, 4) other, 5) projects, 6) admin.
+			 */
+			final SortedSet<String> source = new TreeSet<String>(terms.keySet());
+			for (final String term : source) {
 				addSitesToTerm(term, terms, sortedTerms);
 			}
 		}
@@ -171,37 +224,45 @@ public class MoreSiteViewImpl {
 	 * 
 	 * @param term
 	 * @param terms
+	 *            Source
 	 * @param sortedTerms
+	 *            Will be mutated by method.
 	 */
-	void addSitesToTerm(final String term, final Map<String, List<Site>> terms,
+	private void addSitesToTerm(final String term,
+			final Map<String, List<Site>> terms,
 			final List<Map<String, List<Site>>> sortedTerms) {
-		final List<Site> sortedSites = terms.get(term);
-		if (sortedSites == null || sortedSites.isEmpty()) {
+		final List<Site> sites = terms.get(term);
+		if (sites == null || sites.isEmpty()) {
 			; // do nothing
 		} else {
 			final Map<String, List<Site>> matches = new HashMap<String, List<Site>>(
 					1);
-			matches.put(term, sortedSites);
+			matches.put(term, sites);
 			sortedTerms.add(matches);
 		}
 	}
 
-	/**
-	 * Simple comparator for sorting sites based on site title.
-	 */
-	static class TitleSorter implements Comparator<Site>, Serializable {
-		private static final long serialVersionUID = -3933901080921177017L;
-
-		public int compare(Site first, Site second) {
-			if (first == null || second == null) {
-				return 0;
-			}
-			final String firstTitle = first.getTitle();
-			final String secondTitle = second.getTitle();
-			if (firstTitle != null) {
-				return firstTitle.compareToIgnoreCase(secondTitle);
-			}
-			return 0;
-		}
-	}
+	// /**
+	// * Simple comparator for sorting sites based on site title.
+	// *
+	// * @see Comparator
+	// */
+	// static class TitleSorter implements Comparator<Site>, Serializable {
+	// private static final long serialVersionUID = -3933901080921177017L;
+	//
+	// /**
+	// * @see Comparator#compare(Object, Object)
+	// */
+	// public int compare(Site first, Site second) {
+	// if (first == null || second == null) {
+	// return 0;
+	// }
+	// final String firstTitle = first.getTitle();
+	// final String secondTitle = second.getTitle();
+	// if (firstTitle != null) {
+	// return firstTitle.compareToIgnoreCase(secondTitle);
+	// }
+	// return 0;
+	// }
+	// }
 }

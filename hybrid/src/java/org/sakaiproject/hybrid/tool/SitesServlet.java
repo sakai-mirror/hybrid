@@ -68,7 +68,7 @@ public class SitesServlet extends HttpServlet {
 		final String categorizedParam = req.getParameter(CATEGORIZED);
 		boolean categorized = false;
 		if (categorizedParam != null) {
-			categorized = Boolean.parseBoolean(req.getParameter(CATEGORIZED));
+			categorized = Boolean.parseBoolean(categorizedParam);
 		}
 		// sites for current user
 		final JSONObject json = new JSONObject();
@@ -86,7 +86,7 @@ public class SitesServlet extends HttpServlet {
 		if (siteList != null) {
 			if (categorized) {
 				List<Map<String, List<Site>>> categorizedSitesList = moreSiteViewImpl
-						.processMySites(siteList);
+						.categorizeSites(siteList);
 				final JSONArray categoriesArrayJson = new JSONArray();
 				for (final Map<String, List<Site>> map : categorizedSitesList) {
 					if (map.size() != 1) {
@@ -106,13 +106,15 @@ public class SitesServlet extends HttpServlet {
 						categoryJson.element("sites", sitesArrayJson);
 						categoriesArrayJson.add(categoryJson);
 					}
-					json.element("categories", categoriesArrayJson);
 				}
+				json.element("size", siteList.size());
+				json.element("categories", categoriesArrayJson);
 			} else { // not categorized
 				final JSONArray sitesArrayJson = new JSONArray();
 				for (Site site : siteList) {
 					sitesArrayJson.add(renderSiteJson(site));
 				}
+				json.element("size", siteList.size());
 				json.element("sites", sitesArrayJson);
 			}
 		}
@@ -133,7 +135,7 @@ public class SitesServlet extends HttpServlet {
 		// site.getCreatedBy().getDisplayName());
 		// siteJson.element("members", site.getMembers().size());
 		// siteJson.element("siteType", site.getType());
-		// TODO ISO8601 date format or other?
+		// TO DO ISO8601 date format or other?
 		// siteJson.element("creationDate", new
 		// SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz")
 		// .format(site.getCreatedDate()));
