@@ -27,10 +27,12 @@
         <dependency>
           <groupId>org.sakaiproject.kernel</groupId>
           <artifactId>sakai-kernel-api</artifactId>
+          <scope>provided</scope>
         </dependency>
         <dependency>
           <groupId>org.sakaiproject.kernel</groupId>
           <artifactId>sakai-component-manager</artifactId>
+          <scope>provided</scope>
         </dependency>
         <dependency>
           <groupId>commons-codec</groupId>

@@ -31,6 +31,7 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.thread_local.api.ThreadLocalManager;
 
 /**
@@ -38,17 +39,23 @@ import org.sakaiproject.thread_local.api.ThreadLocalManager;
  * Note: thread safe.
  */
 public class NakamuraAuthenticationHelper {
-	private static final Log LOG = LogFactory
-			.getLog(NakamuraAuthenticationHelper.class);
-
+	/**
+	 * All sakai.properties settings will be prefixed with this string.
+	 */
+	public static final String CONFIG_PREFIX = "org.sakaiproject.util.NakamuraAuthenticationHelper";
+	/**
+	 * The name of the nakamura anonymous principal.
+	 */
+	public static final String CONFIG_ANONYMOUS = CONFIG_PREFIX + ".anonymous";
 	/**
 	 * The name of the cookie that is set by nakamura.
 	 */
-	private static final String COOKIE_NAME = "SAKAI-TRACKING";
-	/**
-	 * The anonymous nakamura principal name.
-	 */
-	private static final String ANONYMOUS = "anonymous";
+	public static final String CONFIG_COOKIE_NAME = CONFIG_PREFIX
+			+ ".cookieName";
+
+	private static final Log LOG = LogFactory
+			.getLog(NakamuraAuthenticationHelper.class);
+
 	/**
 	 * The key that will be used to cache AuthInfo hits in ThreadLocal. This
 	 * will handle cases where AuthInfo is requested more than once per request.
@@ -56,6 +63,14 @@ public class NakamuraAuthenticationHelper {
 	private static final String THREAD_LOCAL_CACHE_KEY = NakamuraAuthenticationHelper.class
 			.getName() + ".AuthInfo.cache";
 
+	/**
+	 * The anonymous nakamura principal name.
+	 */
+	protected static String ANONYMOUS = "anonymous";
+	/**
+	 * The name of the cookie that is set by nakamura.
+	 */
+	protected String cookieName = "SAKAI-TRACKING";
 	/**
 	 * The Nakamura RESTful service to validate authenticated users
 	 */
@@ -112,6 +127,10 @@ public class NakamuraAuthenticationHelper {
 		this.validateUrl = validateUrl;
 		this.principal = principal;
 		this.hostname = hostname;
+		ANONYMOUS = ServerConfigurationService.getString(CONFIG_ANONYMOUS,
+				ANONYMOUS);
+		cookieName = ServerConfigurationService.getString(CONFIG_COOKIE_NAME,
+				cookieName);
 	}
 
 	/**
@@ -182,7 +201,7 @@ public class NakamuraAuthenticationHelper {
 		final Cookie[] cookies = req.getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
-				if (COOKIE_NAME.equals(cookie.getName())) {
+				if (cookieName.equals(cookie.getName())) {
 					secret = cookie.getValue();
 				}
 			}
