@@ -44,11 +44,11 @@ public class NakamuraAuthenticationHelper {
 	 */
 	public static final String CONFIG_PREFIX = "org.sakaiproject.util.NakamuraAuthenticationHelper";
 	/**
-	 * The name of the nakamura anonymous principal.
+	 * sakai.properties The name of the nakamura anonymous principal.
 	 */
 	public static final String CONFIG_ANONYMOUS = CONFIG_PREFIX + ".anonymous";
 	/**
-	 * The name of the cookie that is set by nakamura.
+	 * sakai.properties The name of the cookie that is set by nakamura.
 	 */
 	public static final String CONFIG_COOKIE_NAME = CONFIG_PREFIX
 			+ ".cookieName";
@@ -64,27 +64,33 @@ public class NakamuraAuthenticationHelper {
 			.getName() + ".AuthInfo.cache";
 
 	/**
-	 * The anonymous nakamura principal name.
+	 * The anonymous nakamura principal name. A good default is provided.
+	 * 
+	 * @see #CONFIG_ANONYMOUS
 	 */
 	private static String ANONYMOUS = "anonymous";
 	/**
-	 * The name of the cookie that is set by nakamura.
+	 * The name of the cookie that is set by nakamura. A good default is
+	 * provided.
+	 * 
+	 * @see #CONFIG_COOKIE_NAME
 	 */
 	protected String cookieName = "SAKAI-TRACKING";
 	/**
-	 * The Nakamura RESTful service to validate authenticated users
+	 * The Nakamura RESTful service to validate authenticated users. A good
+	 * default is provided.
 	 */
 	protected String validateUrl;
 
 	/**
 	 * The nakamura user that has permissions to GET
-	 * /var/cluster/user.cookie.json.
+	 * /var/cluster/user.cookie.json. A good default is provided.
 	 */
 	protected String principal;
 
 	/**
 	 * The hostname we will use to lookup the sharedSecret for access to
-	 * validateUrl.
+	 * validateUrl. A good default is provided.
 	 */
 	protected String hostname;
 
