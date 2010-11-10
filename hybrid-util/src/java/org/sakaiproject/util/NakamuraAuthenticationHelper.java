@@ -66,7 +66,7 @@ public class NakamuraAuthenticationHelper {
 	/**
 	 * The anonymous nakamura principal name.
 	 */
-	protected static String ANONYMOUS = "anonymous";
+	private static String ANONYMOUS = "anonymous";
 	/**
 	 * The name of the cookie that is set by nakamura.
 	 */
