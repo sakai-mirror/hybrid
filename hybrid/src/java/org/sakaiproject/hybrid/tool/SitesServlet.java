@@ -64,7 +64,6 @@ public class SitesServlet extends HttpServlet {
 			LOG.debug("doGet(HttpServletRequest " + req
 					+ ", HttpServletResponse " + resp + ")");
 		}
-		// TODO remove categorizedParam once debugged
 		final String categorizedParam = req.getParameter(CATEGORIZED);
 		boolean categorized = false;
 		if (categorizedParam != null) {

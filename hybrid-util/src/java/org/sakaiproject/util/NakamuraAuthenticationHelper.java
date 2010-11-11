@@ -31,7 +31,8 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.sakaiproject.component.cover.ServerConfigurationService;
+import org.sakaiproject.component.api.ComponentManager;
+import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.thread_local.api.ThreadLocalManager;
 
 /**
@@ -95,7 +96,9 @@ public class NakamuraAuthenticationHelper {
 	protected String hostname;
 
 	// dependencies
-	private ThreadLocalManager threadLocalManager;
+	ThreadLocalManager threadLocalManager;
+	ServerConfigurationService serverConfigurationService;
+	XSakaiToken xSakaiToken;
 
 	/**
 	 * Class is immutable and thread safe.
@@ -103,6 +106,7 @@ public class NakamuraAuthenticationHelper {
 	 * @param threadLocalManager
 	 *            Required. Used to get a reference to
 	 *            {@link HttpServletRequest} from {@link ThreadLocalManager}
+	 * @param serverConfigurationService
 	 * @param validateUrl
 	 *            The Nakamura REST end-point we will use to validate the
 	 *            cookie.
@@ -114,11 +118,23 @@ public class NakamuraAuthenticationHelper {
 	 *            The hostname we will use to lookup the sharedSecret for access
 	 *            to validateUrl
 	 * @throws IllegalArgumentException
+	 * @throws IllegalStateException
 	 */
-	public NakamuraAuthenticationHelper(ThreadLocalManager threadLocalManager,
+	public NakamuraAuthenticationHelper(ComponentManager componentManager,
 			String validateUrl, String principal, String hostname) {
+		if (componentManager == null) {
+			throw new IllegalArgumentException("componentManager == null;");
+		}
+		threadLocalManager = (ThreadLocalManager) componentManager
+				.get(ThreadLocalManager.class);
 		if (threadLocalManager == null) {
-			throw new IllegalArgumentException("threadLocalManager == null");
+			throw new IllegalStateException("threadLocalManager == null");
+		}
+		serverConfigurationService = (ServerConfigurationService) componentManager
+				.get(ServerConfigurationService.class);
+		if (serverConfigurationService == null) {
+			throw new IllegalStateException(
+					"serverConfigurationService == null");
 		}
 		if (validateUrl == null || "".equals(validateUrl)) {
 			throw new IllegalArgumentException("validateUrl == null OR empty");
@@ -129,14 +145,15 @@ public class NakamuraAuthenticationHelper {
 		if (hostname == null || "".equals(hostname)) {
 			throw new IllegalArgumentException("hostname == null OR empty");
 		}
-		this.threadLocalManager = threadLocalManager;
 		this.validateUrl = validateUrl;
 		this.principal = principal;
 		this.hostname = hostname;
-		ANONYMOUS = ServerConfigurationService.getString(CONFIG_ANONYMOUS,
+		ANONYMOUS = serverConfigurationService.getString(CONFIG_ANONYMOUS,
 				ANONYMOUS);
-		cookieName = ServerConfigurationService.getString(CONFIG_COOKIE_NAME,
+		cookieName = serverConfigurationService.getString(CONFIG_COOKIE_NAME,
 				cookieName);
+
+		xSakaiToken = new XSakaiToken(componentManager);
 	}
 
 	/**
@@ -164,7 +181,7 @@ public class NakamuraAuthenticationHelper {
 				final URI uri = new URI(validateUrl + secret);
 				final HttpGet httpget = new HttpGet(uri);
 				// authenticate to Nakamura using x-sakai-token mechanism
-				final String token = XSakaiToken.createToken(hostname,
+				final String token = xSakaiToken.createToken(hostname,
 						principal);
 				httpget.addHeader(XSakaiToken.X_SAKAI_TOKEN_HEADER, token);
 				//
@@ -195,16 +212,16 @@ public class NakamuraAuthenticationHelper {
 	/**
 	 * Gets the authentication key from SAKAI-TRACKING cookie.
 	 * 
-	 * @param req
+	 * @param request
 	 * @return null if no secret can be found.
 	 */
-	private String getSecret(HttpServletRequest req) {
-		LOG.debug("getSecret(HttpServletRequest req)");
-		if (req == null) {
+	private String getSecret(HttpServletRequest request) {
+		LOG.debug("getSecret(HttpServletRequest request)");
+		if (request == null) {
 			throw new IllegalArgumentException("HttpServletRequest == null");
 		}
 		String secret = null;
-		final Cookie[] cookies = req.getCookies();
+		final Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
 				if (cookieName.equals(cookie.getName())) {
