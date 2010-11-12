@@ -26,6 +26,7 @@ import net.sf.json.JSONObject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
@@ -94,6 +95,11 @@ public class NakamuraAuthenticationHelper {
 	 * validateUrl. A good default is provided.
 	 */
 	protected String hostname;
+
+	/**
+	 * A simple abstraction to allow for proper unit testing
+	 */
+	protected HttpClientProvider httpClientProvider = new DefaultHttpClientProvider();
 
 	// dependencies
 	ThreadLocalManager threadLocalManager;
@@ -176,7 +182,7 @@ public class NakamuraAuthenticationHelper {
 		AuthInfo authInfo = null;
 		final String secret = getSecret(request);
 		if (secret != null) {
-			final DefaultHttpClient http = new DefaultHttpClient();
+			final HttpClient httpClient = httpClientProvider.getHttpClient();
 			try {
 				final URI uri = new URI(validateUrl + secret);
 				final HttpGet httpget = new HttpGet(uri);
@@ -186,7 +192,7 @@ public class NakamuraAuthenticationHelper {
 				httpget.addHeader(XSakaiToken.X_SAKAI_TOKEN_HEADER, token);
 				//
 				final ResponseHandler<String> responseHandler = new BasicResponseHandler();
-				final String responseBody = http.execute(httpget,
+				final String responseBody = httpClient.execute(httpget,
 						responseHandler);
 				authInfo = new AuthInfo(responseBody);
 			} catch (HttpResponseException e) {
@@ -199,7 +205,7 @@ public class NakamuraAuthenticationHelper {
 				LOG.error(e.getMessage(), e);
 				throw new Error(e);
 			} finally {
-				http.getConnectionManager().shutdown();
+				httpClient.getConnectionManager().shutdown();
 			}
 		}
 
@@ -296,4 +302,36 @@ public class NakamuraAuthenticationHelper {
 		}
 	}
 
+	/**
+	 * A simple abstraction to allow for unit testing of
+	 * {@link NakamuraAuthenticationHelper}.
+	 * 
+	 */
+	public interface HttpClientProvider {
+		public HttpClient getHttpClient();
+	}
+
+	/**
+	 * Implementation is thread safe.
+	 */
+	private static class DefaultHttpClientProvider implements
+			HttpClientProvider {
+		private static final Log LOG = LogFactory
+				.getLog(DefaultHttpClientProvider.class);
+
+		public DefaultHttpClientProvider() {
+			LOG.debug("new DefaultHttpClientProvider()");
+			; // nothing to do
+		}
+
+		/**
+		 * @see org.sakaiproject.util.api.HttpClientProvider#getHttpGet()
+		 */
+		@Override
+		public HttpClient getHttpClient() {
+			LOG.debug("getHttpClient()");
+			return new DefaultHttpClient();
+		}
+
+	}
 }
