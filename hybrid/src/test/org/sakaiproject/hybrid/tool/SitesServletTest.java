@@ -104,7 +104,7 @@ public class SitesServletTest extends TestCase {
 		try {
 			sitesServlet.doGet(request, response);
 			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			assertNull("Exception should not be thrown", e);
 		}
 	}

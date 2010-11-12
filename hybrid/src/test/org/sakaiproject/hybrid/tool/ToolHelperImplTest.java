@@ -32,11 +32,11 @@ import org.sakaiproject.site.api.Site;
 import org.sakaiproject.tool.api.Placement;
 
 public class ToolHelperImplTest extends TestCase {
-	ToolHelperImpl toolHelperImpl;
-	SecurityService securityService;
-	Site site;
-	Placement placement;
-	Properties properties;
+	ToolHelperImpl toolHelperImpl = null;
+	SecurityService securityService = null;
+	Site site = null;
+	Placement placement = null;
+	Properties properties = null;
 
 	/**
 	 * @see junit.framework.TestCase#setUp()

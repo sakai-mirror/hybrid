@@ -39,6 +39,8 @@ import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.tool.api.SessionManager;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+
 /**
  * Based on
  * https://source.caret.cam.ac.uk/camtools/trunk/camtools/sdata/tool/sakai
@@ -52,8 +54,11 @@ public class SitesServlet extends HttpServlet {
 	private static final long serialVersionUID = 7907409301065984518L;
 	private static final Log LOG = LogFactory.getLog(SitesServlet.class);
 	private static final String CATEGORIZED = "categorized";
+	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
 	protected transient SessionManager sessionManager;
+	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
 	protected transient SiteService siteService;
+	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
 	protected transient ServerConfigurationService serverConfigurationService;
 	protected transient MoreSiteViewImpl moreSiteViewImpl;
 
