@@ -33,8 +33,8 @@ import net.sf.json.JSONObject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.component.api.ServerConfigurationService;
-import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.tool.api.SessionManager;
@@ -50,6 +50,7 @@ import edu.umd.cs.findbugs.annotations.SuppressWarnings;
  * No required get parameters. Runs in the context of the current user. Returns
  * all sites that the user has access to visit.
  */
+@SuppressWarnings(value = "MTIA_SUSPECT_SERVLET_INSTANCE_FIELD", justification = "dependencies only mutated only during init()")
 public class SitesServlet extends HttpServlet {
 	private static final long serialVersionUID = 7907409301065984518L;
 	private static final Log LOG = LogFactory.getLog(SitesServlet.class);
@@ -60,6 +61,8 @@ public class SitesServlet extends HttpServlet {
 	protected transient SiteService siteService;
 	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
 	protected transient ServerConfigurationService serverConfigurationService;
+	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	protected transient ComponentManager componentManager;
 	protected transient MoreSiteViewImpl moreSiteViewImpl;
 
 	@Override
@@ -149,22 +152,40 @@ public class SitesServlet extends HttpServlet {
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
-		sessionManager = (SessionManager) ComponentManager
-				.get(org.sakaiproject.tool.api.SessionManager.class);
+		if (componentManager == null) {
+			componentManager = (ComponentManager) org.sakaiproject.component.cover.ComponentManager
+					.get(ComponentManager.class);
+		}
+		if (componentManager == null) {
+			throw new IllegalStateException("componentManager == null");
+		}
+		sessionManager = (SessionManager) componentManager
+				.get(SessionManager.class);
 		if (sessionManager == null) {
 			throw new IllegalStateException("SessionManager == null");
 		}
-		siteService = (SiteService) ComponentManager
-				.get(org.sakaiproject.site.api.SiteService.class);
+		siteService = (SiteService) componentManager.get(SiteService.class);
 		if (siteService == null) {
 			throw new IllegalStateException("SiteService == null");
 		}
-		serverConfigurationService = (ServerConfigurationService) ComponentManager
-				.get(org.sakaiproject.component.api.ServerConfigurationService.class);
+		serverConfigurationService = (ServerConfigurationService) componentManager
+				.get(ServerConfigurationService.class);
 		if (serverConfigurationService == null) {
 			throw new IllegalStateException(
 					"ServerConfigurationService == null");
 		}
 		moreSiteViewImpl = new MoreSiteViewImpl(serverConfigurationService);
+	}
+
+	/**
+	 * Only used for unit testing setup.
+	 * 
+	 * @param componentManager
+	 */
+	protected void setupTestCase(ComponentManager componentManager) {
+		if (componentManager == null) {
+			throw new IllegalArgumentException("componentManager == null");
+		}
+		this.componentManager = componentManager;
 	}
 }
