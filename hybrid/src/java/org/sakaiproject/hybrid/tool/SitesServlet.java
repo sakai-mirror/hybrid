@@ -153,8 +153,8 @@ public class SitesServlet extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 		if (componentManager == null) {
-			componentManager = (ComponentManager) org.sakaiproject.component.cover.ComponentManager
-					.get(ComponentManager.class);
+			componentManager = org.sakaiproject.component.cover.ComponentManager
+					.getInstance();
 		}
 		if (componentManager == null) {
 			throw new IllegalStateException("componentManager == null");
