@@ -82,7 +82,7 @@ public class Signature {
 
 			return result;
 
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			throw new SignatureException("Failed to generate HMAC : "
 					+ e.getMessage(), e);
 		}
