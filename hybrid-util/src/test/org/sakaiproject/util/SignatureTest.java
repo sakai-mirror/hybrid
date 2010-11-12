@@ -17,7 +17,9 @@
  */
 package org.sakaiproject.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.security.SignatureException;
 
@@ -64,7 +66,7 @@ public class SignatureTest {
 		}
 		// bad parameters
 		try {
-			final String hmac = Signature.calculateRFC2104HMAC(null, MOCK_KEY);
+			Signature.calculateRFC2104HMAC(null, MOCK_KEY);
 			fail("IllegalArgumentException should be thrown");
 		} catch (IllegalArgumentException e) {
 			assertNotNull("IllegalArgumentException should be thrown", e);
@@ -72,7 +74,7 @@ public class SignatureTest {
 			fail("IllegalArgumentException should be thrown");
 		}
 		try {
-			final String hmac = Signature.calculateRFC2104HMAC(MOCK_DATA, null);
+			Signature.calculateRFC2104HMAC(MOCK_DATA, null);
 			fail("IllegalArgumentException should be thrown");
 		} catch (IllegalArgumentException e) {
 			assertNotNull("IllegalArgumentException should be thrown", e);
@@ -99,8 +101,7 @@ public class SignatureTest {
 		}
 		// bad parameters
 		try {
-			final String hmac = Signature.calculateRFC2104HMACWithEncoding(
-					null, MOCK_KEY, true);
+			Signature.calculateRFC2104HMACWithEncoding(null, MOCK_KEY, true);
 			fail("IllegalArgumentException should be thrown");
 		} catch (IllegalArgumentException e) {
 			assertNotNull("IllegalArgumentException should be thrown", e);
@@ -108,8 +109,7 @@ public class SignatureTest {
 			fail("IllegalArgumentException should be thrown");
 		}
 		try {
-			final String hmac = Signature.calculateRFC2104HMACWithEncoding(
-					MOCK_DATA, null, true);
+			Signature.calculateRFC2104HMACWithEncoding(MOCK_DATA, null, true);
 			fail("IllegalArgumentException should be thrown");
 		} catch (IllegalArgumentException e) {
 			assertNotNull("IllegalArgumentException should be thrown", e);
