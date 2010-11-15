@@ -19,6 +19,8 @@ package org.sakaiproject.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
@@ -27,6 +29,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.client.BasicResponseHandler;
@@ -235,7 +238,7 @@ public class NakamuraAuthenticationHelperTest {
 	 * @see NakamuraAuthenticationHelper#getPrincipalLoggedIntoNakamura(HttpServletRequest)
 	 */
 	@Test
-	public void testGetPrincipalLoggedIntoNakamura() {
+	public void testGetPrincipalLoggedIntoNakamura() throws Exception {
 		// try bad parameters first
 		try { // null request
 			nakamuraAuthenticationHelper.getPrincipalLoggedIntoNakamura(null);
@@ -249,9 +252,78 @@ public class NakamuraAuthenticationHelperTest {
 					.getPrincipalLoggedIntoNakamura(request);
 			assertNotNull(authInfo);
 			assertEquals(MOCK_PRINCIPAL, authInfo.getPrincipal());
+			assertNotNull(authInfo.getFirstName());
+			assertEquals("Admin", authInfo.getFirstName());
+			assertNotNull(authInfo.getLastName());
+			assertEquals("User", authInfo.getLastName());
+			assertNotNull(authInfo.getEmailAddress());
+			assertEquals("admin@sakai.invalid", authInfo.getEmailAddress());
 		} catch (Throwable e) {
-			e.printStackTrace();
 			fail("Throwable should not be thrown: " + e);
+		}
+	}
+
+	/**
+	 * With a good cache hit.
+	 * 
+	 * @see NakamuraAuthenticationHelper#getPrincipalLoggedIntoNakamura(HttpServletRequest)
+	 */
+	@Test
+	public void testGetPrincipalLoggedIntoNakamuraCacheHit() throws Exception {
+		final AuthInfo mockAuthInfo = new AuthInfo(MOCK_JSON);
+		when(
+				threadLocalManager
+						.get(NakamuraAuthenticationHelper.THREAD_LOCAL_CACHE_KEY))
+				.thenReturn(mockAuthInfo);
+		try {
+			final AuthInfo authInfo = nakamuraAuthenticationHelper
+					.getPrincipalLoggedIntoNakamura(request);
+			assertNotNull(authInfo);
+			assertEquals(MOCK_PRINCIPAL, authInfo.getPrincipal());
+			assertTrue(mockAuthInfo == authInfo); // should be same object
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown: " + e);
+		}
+	}
+
+	/**
+	 * @see NakamuraAuthenticationHelper#getPrincipalLoggedIntoNakamura(HttpServletRequest)
+	 */
+	@Test
+	public void testHttpResponseException() throws Exception {
+		// HttpResponseException
+		when(
+				httpClient.execute(any(HttpUriRequest.class),
+						any(BasicResponseHandler.class))).thenThrow(
+				new HttpResponseException(404,
+						"could not find cookie / not valid"));
+		try {
+			AuthInfo authInfo = nakamuraAuthenticationHelper
+					.getPrincipalLoggedIntoNakamura(request);
+			assertNull(authInfo);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown: " + e);
+		}
+	}
+
+	/**
+	 * @see NakamuraAuthenticationHelper#getPrincipalLoggedIntoNakamura(HttpServletRequest)
+	 */
+	@Test
+	public void testRuntimeException() throws Exception {
+		// Throwable / RuntimeException
+		when(
+				httpClient.execute(any(HttpUriRequest.class),
+						any(BasicResponseHandler.class))).thenThrow(
+				new IllegalStateException());
+		try {
+			nakamuraAuthenticationHelper
+					.getPrincipalLoggedIntoNakamura(request);
+			fail("Error should be thrown");
+		} catch (Error e) {
+			assertNotNull("Error should be thrown", e);
+		} catch (Throwable e) {
+			fail("Error should be thrown");
 		}
 	}
 

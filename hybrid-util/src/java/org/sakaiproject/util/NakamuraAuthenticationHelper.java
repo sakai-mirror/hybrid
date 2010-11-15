@@ -62,7 +62,7 @@ public class NakamuraAuthenticationHelper {
 	 * The key that will be used to cache AuthInfo hits in ThreadLocal. This
 	 * will handle cases where AuthInfo is requested more than once per request.
 	 */
-	private static final String THREAD_LOCAL_CACHE_KEY = NakamuraAuthenticationHelper.class
+	static final String THREAD_LOCAL_CACHE_KEY = NakamuraAuthenticationHelper.class
 			.getName() + ".AuthInfo.cache";
 
 	/**
@@ -256,7 +256,7 @@ public class NakamuraAuthenticationHelper {
 		 * @param json
 		 *            The JSON returned from nakamura.
 		 */
-		private AuthInfo(final String json) {
+		protected AuthInfo(final String json) {
 			if (AILOG.isDebugEnabled()) {
 				AILOG.debug("new AuthInfo(String " + json + ")");
 			}
