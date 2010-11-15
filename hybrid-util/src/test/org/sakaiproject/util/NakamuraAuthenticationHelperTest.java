@@ -193,6 +193,45 @@ public class NakamuraAuthenticationHelperTest {
 	}
 
 	/**
+	 * @see NakamuraAuthenticationHelper#NakamuraAuthenticationHelper(ComponentManager,
+	 *      String, String, String)
+	 */
+	@Test
+	public void testNullThreadLocalManager() {
+		when(componentManager.get(ThreadLocalManager.class)).thenReturn(null);
+		try { // null ThreadLocalManager
+			nakamuraAuthenticationHelper = new NakamuraAuthenticationHelper(
+					componentManager, MOCK_VALIDATE_URL, MOCK_PRINCIPAL,
+					MOCK_HOSTNAME);
+			fail("Should not be reached; IllegalStateException exception should be thrown");
+		} catch (IllegalStateException e) {
+			assertNotNull("IllegalStateException should be thrown", e);
+		} catch (Throwable e) {
+			fail("IllegalStateException should be thrown");
+		}
+	}
+
+	/**
+	 * @see NakamuraAuthenticationHelper#NakamuraAuthenticationHelper(ComponentManager,
+	 *      String, String, String)
+	 */
+	@Test
+	public void testNullServerConfigurationService() {
+		when(componentManager.get(ServerConfigurationService.class))
+				.thenReturn(null);
+		try { // null ServerConfigurationService
+			nakamuraAuthenticationHelper = new NakamuraAuthenticationHelper(
+					componentManager, MOCK_VALIDATE_URL, MOCK_PRINCIPAL,
+					MOCK_HOSTNAME);
+			fail("Should not be reached; IllegalStateException exception should be thrown");
+		} catch (IllegalStateException e) {
+			assertNotNull("IllegalStateException should be thrown", e);
+		} catch (Throwable e) {
+			fail("IllegalStateException should be thrown");
+		}
+	}
+
+	/**
 	 * @see NakamuraAuthenticationHelper#getPrincipalLoggedIntoNakamura(HttpServletRequest)
 	 */
 	@Test
