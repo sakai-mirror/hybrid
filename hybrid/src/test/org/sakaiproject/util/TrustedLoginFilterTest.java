@@ -17,8 +17,8 @@
  */
 package org.sakaiproject.util;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -96,9 +96,9 @@ public class TrustedLoginFilterTest extends TestCase {
 			verify(sessionManager).setCurrentSession(newSession);
 			verify(sessionManager).setCurrentSession(existingSession);
 			verify(sessionManager, times(2)).setCurrentSession(
-					any(Session.class));
+					isA(Session.class));
 			verify(newSession).setActive();
-			verify(chain).doFilter(any(ToolRequestWrapper.class), eq(response));
+			verify(chain).doFilter(isA(ToolRequestWrapper.class), eq(response));
 			verify(chain, never()).doFilter(request, response);
 			verify(newSession).invalidate();
 		} catch (Throwable e) {

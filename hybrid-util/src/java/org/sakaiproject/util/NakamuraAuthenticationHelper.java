@@ -243,7 +243,7 @@ public class NakamuraAuthenticationHelper {
 	 * Generally the caller should expect raw results from the JSON parsing
 	 * (e.g. principal could in theory be null).
 	 */
-	public static final class AuthInfo {
+	public static class AuthInfo {
 		private static final Log AILOG = LogFactory.getLog(AuthInfo.class);
 
 		private String principal;
