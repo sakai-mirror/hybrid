@@ -49,8 +49,6 @@ import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.api.Tool;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
-
 /**
  * Based on
  * https://source.caret.cam.ac.uk/camtools/trunk/camtools/sdata/tool/sakai
@@ -71,17 +69,11 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 			.getLog(SiteVisitToolPlacementServlet.class);
 	private static final String SITE_ID = "siteId";
 
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
 	protected transient SessionManager sessionManager;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
 	protected transient SiteService siteService;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
 	protected transient EventTrackingService eventTrackingService;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
 	protected transient ToolHelperImpl toolHelper;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
 	protected transient AuthzGroupService authzGroupService;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
 	protected transient SecurityService securityService;
 
 	/**

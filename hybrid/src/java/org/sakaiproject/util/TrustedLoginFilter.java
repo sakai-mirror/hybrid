@@ -126,7 +126,7 @@ public class TrustedLoginFilter implements Filter {
 	 */
 	public void doFilter(ServletRequest req, ServletResponse resp,
 			FilterChain chain) throws IOException, ServletException {
-		if (enabled && req instanceof HttpServletRequest) {
+		if (enabled) {
 			HttpServletRequest hreq = (HttpServletRequest) req;
 			final String host = req.getRemoteHost();
 			if (safeHosts.indexOf(host) < 0) {

@@ -24,67 +24,30 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.component.api.ServerConfigurationService;
+import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.SessionManager;
 
 /**
- * Utility class for dealing with x-sakai-token semantics. Note: Class is thread
- * safe.
+ * Utility class for dealing with x-sakai-token semantics.
  */
 public class XSakaiToken {
-	private static final Log LOG = LogFactory.getLog(XSakaiToken.class);
+	private final static Log LOG = LogFactory.getLog(XSakaiToken.class);
 	public static final String X_SAKAI_TOKEN_HEADER = "x-sakai-token";
 	public static final String CONFIG_PREFIX = "x.sakai.token";
 	public static final String CONFIG_SHARED_SECRET_SUFFIX = "sharedSecret";
 	public static final String TOKEN_SEPARATOR = ";";
 
-	private final SecureRandom secureRandom = new SecureRandom();
-	// dependencies
-	ComponentManager componentManager;
-	ServerConfigurationService serverConfigurationService;
-	SessionManager sessionManager;
+	private static final SecureRandom SRANDOM = new SecureRandom();
 
 	/**
-	 * @param componentManager
-	 *            Used to obtain references to
-	 *            {@link ServerConfigurationService}, and {@link SessionManager}
-	 * @throws IllegalArgumentException
-	 * @throws IllegalStateException
-	 */
-	public XSakaiToken(ComponentManager componentManager) {
-		LOG.debug("new XSakaiToken(ComponentManager componentManager)");
-		if (componentManager == null) {
-			throw new IllegalArgumentException("componentManager == null");
-		}
-		this.componentManager = componentManager;
-		serverConfigurationService = (ServerConfigurationService) componentManager
-				.get(ServerConfigurationService.class);
-		if (serverConfigurationService == null) {
-			throw new IllegalStateException(
-					"serverConfigurationService == null");
-		}
-		sessionManager = (SessionManager) componentManager
-				.get(SessionManager.class);
-		if (sessionManager == null) {
-			throw new IllegalStateException("sessionManager == null");
-		}
-	}
-
-	/**
-	 * Simply grab the x-sakai-token from the request. Does not validate
-	 * results; i.e. raw data retrieval from request.
+	 * Simply grab the x-sakai-token from the request.
 	 * 
 	 * @param request
 	 * @return
-	 * @throws IllegalArgumentException
 	 */
-	public String getToken(final HttpServletRequest request) {
-		LOG.debug("getToken(final HttpServletRequest request)");
-		if (request == null) {
-			throw new IllegalArgumentException("request == null");
-		}
+	public static String getToken(final HttpServletRequest request) {
 		return request.getHeader(X_SAKAI_TOKEN_HEADER);
 	}
 
@@ -94,17 +57,9 @@ public class XSakaiToken {
 	 * @param request
 	 * @param sharedSecret
 	 * @return
-	 * @throws IllegalArgumentException
 	 */
-	public String getValidatedEid(final HttpServletRequest request,
+	public static String getValidatedEid(final HttpServletRequest request,
 			final String sharedSecret) {
-		LOG.debug("getValidatedEid(final HttpServletRequest request, final String sharedSecret)");
-		if (request == null) {
-			throw new IllegalArgumentException("request == null");
-		}
-		if (sharedSecret == null || "".equals(sharedSecret)) {
-			throw new IllegalArgumentException("sharedSecret == null || empty");
-		}
 		return getValidatedEid(getToken(request), sharedSecret);
 	}
 
@@ -113,17 +68,10 @@ public class XSakaiToken {
 	 * 
 	 * @param token
 	 * @param sharedSecret
-	 * @return eid if valid. null if not valid.
-	 * @throws IllegalArgumentException
+	 * @return
 	 */
-	public String getValidatedEid(final String token, final String sharedSecret) {
-		LOG.debug("getValidatedEid(final String token, final String sharedSecret)");
-		if (token == null) {
-			throw new IllegalArgumentException("token == null");
-		}
-		if (sharedSecret == null) {
-			throw new IllegalArgumentException("sharedSecret == null");
-		}
+	public static String getValidatedEid(final String token,
+			final String sharedSecret) {
 		String userId = null;
 		final String[] parts = token.split(TOKEN_SEPARATOR);
 		if (parts.length == 3) {
@@ -157,14 +105,11 @@ public class XSakaiToken {
 	 *            Fully qualified domain name or an IP address. See:
 	 *            {@link #getSharedSecret(String)}.
 	 * @return
-	 * @throws IllegalArgumentException
 	 */
-	public String createToken(final String hostname) {
-		LOG.debug("String createToken(final String hostname)");
-		if (hostname == null || "".equals(hostname)) {
-			throw new IllegalArgumentException("hostname == null || empty");
-		}
-		final Session session = sessionManager.getCurrentSession();
+	public static String createToken(final String hostname) {
+		final SessionManager sm = (SessionManager) ComponentManager
+				.get(SessionManager.class);
+		final Session session = sm.getCurrentSession();
 		if (session != null) {
 			return createToken(hostname, session.getUserEid());
 		} else {
@@ -186,17 +131,9 @@ public class XSakaiToken {
 	 * @return
 	 * @throws Error
 	 *             Wrapped exception if there is any unexpected trouble.
-	 * @throws IllegalArgumentException
 	 */
-	public String createToken(final String hostname, final String eid)
+	public static String createToken(final String hostname, final String eid)
 			throws Error {
-		LOG.debug("createToken(final String hostname, final String eid)");
-		if (hostname == null || "".equals(hostname)) {
-			throw new IllegalArgumentException("hostname == null OR empty");
-		}
-		if (eid == null || "".equals(eid)) {
-			throw new IllegalArgumentException("eid == null OR empty");
-		}
 		final String sharedSecret = getSharedSecret(hostname);
 		final String token = signMessage(sharedSecret, eid);
 		return token;
@@ -211,18 +148,10 @@ public class XSakaiToken {
 	 * @return Fully computed token.
 	 * @throws Error
 	 *             Wrapped exception if there is any unexpected trouble.
-	 * @throws IllegalArgumentException
 	 */
-	public String signMessage(final String sharedSecret, final String eid) {
-		LOG.debug("signMessage(final String sharedSecret, final String eid)");
-		if (sharedSecret == null || "".equals(sharedSecret)) {
-			throw new IllegalArgumentException("sharedSecret == null OR empty");
-		}
-		if (eid == null || "".equals(eid)) {
-			throw new IllegalArgumentException("eid == null OR empty");
-		}
+	public static String signMessage(final String sharedSecret, final String eid) {
 		String token = null;
-		final String message = eid + TOKEN_SEPARATOR + secureRandom.nextLong();
+		final String message = eid + TOKEN_SEPARATOR + SRANDOM.nextLong();
 		try {
 			final String hash = Signature.calculateRFC2104HMAC(message,
 					sharedSecret);
@@ -241,17 +170,13 @@ public class XSakaiToken {
 	 * @param hostname
 	 *            Fully qualified domain name or an IP address.
 	 * @return null if not found.
-	 * @throws IllegalArgumentException
 	 */
-	public String getSharedSecret(final String hostname) {
-		LOG.debug("getSharedSecret(final String hostname)");
-		if (hostname == null || "".equals(hostname)) {
-			throw new IllegalArgumentException("hostname == null OR empty");
-		}
+	public static String getSharedSecret(final String hostname) {
+		final ServerConfigurationService config = (ServerConfigurationService) ComponentManager
+				.get(ServerConfigurationService.class);
 		final String key = CONFIG_PREFIX + "." + hostname + "."
 				+ CONFIG_SHARED_SECRET_SUFFIX;
-		final String sharedSecret = serverConfigurationService.getString(key,
-				null);
+		final String sharedSecret = config.getString(key, null);
 		return sharedSecret;
 	}
 

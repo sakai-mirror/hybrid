@@ -138,7 +138,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 			when(request.getParameter("siteId")).thenReturn(null);
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			assertNull("Exception should not be thrown", e);
 		}
 	}
@@ -148,7 +148,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 			when(siteService.getSiteVisit("!admin")).thenReturn(null);
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			assertNull("Exception should not be thrown", e);
 		}
 	}
@@ -157,7 +157,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 		try {
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			assertNull("Exception should not be thrown", e);
 		}
@@ -174,7 +174,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 		try {
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			assertNull("Exception should not be thrown", e);
 		}
@@ -186,7 +186,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 					new IdUnusedException(""));
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			assertNull("Exception should not be thrown", e);
 		}
 	}
@@ -197,7 +197,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 					new PermissionException("w", "w", "w"));
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).sendError(HttpServletResponse.SC_FORBIDDEN);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			assertNull("Exception should not be thrown", e);
 		}
 	}
@@ -208,7 +208,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 					new GroupNotDefinedException(""));
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			assertNull("Exception should not be thrown", e);
 		}
 	}
