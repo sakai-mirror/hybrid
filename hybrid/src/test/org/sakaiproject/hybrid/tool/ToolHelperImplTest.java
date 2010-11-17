@@ -27,6 +27,8 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.tool.api.Placement;
@@ -43,6 +45,16 @@ public class ToolHelperImplTest extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
+		Properties log4jProperties = new Properties();
+		log4jProperties.put("log4j.rootLogger", "ALL, A1");
+		log4jProperties.put("log4j.appender.A1",
+				"org.apache.log4j.ConsoleAppender");
+		log4jProperties.put("log4j.appender.A1.layout",
+				"org.apache.log4j.PatternLayout");
+		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
+				PatternLayout.TTCC_CONVERSION_PATTERN);
+		log4jProperties.put("log4j.threshold", "ALL");
+		PropertyConfigurator.configure(log4jProperties);
 		securityService = mock(SecurityService.class);
 		toolHelperImpl = new ToolHelperImpl(securityService);
 		toolHelperImpl.securityService = securityService;

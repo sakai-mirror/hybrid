@@ -25,6 +25,8 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.Properties;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,7 +35,10 @@ import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -85,6 +90,20 @@ public class NakamuraAuthenticationHelperTest {
 	HttpClient httpClient;
 	@Mock
 	ClientConnectionManager clientConnectionManager;
+
+	@BeforeClass
+	public static void setupClass() {
+		Properties log4jProperties = new Properties();
+		log4jProperties.put("log4j.rootLogger", "ALL, A1");
+		log4jProperties.put("log4j.appender.A1",
+				"org.apache.log4j.ConsoleAppender");
+		log4jProperties.put("log4j.appender.A1.layout",
+				"org.apache.log4j.PatternLayout");
+		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
+				PatternLayout.TTCC_CONVERSION_PATTERN);
+		log4jProperties.put("log4j.threshold", "ALL");
+		PropertyConfigurator.configure(log4jProperties);
+	}
 
 	/**
 	 * @see junit.framework.TestCase#setUp()

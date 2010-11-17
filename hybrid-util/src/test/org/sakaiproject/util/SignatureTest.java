@@ -22,8 +22,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.security.SignatureException;
+import java.util.Properties;
 
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -40,6 +44,20 @@ public class SignatureTest {
 	 * Used to test return vales for {@link #MOCK_DATA} and {@link #MOCK_KEY}
 	 */
 	private static final String TEST_HMAC_URLSAFE = "EEFSxb_coHvGM-69RhmfAlXJ9J0";
+
+	@BeforeClass
+	public static void setupClass() {
+		Properties log4jProperties = new Properties();
+		log4jProperties.put("log4j.rootLogger", "ALL, A1");
+		log4jProperties.put("log4j.appender.A1",
+				"org.apache.log4j.ConsoleAppender");
+		log4jProperties.put("log4j.appender.A1.layout",
+				"org.apache.log4j.PatternLayout");
+		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
+				PatternLayout.TTCC_CONVERSION_PATTERN);
+		log4jProperties.put("log4j.threshold", "ALL");
+		PropertyConfigurator.configure(log4jProperties);
+	}
 
 	/**
 	 * @throws java.lang.Exception
