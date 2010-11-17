@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns="http://maven.apache.org/POM/4.0.0"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>sakai-standard-tool</artifactId>
@@ -15,11 +13,11 @@
 	<name>Sakai Nakamura :: Sakai 2/3 Hybrid Base</name>
 	<groupId>org.sakaiproject.hybrid</groupId>
 	<artifactId>hybrid</artifactId>
-	<version>1.1-SNAPSHOT</version>
+	<version>1.1.0</version>
 	<scm>
-		<connection>scm:svn:https://source.sakaiproject.org/svn/hybrid/branches/hybrid-1.1.x/</connection>
-		<developerConnection>scm:svn:https://source.sakaiproject.org/svn/hybrid/branches/hybrid-1.1.x/</developerConnection>
-		<url>https://source.sakaiproject.org/svn/hybrid/branches/hybrid-1.1.x/</url>
+		<connection>scm:svn:https://source.sakaiproject.org/svn/hybrid/tags/hybrid-1.1.0</connection>
+		<developerConnection>scm:svn:https://source.sakaiproject.org/svn/hybrid/tags/hybrid-1.1.0</developerConnection>
+		<url>https://source.sakaiproject.org/svn/hybrid/tags/hybrid-1.1.0</url>
 	</scm>
 	<organization>
 		<name>Sakai Project</name>
