@@ -68,7 +68,7 @@ public class SignatureTest {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.Signature#calculateRFC2104HMAC(java.lang.String, java.lang.String)}
+	 * {@link org.sakaiproject.hybrid.util.Signature#calculateRFC2104HMAC(java.lang.String, java.lang.String)}
 	 * .
 	 */
 	@Test
@@ -103,7 +103,7 @@ public class SignatureTest {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.Signature#calculateRFC2104HMACWithEncoding(java.lang.String, java.lang.String, boolean)}
+	 * {@link org.sakaiproject.hybrid.util.Signature#calculateRFC2104HMACWithEncoding(java.lang.String, java.lang.String, boolean)}
 	 * .
 	 */
 	@Test

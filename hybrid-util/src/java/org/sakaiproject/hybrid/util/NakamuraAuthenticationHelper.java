@@ -44,7 +44,7 @@ public class NakamuraAuthenticationHelper {
 	/**
 	 * All sakai.properties settings will be prefixed with this string.
 	 */
-	public static final String CONFIG_PREFIX = "org.sakaiproject.util.NakamuraAuthenticationHelper";
+	public static final String CONFIG_PREFIX = "org.sakaiproject.hybrid.util.NakamuraAuthenticationHelper";
 	/**
 	 * sakai.properties The name of the nakamura anonymous principal.
 	 */
@@ -325,7 +325,7 @@ public class NakamuraAuthenticationHelper {
 		}
 
 		/**
-		 * @see org.sakaiproject.util.api.HttpClientProvider#getHttpGet()
+		 * @see org.sakaiproject.hybrid.util.api.HttpClientProvider#getHttpGet()
 		 */
 		@Override
 		public HttpClient getHttpClient() {

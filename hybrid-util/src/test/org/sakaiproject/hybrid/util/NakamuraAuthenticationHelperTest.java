@@ -351,7 +351,7 @@ public class NakamuraAuthenticationHelperTest {
 	 */
 	private class MockHttpClientProvider implements HttpClientProvider {
 		/**
-		 * @see org.sakaiproject.util.api.HttpClientProvider#getHttpGet()
+		 * @see org.sakaiproject.hybrid.util.api.HttpClientProvider#getHttpGet()
 		 */
 		@Override
 		public HttpClient getHttpClient() {
