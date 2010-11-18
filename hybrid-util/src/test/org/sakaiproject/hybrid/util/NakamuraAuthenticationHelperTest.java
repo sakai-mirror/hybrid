@@ -15,7 +15,7 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.sakaiproject.util;
+package org.sakaiproject.hybrid.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -45,10 +45,10 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.component.api.ServerConfigurationService;
+import org.sakaiproject.hybrid.util.NakamuraAuthenticationHelper.AuthInfo;
+import org.sakaiproject.hybrid.util.NakamuraAuthenticationHelper.HttpClientProvider;
 import org.sakaiproject.thread_local.api.ThreadLocalManager;
 import org.sakaiproject.tool.api.SessionManager;
-import org.sakaiproject.util.NakamuraAuthenticationHelper.AuthInfo;
-import org.sakaiproject.util.NakamuraAuthenticationHelper.HttpClientProvider;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NakamuraAuthenticationHelperTest {
