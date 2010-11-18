@@ -15,7 +15,7 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.sakaiproject.util;
+package org.sakaiproject.hybrid.util;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -104,7 +104,7 @@ public class TrustedLoginFilterTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
+	 * {@link org.sakaiproject.hybrid.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
 	 * .
 	 */
 	@Test
@@ -128,7 +128,7 @@ public class TrustedLoginFilterTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
+	 * {@link org.sakaiproject.hybrid.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
 	 * .
 	 */
 	@Test
@@ -149,7 +149,7 @@ public class TrustedLoginFilterTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
+	 * {@link org.sakaiproject.hybrid.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
 	 * .
 	 */
 	@Test
@@ -166,7 +166,7 @@ public class TrustedLoginFilterTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
+	 * {@link org.sakaiproject.hybrid.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
 	 * .
 	 */
 	@Test
@@ -183,7 +183,7 @@ public class TrustedLoginFilterTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
+	 * {@link org.sakaiproject.hybrid.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
 	 * .
 	 */
 	@Test
@@ -201,7 +201,7 @@ public class TrustedLoginFilterTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
+	 * {@link org.sakaiproject.hybrid.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
 	 * .
 	 */
 	@Test
@@ -219,7 +219,7 @@ public class TrustedLoginFilterTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
+	 * {@link org.sakaiproject.hybrid.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
 	 * .
 	 */
 	@Test
