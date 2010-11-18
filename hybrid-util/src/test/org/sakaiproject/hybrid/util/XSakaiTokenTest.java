@@ -15,7 +15,7 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.sakaiproject.util;
+package org.sakaiproject.hybrid.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -106,7 +106,7 @@ public class XSakaiTokenTest {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.XSakaiToken#XSakaiToken(org.sakaiproject.component.api.ComponentManager)}
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#XSakaiToken(org.sakaiproject.component.api.ComponentManager)}
 	 * .
 	 */
 	@Test
@@ -131,7 +131,7 @@ public class XSakaiTokenTest {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.XSakaiToken#getToken(javax.servlet.http.HttpServletRequest)}
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#getToken(javax.servlet.http.HttpServletRequest)}
 	 * .
 	 */
 	@Test
@@ -155,7 +155,7 @@ public class XSakaiTokenTest {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.XSakaiToken#getValidatedEid(javax.servlet.http.HttpServletRequest, java.lang.String)}
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#getValidatedEid(javax.servlet.http.HttpServletRequest, java.lang.String)}
 	 * .
 	 */
 	@Test
@@ -191,7 +191,7 @@ public class XSakaiTokenTest {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.XSakaiToken#getValidatedEid(java.lang.String, java.lang.String)}
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#getValidatedEid(java.lang.String, java.lang.String)}
 	 * .
 	 */
 	@Test
@@ -226,7 +226,7 @@ public class XSakaiTokenTest {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.XSakaiToken#createToken(java.lang.String)}.
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#createToken(java.lang.String)}.
 	 */
 	@Test
 	public void testCreateTokenString() {
@@ -259,7 +259,7 @@ public class XSakaiTokenTest {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.XSakaiToken#createToken(java.lang.String, java.lang.String)}
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#createToken(java.lang.String, java.lang.String)}
 	 * .
 	 */
 	@Test
@@ -311,7 +311,7 @@ public class XSakaiTokenTest {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.XSakaiToken#signMessage(java.lang.String, java.lang.String)}
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#signMessage(java.lang.String, java.lang.String)}
 	 * .
 	 */
 	@Test
@@ -363,7 +363,7 @@ public class XSakaiTokenTest {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.XSakaiToken#getSharedSecret(java.lang.String)}
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#getSharedSecret(java.lang.String)}
 	 * .
 	 */
 	@Test

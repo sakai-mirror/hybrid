@@ -15,7 +15,7 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.sakaiproject.util;
+package org.sakaiproject.hybrid.util;
 
 import java.net.URI;
 
@@ -44,7 +44,7 @@ public class NakamuraAuthenticationHelper {
 	/**
 	 * All sakai.properties settings will be prefixed with this string.
 	 */
-	public static final String CONFIG_PREFIX = "org.sakaiproject.util.NakamuraAuthenticationHelper";
+	public static final String CONFIG_PREFIX = "org.sakaiproject.hybrid.util.NakamuraAuthenticationHelper";
 	/**
 	 * sakai.properties The name of the nakamura anonymous principal.
 	 */
@@ -325,7 +325,7 @@ public class NakamuraAuthenticationHelper {
 		}
 
 		/**
-		 * @see org.sakaiproject.util.api.HttpClientProvider#getHttpGet()
+		 * @see org.sakaiproject.hybrid.util.api.HttpClientProvider#getHttpGet()
 		 */
 		@Override
 		public HttpClient getHttpClient() {

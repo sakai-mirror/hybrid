@@ -15,7 +15,7 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.sakaiproject.util;
+package org.sakaiproject.hybrid.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -68,7 +68,7 @@ public class SignatureTest {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.Signature#calculateRFC2104HMAC(java.lang.String, java.lang.String)}
+	 * {@link org.sakaiproject.hybrid.util.Signature#calculateRFC2104HMAC(java.lang.String, java.lang.String)}
 	 * .
 	 */
 	@Test
@@ -103,7 +103,7 @@ public class SignatureTest {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.util.Signature#calculateRFC2104HMACWithEncoding(java.lang.String, java.lang.String, boolean)}
+	 * {@link org.sakaiproject.hybrid.util.Signature#calculateRFC2104HMACWithEncoding(java.lang.String, java.lang.String, boolean)}
 	 * .
 	 */
 	@Test
