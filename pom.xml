@@ -66,7 +66,7 @@
                   <goal>verify-legal-files</goal>
                </goals>
                <configuration>
-                  <strict>true</strict>
+                  <strict>false</strict>
                </configuration>
             </execution>
          </executions>
