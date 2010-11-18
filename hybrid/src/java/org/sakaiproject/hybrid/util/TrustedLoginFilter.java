@@ -15,7 +15,7 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.sakaiproject.util;
+package org.sakaiproject.hybrid.util;
 
 import java.io.IOException;
 import java.security.SignatureException;
@@ -36,6 +36,7 @@ import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
+import org.sakaiproject.util.Signature;
 
 /**
  * <pre>
@@ -65,7 +66,7 @@ import org.sakaiproject.user.api.UserNotDefinedException;
  * 	&lt;/filter&gt;
  * 	&lt;filter&gt;
  * 		&lt;filter-name&gt;sakai.trusted&lt;/filter-name&gt;
- * 		&lt;filter-class&gt;org.sakaiproject.util.TrustedLoginFilter&lt;/filter-class&gt;
+ * 		&lt;filter-class&gt;org.sakaiproject.hybrid.util.TrustedLoginFilter&lt;/filter-class&gt;
  *       &lt;init-param&gt;
  *       	&lt;param-name&gt;shared.secret&lt;/param-name&gt;
  *           &lt;param-value&gt;The Snow on the Volga falls only under the bridges&lt;/param-value&gt;
@@ -96,9 +97,9 @@ import org.sakaiproject.user.api.UserNotDefinedException;
  */
 public class TrustedLoginFilter implements Filter {
 	private final static Log LOG = LogFactory.getLog(TrustedLoginFilter.class);
-	private static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SHARED_SECRET = "org.sakaiproject.util.TrustedLoginFilter.sharedSecret";
-	private static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_ENABLED = "org.sakaiproject.util.TrustedLoginFilter.enabled";
-	private static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SAFE_HOSTS = "org.sakaiproject.util.TrustedLoginFilter.safeHosts";
+	private static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SHARED_SECRET = "org.sakaiproject.hybrid.util.TrustedLoginFilter.sharedSecret";
+	private static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_ENABLED = "org.sakaiproject.hybrid.util.TrustedLoginFilter.enabled";
+	private static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SAFE_HOSTS = "org.sakaiproject.hybrid.util.TrustedLoginFilter.safeHosts";
 	private static final String TOKEN_SEPARATOR = ";";
 
 	protected SessionManager sessionManager;
