@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +36,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
 
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
 import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
@@ -69,6 +72,16 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
+		Properties log4jProperties = new Properties();
+		log4jProperties.put("log4j.rootLogger", "ALL, A1");
+		log4jProperties.put("log4j.appender.A1",
+				"org.apache.log4j.ConsoleAppender");
+		log4jProperties.put("log4j.appender.A1.layout",
+				"org.apache.log4j.PatternLayout");
+		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
+				PatternLayout.TTCC_CONVERSION_PATTERN);
+		log4jProperties.put("log4j.threshold", "ALL");
+		PropertyConfigurator.configure(log4jProperties);
 		siteVisitToolPlacementServlet = new SiteVisitToolPlacementServlet();
 		request = mock(HttpServletRequest.class);
 		response = mock(HttpServletResponse.class);
@@ -138,7 +151,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 			when(request.getParameter("siteId")).thenReturn(null);
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			assertNull("Exception should not be thrown", e);
 		}
 	}
@@ -148,7 +161,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 			when(siteService.getSiteVisit("!admin")).thenReturn(null);
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			assertNull("Exception should not be thrown", e);
 		}
 	}
@@ -157,7 +170,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 		try {
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			assertNull("Exception should not be thrown", e);
 		}
@@ -174,7 +187,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 		try {
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			assertNull("Exception should not be thrown", e);
 		}
@@ -186,7 +199,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 					new IdUnusedException(""));
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			assertNull("Exception should not be thrown", e);
 		}
 	}
@@ -197,7 +210,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 					new PermissionException("w", "w", "w"));
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).sendError(HttpServletResponse.SC_FORBIDDEN);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			assertNull("Exception should not be thrown", e);
 		}
 	}
@@ -208,7 +221,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 					new GroupNotDefinedException(""));
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			assertNull("Exception should not be thrown", e);
 		}
 	}

@@ -17,12 +17,14 @@
  */
 package org.sakaiproject.util;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.Properties;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +32,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
 
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -43,7 +48,7 @@ import org.sakaiproject.user.api.UserNotDefinedException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TrustedLoginFilterTest extends TestCase {
-	TrustedLoginFilter trustedLoginFilter;
+	TrustedLoginFilter trustedLoginFilter = null;
 	@Mock
 	HttpServletRequest request;
 	@Mock
@@ -60,6 +65,20 @@ public class TrustedLoginFilterTest extends TestCase {
 	Session newSession;
 	@Mock
 	User user;
+
+	@BeforeClass
+	public static void setupClass() {
+		Properties log4jProperties = new Properties();
+		log4jProperties.put("log4j.rootLogger", "ALL, A1");
+		log4jProperties.put("log4j.appender.A1",
+				"org.apache.log4j.ConsoleAppender");
+		log4jProperties.put("log4j.appender.A1.layout",
+				"org.apache.log4j.PatternLayout");
+		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
+				PatternLayout.TTCC_CONVERSION_PATTERN);
+		log4jProperties.put("log4j.threshold", "ALL");
+		PropertyConfigurator.configure(log4jProperties);
+	}
 
 	/**
 	 * @see junit.framework.TestCase#setUp()
@@ -96,12 +115,12 @@ public class TrustedLoginFilterTest extends TestCase {
 			verify(sessionManager).setCurrentSession(newSession);
 			verify(sessionManager).setCurrentSession(existingSession);
 			verify(sessionManager, times(2)).setCurrentSession(
-					any(Session.class));
+					isA(Session.class));
 			verify(newSession).setActive();
-			verify(chain).doFilter(any(ToolRequestWrapper.class), eq(response));
+			verify(chain).doFilter(isA(ToolRequestWrapper.class), eq(response));
 			verify(chain, never()).doFilter(request, response);
 			verify(newSession).invalidate();
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			assertNull(e);
 		}
@@ -122,7 +141,7 @@ public class TrustedLoginFilterTest extends TestCase {
 			verify(sessionManager, never()).setCurrentSession(newSession);
 			verify(sessionManager).setCurrentSession(existingSession);
 			verify(chain).doFilter(request, response);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			assertNull(e);
 		}
@@ -139,7 +158,7 @@ public class TrustedLoginFilterTest extends TestCase {
 		try {
 			trustedLoginFilter.doFilter(request, response, chain);
 			verify(chain).doFilter(request, response);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			assertNull(e);
 		}
@@ -156,7 +175,7 @@ public class TrustedLoginFilterTest extends TestCase {
 		try {
 			trustedLoginFilter.doFilter(request, response, chain);
 			verify(chain).doFilter(request, response);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			assertNull(e);
 		}
@@ -174,7 +193,7 @@ public class TrustedLoginFilterTest extends TestCase {
 		try {
 			trustedLoginFilter.doFilter(request, response, chain);
 			verify(chain).doFilter(request, response);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			assertNull(e);
 		}
@@ -192,7 +211,7 @@ public class TrustedLoginFilterTest extends TestCase {
 					new UserNotDefinedException("username"));
 			trustedLoginFilter.doFilter(request, response, chain);
 			verify(chain).doFilter(request, response);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			assertNull(e);
 		}
@@ -209,7 +228,7 @@ public class TrustedLoginFilterTest extends TestCase {
 		try {
 			trustedLoginFilter.doFilter(request, response, chain);
 			verify(chain).doFilter(request, response);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			assertNull(e);
 		}
