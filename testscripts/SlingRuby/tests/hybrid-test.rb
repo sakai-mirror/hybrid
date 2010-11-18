@@ -10,7 +10,7 @@ class TC_HybridTest < Test::Unit::TestCase
   def setup
     super;
     @protocol = "http";
-    @hostname = "sakai3-nightly.uits.indiana.edu";
+    @hostname = "localhost";
     @port = "8080";
 
     @log = Logger.new(STDOUT);
@@ -46,9 +46,6 @@ class TC_HybridTest < Test::Unit::TestCase
       assert_not_nil(site["title"]);
       assert_not_nil(site["id"]);
       assert_not_nil(site["url"]);
-      assert_not_nil(site["owner"]);
-      assert_not_nil(site["members"]);
-      assert_not_nil(site["creationDate"]);
     end
   end
 
