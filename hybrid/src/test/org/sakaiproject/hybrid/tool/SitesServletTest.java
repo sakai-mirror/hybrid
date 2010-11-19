@@ -38,6 +38,7 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
+import org.sakaiproject.api.app.messageforums.SynopticMsgcntrManager;
 import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.component.api.ServerConfigurationService;
@@ -51,6 +52,7 @@ public class SitesServletTest extends TestCase {
 	protected SitesServlet sitesServlet;
 	protected SessionManager sessionManager;
 	protected SiteService siteService;
+	protected SynopticMsgcntrManager synopticMsgcntrManager;
 	protected HttpServletRequest request;
 	protected HttpServletResponse response;
 	protected ComponentManager componentManager;
@@ -116,6 +118,9 @@ public class SitesServletTest extends TestCase {
 		when(componentManager.get(SiteService.class)).thenReturn(siteService);
 		when(componentManager.get(ServerConfigurationService.class))
 				.thenReturn(serverConfigurationService);
+		synopticMsgcntrManager = mock(SynopticMsgcntrManager.class);
+		when(componentManager.get(SynopticMsgcntrManager.class)).thenReturn(
+				synopticMsgcntrManager);
 		sitesServlet = new SitesServlet();
 		sitesServlet.setupTestCase(componentManager);
 		config = mock(ServletConfig.class);
