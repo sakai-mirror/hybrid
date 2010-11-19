@@ -163,8 +163,7 @@ class MoreSiteViewImpl {
 				term = I18N_PROJECT_SITES;
 			} else if ("portfolio".equals(type)) {
 				term = I18N_PORTFOLIO_SITES;
-			} else if ("admin".equals(type) || "portfolioAdmin".equals(type)
-					|| "citationsAdmin".equals(site.getId())) {
+			} else if ("admin".equals(type)) {
 				term = I18N_ADMIN_SITES;
 			} else {
 				term = I18N_OTHER_SITES;
