@@ -232,7 +232,7 @@ class MoreSiteViewImpl {
 			final List<Map<String, List<Site>>> sortedTerms) {
 		final List<Site> sites = terms.get(term);
 		if (sites == null || sites.isEmpty()) {
-			; // do nothing
+			return; // do nothing
 		} else {
 			final Map<String, List<Site>> matches = new HashMap<String, List<Site>>(
 					1);

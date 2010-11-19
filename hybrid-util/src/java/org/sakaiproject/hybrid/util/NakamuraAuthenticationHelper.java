@@ -322,7 +322,7 @@ public class NakamuraAuthenticationHelper {
 
 		public DefaultHttpClientProvider() {
 			LOG.debug("new DefaultHttpClientProvider()");
-			; // nothing to do
+			// nothing to do
 		}
 
 		/**
