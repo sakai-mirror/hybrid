@@ -44,7 +44,8 @@ public class NakamuraAuthenticationHelper {
 	/**
 	 * All sakai.properties settings will be prefixed with this string.
 	 */
-	public static final String CONFIG_PREFIX = "org.sakaiproject.hybrid.util.NakamuraAuthenticationHelper";
+	public static final String CONFIG_PREFIX = NakamuraAuthenticationHelper.class
+			.getName();
 	/**
 	 * sakai.properties The name of the nakamura anonymous principal.
 	 */
