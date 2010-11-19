@@ -117,7 +117,6 @@ public class SitesServlet extends HttpServlet {
 			if (unread) {
 				final String uuid = sessionManager.getCurrentSession()
 						.getUserId();
-				System.out.println("uuid=" + uuid);
 				final List<SynopticMsgcntrItem> synopticMsgcntrItems = synopticMsgcntrManager
 						.getWorkspaceSynopticMsgcntrItems(uuid);
 				if (synopticMsgcntrItems != null) {
