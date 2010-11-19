@@ -114,7 +114,6 @@ public class SitesServlet extends HttpServlet {
 						categoriesArrayJson.add(categoryJson);
 					}
 				}
-				json.element("size", siteList.size());
 				json.element("categories", categoriesArrayJson);
 			} else { // not categorized
 				final JSONArray sitesArrayJson = new JSONArray();
