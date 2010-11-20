@@ -37,7 +37,7 @@ import org.sakaiproject.tool.api.Placement;
 public class ToolHelperImpl {
 	SecurityService securityService;
 
-	private static final Log log = LogFactory.getLog(ToolHelperImpl.class);
+	private static final Log LOG = LogFactory.getLog(ToolHelperImpl.class);
 
 	public static final String TOOLCONFIG_REQUIRED_PERMISSIONS = "functions.require";
 
@@ -70,8 +70,8 @@ public class ToolHelperImpl {
 	 * tool.
 	 */
 	public boolean allowTool(Site site, Placement placement) {
-		if (log.isDebugEnabled()) {
-			log.debug("allowTool(Site site, Placement placement)");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("allowTool(Site site, Placement placement)");
 		}
 		// No way to render an opinion
 		if (placement == null || site == null)
@@ -79,8 +79,8 @@ public class ToolHelperImpl {
 
 		String requiredPermissionsString = placement.getConfig().getProperty(
 				TOOLCONFIG_REQUIRED_PERMISSIONS);
-		if (log.isDebugEnabled())
-			log.debug("requiredPermissionsString=" + requiredPermissionsString
+		if (LOG.isDebugEnabled())
+			LOG.debug("requiredPermissionsString=" + requiredPermissionsString
 					+ " for " + placement.getToolId());
 		if (requiredPermissionsString == null)
 			return true;
@@ -91,8 +91,8 @@ public class ToolHelperImpl {
 		String[] allowedPermissionSets = requiredPermissionsString.split("\\|");
 		for (int i = 0; i < allowedPermissionSets.length; i++) {
 			String[] requiredPermissions = allowedPermissionSets[i].split(",");
-			if (log.isDebugEnabled())
-				log.debug("requiredPermissions="
+			if (LOG.isDebugEnabled())
+				LOG.debug("requiredPermissions="
 						+ Arrays.asList(requiredPermissions));
 			boolean gotAllInList = true;
 			for (int j = 0; j < requiredPermissions.length; j++) {

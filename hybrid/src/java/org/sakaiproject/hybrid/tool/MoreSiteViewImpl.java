@@ -48,7 +48,7 @@ class MoreSiteViewImpl {
 	 * How much additional capacity will the Map&lt String, List&lt Site&gt&gt
 	 * terms require? For example: All sites, Portfolio, Project, Other.
 	 */
-	protected static int ADDITIONAL_TERMS_CAPACITY = 6;
+	protected static final int ADDITIONAL_TERMS_CAPACITY = 6;
 
 	// key naming scheme allows for natural sort order if no
 	// sakai.properties->portal.term.order is supplied.

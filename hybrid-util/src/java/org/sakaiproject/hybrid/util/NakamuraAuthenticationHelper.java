@@ -72,7 +72,7 @@ public class NakamuraAuthenticationHelper {
 	 * 
 	 * @see #CONFIG_ANONYMOUS
 	 */
-	private static String ANONYMOUS = "anonymous";
+	private static String anonymous = "anonymous";
 	/**
 	 * The name of the cookie that is set by nakamura. A good default is
 	 * provided.
@@ -156,8 +156,8 @@ public class NakamuraAuthenticationHelper {
 		this.validateUrl = validateUrl;
 		this.principal = principal;
 		this.hostname = hostname;
-		ANONYMOUS = serverConfigurationService.getString(CONFIG_ANONYMOUS,
-				ANONYMOUS);
+		anonymous = serverConfigurationService.getString(CONFIG_ANONYMOUS,
+				anonymous);
 		cookieName = serverConfigurationService.getString(CONFIG_COOKIE_NAME,
 				cookieName);
 
@@ -265,7 +265,7 @@ public class NakamuraAuthenticationHelper {
 			final JSONObject user = JSONObject.fromObject(json).getJSONObject(
 					"user");
 			final String p = user.getString("principal");
-			if (p != null && !"".equals(p) && !ANONYMOUS.equals(p)) {
+			if (p != null && !"".equals(p) && !anonymous.equals(p)) {
 				principal = p;
 			}
 
