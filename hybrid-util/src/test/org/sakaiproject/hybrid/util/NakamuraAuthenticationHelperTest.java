@@ -338,11 +338,11 @@ public class NakamuraAuthenticationHelperTest {
 		try {
 			nakamuraAuthenticationHelper
 					.getPrincipalLoggedIntoNakamura(request);
-			fail("Error should be thrown");
-		} catch (Error e) {
-			assertNotNull("Error should be thrown", e);
+			fail("IllegalStateException should be thrown");
+		} catch (IllegalStateException e) {
+			assertNotNull("IllegalStateException should be thrown", e);
 		} catch (Throwable e) {
-			fail("Error should be thrown");
+			fail("IllegalStateException should be thrown");
 		}
 	}
 
