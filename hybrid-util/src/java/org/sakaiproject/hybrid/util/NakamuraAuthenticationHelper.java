@@ -79,7 +79,7 @@ public class NakamuraAuthenticationHelper {
 	 * 
 	 * @see #CONFIG_COOKIE_NAME
 	 */
-	private String cookieName = "SAKAI-TRACKING";
+	private transient final String cookieName;
 	/**
 	 * The Nakamura RESTful service to validate authenticated users. A good
 	 * default is provided.
@@ -160,7 +160,7 @@ public class NakamuraAuthenticationHelper {
 		anonymous = serverConfigurationService.getString(CONFIG_ANONYMOUS,
 				anonymous);
 		cookieName = serverConfigurationService.getString(CONFIG_COOKIE_NAME,
-				cookieName);
+				"SAKAI-TRACKING");
 
 		xSakaiToken = new XSakaiToken(componentManager);
 	}
