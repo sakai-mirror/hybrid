@@ -54,7 +54,7 @@ public class XSakaiToken {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalStateException
 	 */
-	public XSakaiToken(ComponentManager componentManager) {
+	public XSakaiToken(final ComponentManager componentManager) {
 		LOG.debug("new XSakaiToken(ComponentManager componentManager)");
 		if (componentManager == null) {
 			throw new IllegalArgumentException("componentManager == null");

@@ -50,13 +50,13 @@ public class Signature {
 	 * @throws java.security.SignatureException
 	 *             when signature generation fails
 	 */
-	public static String calculateRFC2104HMAC(String data, String key)
-			throws java.security.SignatureException {
+	public static String calculateRFC2104HMAC(final String data,
+			final String key) throws java.security.SignatureException {
 		return calculateRFC2104HMACWithEncoding(data, key, false);
 	}
 
-	public static String calculateRFC2104HMACWithEncoding(String data,
-			String key, boolean urlSafe)
+	public static String calculateRFC2104HMACWithEncoding(final String data,
+			final String key, final boolean urlSafe)
 			throws java.security.SignatureException {
 		if (data == null) {
 			throw new IllegalArgumentException("String data == null");

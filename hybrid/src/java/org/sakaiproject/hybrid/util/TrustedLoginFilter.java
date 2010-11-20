@@ -125,8 +125,8 @@ public class TrustedLoginFilter implements Filter {
 	 * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
 	 *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
 	 */
-	public void doFilter(ServletRequest req, ServletResponse resp,
-			FilterChain chain) throws IOException, ServletException {
+	public void doFilter(final ServletRequest req, final ServletResponse resp,
+			final FilterChain chain) throws IOException, ServletException {
 		if (enabled && req instanceof HttpServletRequest) {
 			HttpServletRequest hreq = (HttpServletRequest) req;
 			final String host = req.getRemoteHost();
@@ -189,7 +189,7 @@ public class TrustedLoginFilter implements Filter {
 	 * @param token
 	 * @return
 	 */
-	protected String decodeToken(String token) {
+	protected String decodeToken(final String token) {
 		String userId = null;
 		final String[] parts = token.split(TOKEN_SEPARATOR);
 		if (parts.length == 3) {
@@ -217,7 +217,7 @@ public class TrustedLoginFilter implements Filter {
 	/**
 	 * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
 	 */
-	public void init(FilterConfig config) throws ServletException {
+	public void init(final FilterConfig config) throws ServletException {
 		sessionManager = (SessionManager) ComponentManager
 				.get(org.sakaiproject.tool.api.SessionManager.class);
 		if (sessionManager == null) {

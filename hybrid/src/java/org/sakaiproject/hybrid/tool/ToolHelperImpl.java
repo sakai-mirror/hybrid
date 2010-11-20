@@ -46,7 +46,7 @@ public class ToolHelperImpl {
 	 * @param securityService
 	 *            Required
 	 */
-	public ToolHelperImpl(SecurityService securityService) {
+	public ToolHelperImpl(final SecurityService securityService) {
 		if (securityService == null) {
 			throw new IllegalArgumentException(
 					"SecurityService cannot be null!");
@@ -69,7 +69,7 @@ public class ToolHelperImpl {
 	 * If the configuration tag is not set or is null, then all users see the
 	 * tool.
 	 */
-	public boolean allowTool(Site site, Placement placement) {
+	public boolean allowTool(final Site site, final Placement placement) {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("allowTool(Site site, Placement placement)");
 		}

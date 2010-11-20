@@ -90,8 +90,9 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	 *      javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	protected void doGet(final HttpServletRequest req,
+			final HttpServletResponse resp) throws ServletException,
+			IOException {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("doGet(HttpServletRequest " + req
 					+ ", HttpServletResponse " + resp + ")");
@@ -231,7 +232,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	 * @param site
 	 * @return
 	 */
-	private boolean canAccessAtLeastOneTool(Site site) {
+	private boolean canAccessAtLeastOneTool(final Site site) {
 		List<SitePage> pages = site.getOrderedPages();
 		if (pages != null) {
 			for (SitePage page : pages) {
@@ -255,8 +256,8 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	 * @param message
 	 * @throws IOException
 	 */
-	private void sendError(HttpServletResponse resp, int errorCode,
-			String message) throws IOException {
+	private void sendError(final HttpServletResponse resp, final int errorCode,
+			final String message) throws IOException {
 		if (!resp.isCommitted()) {
 			resp.sendError(errorCode);
 			return;
@@ -266,7 +267,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	}
 
 	@Override
-	public void init(ServletConfig config) throws ServletException {
+	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
 		sessionManager = (SessionManager) ComponentManager
 				.get(org.sakaiproject.tool.api.SessionManager.class);

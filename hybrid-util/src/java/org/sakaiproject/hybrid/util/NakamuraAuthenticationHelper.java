@@ -128,8 +128,9 @@ public class NakamuraAuthenticationHelper {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalStateException
 	 */
-	public NakamuraAuthenticationHelper(ComponentManager componentManager,
-			String validateUrl, String principal, String hostname) {
+	public NakamuraAuthenticationHelper(
+			final ComponentManager componentManager, final String validateUrl,
+			final String principal, final String hostname) {
 		if (componentManager == null) {
 			throw new IllegalArgumentException("componentManager == null;");
 		}
@@ -171,7 +172,8 @@ public class NakamuraAuthenticationHelper {
 	 * @return null if user cannot be authenticated.
 	 * @throws IllegalArgumentException
 	 */
-	public AuthInfo getPrincipalLoggedIntoNakamura(HttpServletRequest request) {
+	public AuthInfo getPrincipalLoggedIntoNakamura(
+			final HttpServletRequest request) {
 		LOG.debug("getPrincipalLoggedIntoNakamura(HttpServletRequest request)");
 		if (request == null) {
 			throw new IllegalArgumentException("HttpServletRequest == null");
@@ -223,7 +225,7 @@ public class NakamuraAuthenticationHelper {
 	 * @param request
 	 * @return null if no secret can be found.
 	 */
-	private String getSecret(HttpServletRequest request) {
+	private String getSecret(final HttpServletRequest request) {
 		LOG.debug("getSecret(HttpServletRequest request)");
 		if (request == null) {
 			throw new IllegalArgumentException("HttpServletRequest == null");

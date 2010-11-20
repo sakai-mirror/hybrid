@@ -82,8 +82,9 @@ public class SitesServlet extends HttpServlet {
 	protected transient MoreSiteViewImpl moreSiteViewImpl;
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	protected void doGet(final HttpServletRequest req,
+			final HttpServletResponse resp) throws ServletException,
+			IOException {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("doGet(HttpServletRequest " + req
 					+ ", HttpServletResponse " + resp + ")");
@@ -181,9 +182,9 @@ public class SitesServlet extends HttpServlet {
 		json.write(resp.getWriter());
 	}
 
-	private JSONObject renderSiteJson(Site site,
-			Map<String, Integer> unreadForums,
-			Map<String, Integer> unreadMessages) {
+	private JSONObject renderSiteJson(final Site site,
+			final Map<String, Integer> unreadForums,
+			final Map<String, Integer> unreadMessages) {
 		final JSONObject siteJson = new JSONObject();
 		final String siteId = site.getId();
 		siteJson.element("title", site.getTitle());
@@ -205,7 +206,7 @@ public class SitesServlet extends HttpServlet {
 	}
 
 	@Override
-	public void init(ServletConfig config) throws ServletException {
+	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
 		if (componentManager == null) {
 			componentManager = org.sakaiproject.component.cover.ComponentManager
@@ -242,7 +243,7 @@ public class SitesServlet extends HttpServlet {
 	 * 
 	 * @param componentManager
 	 */
-	protected void setupTestCase(ComponentManager componentManager) {
+	protected void setupTestCase(final ComponentManager componentManager) {
 		if (componentManager == null) {
 			throw new IllegalArgumentException("componentManager == null");
 		}
