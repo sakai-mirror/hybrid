@@ -250,10 +250,10 @@ public class NakamuraAuthenticationHelper {
 	public static class AuthInfo {
 		private static final Log AILOG = LogFactory.getLog(AuthInfo.class);
 
-		private transient String principal;
-		private transient String firstName;
-		private transient String lastName;
-		private transient String emailAddress;
+		private final transient String principal;
+		private final transient String firstName;
+		private final transient String lastName;
+		private final transient String emailAddress;
 
 		/**
 		 * 
@@ -269,6 +269,8 @@ public class NakamuraAuthenticationHelper {
 			final String p = user.getString("principal");
 			if (p != null && !"".equals(p) && !anonymous.equals(p)) {
 				principal = p;
+			} else {
+				principal = null;
 			}
 
 			final JSONObject properties = user.getJSONObject("properties");
