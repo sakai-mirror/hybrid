@@ -213,6 +213,9 @@ public class XSakaiToken {
 	 * @throws Error
 	 *             Wrapped exception if there is any unexpected trouble.
 	 * @throws IllegalArgumentException
+	 * @throws IllegalStateException
+	 *             Wraps {@link SignatureException} into a
+	 *             {@link RuntimeException}.
 	 */
 	public String signMessage(final String sharedSecret, final String eid) {
 		LOG.debug("signMessage(final String sharedSecret, final String eid)");

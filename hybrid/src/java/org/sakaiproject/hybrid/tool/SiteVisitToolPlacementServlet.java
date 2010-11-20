@@ -255,6 +255,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	 * @param errorCode
 	 * @param message
 	 * @throws IOException
+	 * @throws ResponseCommittedException
 	 */
 	private void sendError(final HttpServletResponse resp, final int errorCode,
 			final String message) throws IOException {
@@ -262,7 +263,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 			resp.sendError(errorCode);
 			return;
 		} else {
-			throw new IllegalStateException(message);
+			throw new ResponseCommittedException(message);
 		}
 	}
 
@@ -295,5 +296,20 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 			throw new IllegalStateException("SecurityService == null");
 		}
 		toolHelper = new ToolHelperImpl(securityService);
+	}
+
+	/**
+	 *
+	 */
+	public static class ResponseCommittedException extends RuntimeException {
+		private static final long serialVersionUID = -288866672761140745L;
+
+		/**
+		 * @see RuntimeException#RuntimeException(String)
+		 * @param message
+		 */
+		public ResponseCommittedException(String message) {
+			super(message);
+		}
 	}
 }

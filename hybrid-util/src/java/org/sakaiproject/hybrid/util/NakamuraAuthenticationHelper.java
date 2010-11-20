@@ -171,6 +171,8 @@ public class NakamuraAuthenticationHelper {
 	 * @param request
 	 * @return null if user cannot be authenticated.
 	 * @throws IllegalArgumentException
+	 * @throws IllegalStateException
+	 *             For all unexpected cause Exceptions.
 	 */
 	public AuthInfo getPrincipalLoggedIntoNakamura(
 			final HttpServletRequest request) {
