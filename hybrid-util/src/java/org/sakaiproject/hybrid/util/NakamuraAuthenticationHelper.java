@@ -79,7 +79,7 @@ public class NakamuraAuthenticationHelper {
 	 * 
 	 * @see #CONFIG_COOKIE_NAME
 	 */
-	protected static String cookieName = "SAKAI-TRACKING";
+	private String cookieName = "SAKAI-TRACKING";
 	/**
 	 * The Nakamura RESTful service to validate authenticated users. A good
 	 * default is provided.
