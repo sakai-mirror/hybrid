@@ -142,7 +142,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 			siteJson.element("skin", site.getSkin());
 			siteJson.element("type", site.getType());
 			// get the list of site pages
-			List<SitePage> pages = site.getOrderedPages();
+			final List<SitePage> pages = site.getOrderedPages();
 			int number = 0;
 			if (pages != null && canAccessAtLeastOneTool(site)) {
 				final JSONArray pagesArray = new JSONArray();
@@ -154,7 +154,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 					pageJson.element("number", ++number);
 					pageJson.element("popup", page.isPopUp());
 					// get list of tools for the page
-					List<ToolConfiguration> tools = page.getTools();
+					final List<ToolConfiguration> tools = page.getTools();
 					if (tools != null && !tools.isEmpty()) {
 						pageJson.element(
 								"iconclass",
@@ -233,10 +233,10 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	 * @return
 	 */
 	private boolean canAccessAtLeastOneTool(final Site site) {
-		List<SitePage> pages = site.getOrderedPages();
+		final List<SitePage> pages = site.getOrderedPages();
 		if (pages != null) {
 			for (SitePage page : pages) {
-				List<ToolConfiguration> tools = page.getTools();
+				final List<ToolConfiguration> tools = page.getTools();
 				for (ToolConfiguration tool : tools) {
 					if (toolHelper.allowTool(site, tool)) {
 						return true;

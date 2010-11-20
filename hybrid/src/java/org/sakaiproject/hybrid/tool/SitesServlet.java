@@ -144,7 +144,7 @@ public class SitesServlet extends HttpServlet {
 				}
 			}
 			if (categorized) {
-				List<Map<String, List<Site>>> categorizedSitesList = moreSiteViewImpl
+				final List<Map<String, List<Site>>> categorizedSitesList = moreSiteViewImpl
 						.categorizeSites(siteList);
 				final JSONArray categoriesArrayJson = new JSONArray();
 				for (final Map<String, List<Site>> map : categorizedSitesList) {

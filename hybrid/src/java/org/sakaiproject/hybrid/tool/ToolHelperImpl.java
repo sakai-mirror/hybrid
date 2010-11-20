@@ -88,9 +88,11 @@ public class ToolHelperImpl {
 		if (requiredPermissionsString.length() == 0)
 			return true;
 
-		String[] allowedPermissionSets = requiredPermissionsString.split("\\|");
+		final String[] allowedPermissionSets = requiredPermissionsString
+				.split("\\|");
 		for (int i = 0; i < allowedPermissionSets.length; i++) {
-			String[] requiredPermissions = allowedPermissionSets[i].split(",");
+			final String[] requiredPermissions = allowedPermissionSets[i]
+					.split(",");
 			if (LOG.isDebugEnabled())
 				LOG.debug("requiredPermissions="
 						+ Arrays.asList(requiredPermissions));

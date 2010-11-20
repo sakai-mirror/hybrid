@@ -66,20 +66,21 @@ public class Signature {
 		}
 		try {
 			// Get an hmac_sha1 key from the raw key bytes
-			byte[] keyBytes = key.getBytes("UTF-8");
-			SecretKeySpec signingKey = new SecretKeySpec(keyBytes,
+			final byte[] keyBytes = key.getBytes("UTF-8");
+			final SecretKeySpec signingKey = new SecretKeySpec(keyBytes,
 					HMAC_SHA1_ALGORITHM);
 
 			// Get an hmac_sha1 Mac instance and initialize with the signing key
-			Mac mac = Mac.getInstance(HMAC_SHA1_ALGORITHM);
+			final Mac mac = Mac.getInstance(HMAC_SHA1_ALGORITHM);
 			mac.init(signingKey);
 
 			// Compute the hmac on input data bytes
-			byte[] rawHmac = mac.doFinal(data.getBytes("UTF-8"));
+			final byte[] rawHmac = mac.doFinal(data.getBytes("UTF-8"));
 
 			// Convert raw bytes to encoding
-			byte[] base64Bytes = Base64.encodeBase64(rawHmac, false, urlSafe);
-			String result = new String(base64Bytes, "UTF-8");
+			final byte[] base64Bytes = Base64.encodeBase64(rawHmac, false,
+					urlSafe);
+			final String result = new String(base64Bytes, "UTF-8");
 
 			return result;
 
