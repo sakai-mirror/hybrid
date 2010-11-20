@@ -261,7 +261,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 			resp.sendError(errorCode);
 			return;
 		} else {
-			throw new Error(message);
+			throw new IllegalStateException(message);
 		}
 	}
 

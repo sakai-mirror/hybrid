@@ -205,7 +205,7 @@ public class NakamuraAuthenticationHelper {
 				}
 			} catch (Exception e) {
 				LOG.error(e.getMessage(), e);
-				throw new Error(e);
+				throw new IllegalStateException(e);
 			} finally {
 				httpClient.getConnectionManager().shutdown();
 			}

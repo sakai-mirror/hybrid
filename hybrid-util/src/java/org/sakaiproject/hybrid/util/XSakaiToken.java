@@ -229,7 +229,7 @@ public class XSakaiToken {
 					sharedSecret);
 			token = hash + TOKEN_SEPARATOR + message;
 		} catch (SignatureException e) {
-			throw new Error(e);
+			throw new IllegalStateException(e);
 		}
 		return token;
 	}
