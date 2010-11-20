@@ -41,11 +41,11 @@ public class XSakaiToken {
 	public static final String CONFIG_SHARED_SECRET_SUFFIX = "sharedSecret";
 	public static final String TOKEN_SEPARATOR = ";";
 
-	private final SecureRandom secureRandom = new SecureRandom();
+	private transient final SecureRandom secureRandom = new SecureRandom();
 	// dependencies
-	ComponentManager componentManager;
-	ServerConfigurationService serverConfigurationService;
-	SessionManager sessionManager;
+	transient ComponentManager componentManager;
+	transient ServerConfigurationService serverConfigurationService;
+	transient SessionManager sessionManager;
 
 	/**
 	 * @param componentManager

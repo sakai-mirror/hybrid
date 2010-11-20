@@ -79,34 +79,34 @@ public class NakamuraAuthenticationHelper {
 	 * 
 	 * @see #CONFIG_COOKIE_NAME
 	 */
-	protected String cookieName = "SAKAI-TRACKING";
+	protected static String cookieName = "SAKAI-TRACKING";
 	/**
 	 * The Nakamura RESTful service to validate authenticated users. A good
 	 * default is provided.
 	 */
-	protected String validateUrl;
+	protected transient String validateUrl;
 
 	/**
 	 * The nakamura user that has permissions to GET
 	 * /var/cluster/user.cookie.json. A good default is provided.
 	 */
-	protected String principal;
+	protected transient String principal;
 
 	/**
 	 * The hostname we will use to lookup the sharedSecret for access to
 	 * validateUrl. A good default is provided.
 	 */
-	protected String hostname;
+	protected transient String hostname;
 
 	/**
 	 * A simple abstraction to allow for proper unit testing
 	 */
-	protected HttpClientProvider httpClientProvider = new DefaultHttpClientProvider();
+	protected transient HttpClientProvider httpClientProvider = new DefaultHttpClientProvider();
 
 	// dependencies
-	ThreadLocalManager threadLocalManager;
-	ServerConfigurationService serverConfigurationService;
-	XSakaiToken xSakaiToken;
+	transient ThreadLocalManager threadLocalManager;
+	transient ServerConfigurationService serverConfigurationService;
+	transient XSakaiToken xSakaiToken;
 
 	/**
 	 * Class is immutable and thread safe.
@@ -248,10 +248,10 @@ public class NakamuraAuthenticationHelper {
 	public static class AuthInfo {
 		private static final Log AILOG = LogFactory.getLog(AuthInfo.class);
 
-		private String principal;
-		private String firstName;
-		private String lastName;
-		private String emailAddress;
+		private transient String principal;
+		private transient String firstName;
+		private transient String lastName;
+		private transient String emailAddress;
 
 		/**
 		 * 

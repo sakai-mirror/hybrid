@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 public class ToolRequestWrapper extends HttpServletRequestWrapper {
 
-	private String remoteUser;
+	private transient String remoteUser;
 
 	public ToolRequestWrapper(HttpServletRequest request) {
 		super(request);

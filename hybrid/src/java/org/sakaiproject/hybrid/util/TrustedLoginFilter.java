@@ -102,24 +102,24 @@ public class TrustedLoginFilter implements Filter {
 	private static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SAFE_HOSTS = "org.sakaiproject.hybrid.util.TrustedLoginFilter.safeHosts";
 	private static final String TOKEN_SEPARATOR = ";";
 
-	protected SessionManager sessionManager;
-	protected UserDirectoryService userDirectoryService;
+	protected transient SessionManager sessionManager;
+	protected transient UserDirectoryService userDirectoryService;
 
 	/**
 	 * Property to contain the shared secret used by all trusted servers. The
 	 * shared secret used for server to server trusted tokens.
 	 */
-	protected String sharedSecret = null;
+	protected transient String sharedSecret = null;
 	/**
 	 * True if server tokens are enabled. If true, trusted tokens from servers
 	 * are accepted considered.
 	 */
-	protected boolean enabled = true;
+	protected transient boolean enabled = true;
 	/**
 	 * A list of all the known safe hosts to trust as servers. A ; separated
 	 * list of hosts that this instance trusts to make server connections.
 	 */
-	protected String safeHosts = ";localhost;";
+	protected transient String safeHosts = ";localhost;";
 
 	/**
 	 * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
