@@ -308,7 +308,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 		 * @see RuntimeException#RuntimeException(String)
 		 * @param message
 		 */
-		public ResponseCommittedException(String message) {
+		public ResponseCommittedException(final String message) {
 			super(message);
 		}
 	}
