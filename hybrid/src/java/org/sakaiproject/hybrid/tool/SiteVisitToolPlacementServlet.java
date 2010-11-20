@@ -65,6 +65,7 @@ import edu.umd.cs.findbugs.annotations.SuppressWarnings;
  * HttpServletResponse.SC_FORBIDDEN if the current user does not have permission
  * to access the specified site.
  */
+@SuppressWarnings("PMD.LongVariable")
 public class SiteVisitToolPlacementServlet extends HttpServlet {
 	private static final long serialVersionUID = -1182601175544873164L;
 	private static final Log LOG = LogFactory

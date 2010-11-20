@@ -33,6 +33,7 @@ import org.sakaiproject.tool.api.SessionManager;
  * Utility class for dealing with x-sakai-token semantics. Note: Class is thread
  * safe.
  */
+@SuppressWarnings("PMD.LongVariable")
 public class XSakaiToken {
 	private static final Log LOG = LogFactory.getLog(XSakaiToken.class);
 	public static final String X_SAKAI_TOKEN_HEADER = "x-sakai-token";

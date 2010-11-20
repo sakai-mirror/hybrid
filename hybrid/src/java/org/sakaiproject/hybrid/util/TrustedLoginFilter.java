@@ -94,6 +94,7 @@ import org.sakaiproject.user.api.UserNotDefinedException;
  * </pre>
  * 
  */
+@SuppressWarnings("PMD.LongVariable")
 public class TrustedLoginFilter implements Filter {
 	private final static Log LOG = LogFactory.getLog(TrustedLoginFilter.class);
 	private static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SHARED_SECRET = "org.sakaiproject.hybrid.util.TrustedLoginFilter.sharedSecret";

@@ -40,6 +40,7 @@ import org.sakaiproject.thread_local.api.ThreadLocalManager;
  * Useful helper for interacting with Nakamura's authentication REST end-points.
  * Note: thread safe.
  */
+@SuppressWarnings("PMD.LongVariable")
 public class NakamuraAuthenticationHelper {
 	/**
 	 * All sakai.properties settings will be prefixed with this string.

@@ -33,6 +33,7 @@ import org.sakaiproject.tool.api.Placement;
  * <p>
  * Inclusion helps avoid class loader issue with sakai-portal-impl.
  */
+@SuppressWarnings("PMD.LongVariable")
 public class ToolHelperImpl {
 	SecurityService securityService;
 

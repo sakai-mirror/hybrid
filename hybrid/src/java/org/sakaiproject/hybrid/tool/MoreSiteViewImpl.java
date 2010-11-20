@@ -40,6 +40,7 @@ import org.sakaiproject.site.api.Site;
  * <p>
  * Object is thread safe.
  */
+@SuppressWarnings("PMD.LongVariable")
 class MoreSiteViewImpl {
 	private static final Log LOG = LogFactory.getLog(MoreSiteViewImpl.class);
 
