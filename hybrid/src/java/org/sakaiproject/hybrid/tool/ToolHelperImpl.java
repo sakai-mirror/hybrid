@@ -35,7 +35,7 @@ import org.sakaiproject.tool.api.Placement;
  */
 @SuppressWarnings("PMD.LongVariable")
 public class ToolHelperImpl {
-	transient SecurityService securityService;
+	protected transient SecurityService securityService;
 
 	private static final Log LOG = LogFactory.getLog(ToolHelperImpl.class);
 

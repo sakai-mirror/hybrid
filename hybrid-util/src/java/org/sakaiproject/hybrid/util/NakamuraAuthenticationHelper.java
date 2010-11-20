@@ -64,7 +64,7 @@ public class NakamuraAuthenticationHelper {
 	 * The key that will be used to cache AuthInfo hits in ThreadLocal. This
 	 * will handle cases where AuthInfo is requested more than once per request.
 	 */
-	static final String THREAD_LOCAL_CACHE_KEY = NakamuraAuthenticationHelper.class
+	protected static final String THREAD_LOCAL_CACHE_KEY = NakamuraAuthenticationHelper.class
 			.getName() + ".AuthInfo.cache";
 
 	/**
@@ -104,9 +104,9 @@ public class NakamuraAuthenticationHelper {
 	protected transient HttpClientProvider httpClientProvider = new DefaultHttpClientProvider();
 
 	// dependencies
-	transient ThreadLocalManager threadLocalManager;
-	transient ServerConfigurationService serverConfigurationService;
-	transient XSakaiToken xSakaiToken;
+	protected transient ThreadLocalManager threadLocalManager;
+	protected transient ServerConfigurationService serverConfigurationService;
+	protected transient XSakaiToken xSakaiToken;
 
 	/**
 	 * Class is immutable and thread safe.

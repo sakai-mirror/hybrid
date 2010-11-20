@@ -87,7 +87,7 @@ class MoreSiteViewImpl {
 	/**
 	 * Injected via constructor
 	 */
-	transient ServerConfigurationService serverConfigurationService;
+	protected transient ServerConfigurationService serverConfigurationService;
 
 	/**
 	 * Dependencies get injected at creation of object to help with unit

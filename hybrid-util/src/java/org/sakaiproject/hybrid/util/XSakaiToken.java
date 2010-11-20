@@ -43,9 +43,9 @@ public class XSakaiToken {
 
 	private transient final SecureRandom secureRandom = new SecureRandom();
 	// dependencies
-	transient ComponentManager componentManager;
-	transient ServerConfigurationService serverConfigurationService;
-	transient SessionManager sessionManager;
+	protected transient ComponentManager componentManager;
+	protected transient ServerConfigurationService serverConfigurationService;
+	protected transient SessionManager sessionManager;
 
 	/**
 	 * @param componentManager
