@@ -72,7 +72,7 @@ public class ToolHelperImpl {
 	 * tool.
 	 */
 	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.NPathComplexity",
-			"PMD.DataflowAnomalyAnalysis" })
+			"PMD.DataflowAnomalyAnalysis", "PMD.OnlyOneReturn" })
 	public boolean allowTool(final Site site, final Placement placement) {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("allowTool(Site site, Placement placement)");
