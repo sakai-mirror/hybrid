@@ -67,15 +67,17 @@ public class SitesServlet extends HttpServlet {
 	 * counts.
 	 */
 	private static final String UNREAD = "unread";
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	private static final String MSF_MUTABLE_SERVLET_FIELD = "MSF_MUTABLE_SERVLET_FIELD";
+	private static final String DEPENDENCY_ONLY_MUTATED_DURING_INIT = "dependency mutated only during init()";
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient SessionManager sessionManager;
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient SiteService siteService;
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient ServerConfigurationService serverConfigurationService;
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient ComponentManager componentManager;
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient SynopticMsgcntrManager synopticMsgcntrManager;
 	protected transient MoreSiteViewImpl moreSiteViewImpl;
 
