@@ -23,6 +23,7 @@ import java.util.Set;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -65,7 +66,7 @@ import edu.umd.cs.findbugs.annotations.SuppressWarnings;
  * HttpServletResponse.SC_FORBIDDEN if the current user does not have permission
  * to access the specified site.
  */
-@SuppressWarnings("PMD.LongVariable")
+@SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 public class SiteVisitToolPlacementServlet extends HttpServlet {
 	private static final long serialVersionUID = -1182601175544873164L;
 	private static final Log LOG = LogFactory
@@ -90,6 +91,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	 *      javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
+	@SuppressWarnings({ "PMD.CyclomaticComplexity" })
 	protected void doGet(final HttpServletRequest req,
 			final HttpServletResponse resp) throws ServletException,
 			IOException {
@@ -299,7 +301,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	}
 
 	/**
-	 *
+	 * @see ServletResponse#isCommitted()
 	 */
 	public static class ResponseCommittedException extends RuntimeException {
 		private static final long serialVersionUID = -288866672761140745L;

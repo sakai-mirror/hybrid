@@ -128,6 +128,7 @@ public class NakamuraAuthenticationHelper {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalStateException
 	 */
+	@SuppressWarnings("PMD.CyclomaticComplexity")
 	public NakamuraAuthenticationHelper(
 			final ComponentManager componentManager, final String validateUrl,
 			final String principal, final String hostname) {

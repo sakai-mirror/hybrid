@@ -40,7 +40,7 @@ import org.sakaiproject.site.api.Site;
  * <p>
  * Object is thread safe.
  */
-@SuppressWarnings("PMD.LongVariable")
+@SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 class MoreSiteViewImpl {
 	private static final Log LOG = LogFactory.getLog(MoreSiteViewImpl.class);
 
@@ -116,6 +116,7 @@ class MoreSiteViewImpl {
 	 *            sorted by title ascending.
 	 * @return
 	 */
+	@SuppressWarnings({ "PMD.CyclomaticComplexity" })
 	public List<Map<String, List<Site>>> categorizeSites(
 			final List<Site> siteList) {
 		if (LOG.isDebugEnabled()) {

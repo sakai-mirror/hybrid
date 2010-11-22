@@ -55,7 +55,7 @@ import edu.umd.cs.findbugs.annotations.SuppressWarnings;
  * all sites that the user has access to visit.
  */
 @SuppressWarnings(value = "MTIA_SUSPECT_SERVLET_INSTANCE_FIELD", justification = "dependencies only mutated only during init()")
-@java.lang.SuppressWarnings("PMD.LongVariable")
+@java.lang.SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 public class SitesServlet extends HttpServlet {
 	// TODO i18n category names
 	private static final long serialVersionUID = 7907409301065984518L;
@@ -82,6 +82,7 @@ public class SitesServlet extends HttpServlet {
 	protected transient MoreSiteViewImpl moreSiteViewImpl;
 
 	@Override
+	@SuppressWarnings({ "PMD.CyclomaticComplexity" })
 	protected void doGet(final HttpServletRequest req,
 			final HttpServletResponse resp) throws ServletException,
 			IOException {

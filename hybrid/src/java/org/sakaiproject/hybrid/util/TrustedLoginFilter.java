@@ -94,7 +94,7 @@ import org.sakaiproject.user.api.UserNotDefinedException;
  * </pre>
  * 
  */
-@SuppressWarnings("PMD.LongVariable")
+@SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 public class TrustedLoginFilter implements Filter {
 	private final static Log LOG = LogFactory.getLog(TrustedLoginFilter.class);
 	private static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SHARED_SECRET = "org.sakaiproject.hybrid.util.TrustedLoginFilter.sharedSecret";
@@ -125,6 +125,7 @@ public class TrustedLoginFilter implements Filter {
 	 * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
 	 *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
 	 */
+	@SuppressWarnings({ "PMD.CyclomaticComplexity" })
 	public void doFilter(final ServletRequest req, final ServletResponse resp,
 			final FilterChain chain) throws IOException, ServletException {
 		if (enabled && req instanceof HttpServletRequest) {

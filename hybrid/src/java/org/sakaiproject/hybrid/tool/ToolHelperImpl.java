@@ -33,7 +33,7 @@ import org.sakaiproject.tool.api.Placement;
  * <p>
  * Inclusion helps avoid class loader issue with sakai-portal-impl.
  */
-@SuppressWarnings("PMD.LongVariable")
+@SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 public class ToolHelperImpl {
 	protected transient SecurityService securityService;
 
@@ -69,6 +69,7 @@ public class ToolHelperImpl {
 	 * If the configuration tag is not set or is null, then all users see the
 	 * tool.
 	 */
+	@SuppressWarnings({ "PMD.CyclomaticComplexity" })
 	public boolean allowTool(final Site site, final Placement placement) {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("allowTool(Site site, Placement placement)");
