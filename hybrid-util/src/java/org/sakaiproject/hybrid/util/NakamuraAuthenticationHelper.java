@@ -186,7 +186,7 @@ public class NakamuraAuthenticationHelper {
 			throw new IllegalArgumentException("HttpServletRequest == null");
 		}
 		final Object cache = threadLocalManager.get(THREAD_LOCAL_CACHE_KEY);
-		if (cache != null && cache instanceof AuthInfo) {
+		if (cache instanceof AuthInfo) {
 			LOG.debug("cache hit!");
 			return (AuthInfo) cache;
 		}
