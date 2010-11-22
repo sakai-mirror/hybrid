@@ -84,7 +84,8 @@ public class SitesServlet extends HttpServlet {
 
 	@Override
 	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.NPathComplexity",
-			"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDeeplyNestedIfStmts" })
+			"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDeeplyNestedIfStmts",
+			"PMD.AvoidInstantiatingObjectsInLoops" })
 	protected void doGet(final HttpServletRequest req,
 			final HttpServletResponse resp) throws ServletException,
 			IOException {
