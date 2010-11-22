@@ -277,11 +277,12 @@ public class NakamuraAuthenticationHelper {
 			}
 			final JSONObject user = JSONObject.fromObject(json).getJSONObject(
 					"user");
-			final String p = user.getString("principal");
-			if (p != null && !"".equals(p) && !anonymous.equals(p)) {
-				principal = p;
+			final String principal = user.getString("principal");
+			if (principal != null && !"".equals(principal)
+					&& !anonymous.equals(principal)) {
+				this.principal = principal;
 			} else {
-				principal = null;
+				this.principal = null;
 			}
 
 			final JSONObject properties = user.getJSONObject("properties");
