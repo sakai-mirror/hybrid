@@ -33,7 +33,7 @@ import org.apache.commons.codec.binary.Base64;
  * Utility to calculate signatures for information.
  */
 @SuppressWarnings("PMD.LongVariable")
-public class Signature {
+public final class Signature {
 	private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
 	/**
