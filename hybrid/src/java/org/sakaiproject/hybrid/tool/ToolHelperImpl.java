@@ -78,28 +78,33 @@ public class ToolHelperImpl {
 			LOG.debug("allowTool(Site site, Placement placement)");
 		}
 		// No way to render an opinion
-		if (placement == null || site == null)
+		if (placement == null || site == null) {
 			return true;
+		}
 
 		String requiredPermissionsString = placement.getConfig().getProperty(
 				TOOLCONFIG_REQUIRED_PERMISSIONS);
-		if (LOG.isDebugEnabled())
+		if (LOG.isDebugEnabled()) {
 			LOG.debug("requiredPermissionsString=" + requiredPermissionsString
 					+ " for " + placement.getToolId());
-		if (requiredPermissionsString == null)
+		}
+		if (requiredPermissionsString == null) {
 			return true;
+		}
 		requiredPermissionsString = requiredPermissionsString.trim();
-		if (requiredPermissionsString.length() == 0)
+		if (requiredPermissionsString.length() == 0) {
 			return true;
+		}
 
 		final String[] allowedPermissionSets = requiredPermissionsString
 				.split("\\|");
 		for (int i = 0; i < allowedPermissionSets.length; i++) {
 			final String[] requiredPermissions = allowedPermissionSets[i]
 					.split(",");
-			if (LOG.isDebugEnabled())
+			if (LOG.isDebugEnabled()) {
 				LOG.debug("requiredPermissions="
 						+ Arrays.asList(requiredPermissions));
+			}
 			boolean gotAllInList = true;
 			for (int j = 0; j < requiredPermissions.length; j++) {
 				if (!securityService.unlock(requiredPermissions[j].trim(),
