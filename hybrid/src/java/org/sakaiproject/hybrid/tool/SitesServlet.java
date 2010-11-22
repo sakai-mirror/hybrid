@@ -91,16 +91,9 @@ public class SitesServlet extends HttpServlet {
 			LOG.debug("doGet(HttpServletRequest " + req
 					+ ", HttpServletResponse " + resp + ")");
 		}
-		final String categorizedParam = req.getParameter(CATEGORIZED);
-		boolean categorized = false;
-		if (categorizedParam != null) {
-			categorized = Boolean.parseBoolean(categorizedParam);
-		}
-		final String unreadParam = req.getParameter(UNREAD);
-		boolean unread = false;
-		if (unreadParam != null) {
-			unread = Boolean.parseBoolean(unreadParam);
-		}
+		final boolean categorized = Boolean.parseBoolean(req
+				.getParameter(CATEGORIZED));
+		final boolean unread = Boolean.parseBoolean(req.getParameter(UNREAD));
 		// sites for current user
 		final JSONObject json = new JSONObject();
 		final String principal = sessionManager.getCurrentSession()
@@ -116,7 +109,9 @@ public class SitesServlet extends HttpServlet {
 				org.sakaiproject.site.api.SiteService.SortType.TITLE_ASC, null);
 		if (siteList != null) {
 			// initialize values to an empty map to avoid null check later
+			@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 			Map<String, Integer> unreadForums = Collections.emptyMap();
+			@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 			Map<String, Integer> unreadMessages = unreadForums;
 			if (unread) {
 				final String uuid = sessionManager.getCurrentSession()
@@ -148,6 +143,7 @@ public class SitesServlet extends HttpServlet {
 			if (categorized) {
 				final List<Map<String, List<Site>>> categorizedSitesList = moreSiteViewImpl
 						.categorizeSites(siteList);
+				@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 				final JSONArray categoriesArrayJson = new JSONArray();
 				for (final Map<String, List<Site>> map : categorizedSitesList) {
 					if (map.size() != 1) {

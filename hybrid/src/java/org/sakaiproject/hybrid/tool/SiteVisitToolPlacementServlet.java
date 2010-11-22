@@ -114,13 +114,16 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 			}
 		}
 		// should we record a site visit event?
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		final boolean writeEvent = Boolean.parseBoolean(req
 				.getParameter("writeEvent"));
 		// current user
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		final String principal = sessionManager.getCurrentSession()
 				.getUserEid();
 		// 1) get the Site object for siteId
 		// 2) ensure user has access to Site via SiteService.getSiteVisit()
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		Site site = null;
 		try {
 			site = siteService.getSiteVisit(siteId);

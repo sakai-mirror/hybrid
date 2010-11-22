@@ -125,6 +125,7 @@ public class XSakaiToken {
 		if (sharedSecret == null) {
 			throw new IllegalArgumentException("sharedSecret == null");
 		}
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		String userId = null;
 		final String[] parts = token.split(TOKEN_SEPARATOR);
 		if (parts.length == 3) {
@@ -225,6 +226,7 @@ public class XSakaiToken {
 		if (eid == null || "".equals(eid)) {
 			throw new IllegalArgumentException("eid == null OR empty");
 		}
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		String token = null;
 		final String message = eid + TOKEN_SEPARATOR + secureRandom.nextLong();
 		try {

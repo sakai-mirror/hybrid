@@ -190,6 +190,7 @@ public class NakamuraAuthenticationHelper {
 			LOG.debug("cache hit!");
 			return (AuthInfo) cache;
 		}
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		AuthInfo authInfo = null;
 		final String secret = getSecret(request);
 		if (secret != null) {
@@ -237,6 +238,7 @@ public class NakamuraAuthenticationHelper {
 		if (request == null) {
 			throw new IllegalArgumentException("HttpServletRequest == null");
 		}
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		String secret = null;
 		final Cookie[] cookies = request.getCookies();
 		if (cookies != null) {

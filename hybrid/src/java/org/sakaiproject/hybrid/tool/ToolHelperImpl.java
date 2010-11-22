@@ -25,6 +25,8 @@ import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.tool.api.Placement;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+
 /**
  * Copied from <a href=
  * "https://source.sakaiproject.org/svn/portal/tags/sakai-2.7.1/portal-impl/impl/src/java/org/sakaiproject/portal/charon/ToolHelperImpl.java"
@@ -97,6 +99,7 @@ public class ToolHelperImpl {
 			if (LOG.isDebugEnabled())
 				LOG.debug("requiredPermissions="
 						+ Arrays.asList(requiredPermissions));
+			@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 			boolean gotAllInList = true;
 			for (int j = 0; j < requiredPermissions.length; j++) {
 				if (!securityService.unlock(requiredPermissions[j].trim(),

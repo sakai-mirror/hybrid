@@ -37,6 +37,8 @@ import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+
 /**
  * <pre>
  *  A filter to come after the standard sakai request filter to allow services
@@ -129,6 +131,7 @@ public class TrustedLoginFilter implements Filter {
 	public void doFilter(final ServletRequest req, final ServletResponse resp,
 			final FilterChain chain) throws IOException, ServletException {
 		if (enabled && req instanceof HttpServletRequest) {
+			@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 			HttpServletRequest hreq = (HttpServletRequest) req;
 			final String host = req.getRemoteHost();
 			if (safeHosts.indexOf(host) < 0) {
@@ -137,7 +140,9 @@ public class TrustedLoginFilter implements Filter {
 				return;
 			} else {
 				final String token = hreq.getHeader("x-sakai-token");
+				@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 				Session currentSession = null;
+				@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 				Session requestSession = null;
 				if (token != null) {
 					final String trustedUserName = decodeToken(token);
@@ -145,6 +150,7 @@ public class TrustedLoginFilter implements Filter {
 						currentSession = sessionManager.getCurrentSession();
 						if (!trustedUserName
 								.equals(currentSession.getUserEid())) {
+							@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 							org.sakaiproject.user.api.User user = null;
 							try {
 								user = userDirectoryService
@@ -191,6 +197,7 @@ public class TrustedLoginFilter implements Filter {
 	 * @return
 	 */
 	protected String decodeToken(final String token) {
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		String userId = null;
 		final String[] parts = token.split(TOKEN_SEPARATOR);
 		if (parts.length == 3) {

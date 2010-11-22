@@ -141,6 +141,7 @@ class MoreSiteViewImpl {
 				.getStrings("portal.term.order");
 
 		// try to determine a good initial capacity for Map terms
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		int size = -1;
 		if (termOrder != null) {
 			size = termOrder.length + ADDITIONAL_TERMS_CAPACITY;
@@ -156,6 +157,7 @@ class MoreSiteViewImpl {
 		for (Site site : siteList) {
 			final String type = site.getType();
 			// determine term
+			@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 			String term = null;
 			if ("course".equals(type)) {
 				term = site.getProperties().getProperty("term");
