@@ -37,6 +37,15 @@ public class Signature {
 	private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
 	/**
+	 * If you have a class that has nothing but static methods, consider making
+	 * it a Singleton. Also, if you want this class to be a Singleton, remember
+	 * to add a private constructor to prevent instantiation.
+	 */
+	private Signature() {
+		// PMD.UseSingleton
+	}
+
+	/**
 	 * Calculate an RFC2104 compliant HMAC (Hash-based Message Authentication
 	 * Code)
 	 * 
