@@ -43,8 +43,6 @@ import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.tool.api.SessionManager;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
-
 /**
  * Based on
  * https://source.caret.cam.ac.uk/camtools/trunk/camtools/sdata/tool/sakai
@@ -54,8 +52,8 @@ import edu.umd.cs.findbugs.annotations.SuppressWarnings;
  * No required get parameters. Runs in the context of the current user. Returns
  * all sites that the user has access to visit.
  */
-@SuppressWarnings(value = "MTIA_SUSPECT_SERVLET_INSTANCE_FIELD", justification = "dependencies only mutated only during init()")
-@java.lang.SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
+@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MTIA_SUSPECT_SERVLET_INSTANCE_FIELD", justification = "dependencies only mutated only during init()")
+@SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 public class SitesServlet extends HttpServlet {
 	// TODO i18n category names
 	private static final long serialVersionUID = 7907409301065984518L;
@@ -69,15 +67,15 @@ public class SitesServlet extends HttpServlet {
 	 * counts.
 	 */
 	private static final String UNREAD = "unread";
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
 	protected transient SessionManager sessionManager;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
 	protected transient SiteService siteService;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
 	protected transient ServerConfigurationService serverConfigurationService;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
 	protected transient ComponentManager componentManager;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
 	protected transient SynopticMsgcntrManager synopticMsgcntrManager;
 	protected transient MoreSiteViewImpl moreSiteViewImpl;
 
