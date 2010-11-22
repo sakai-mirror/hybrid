@@ -17,6 +17,9 @@
  */
 package org.sakaiproject.hybrid.util;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 
 import javax.crypto.Mac;
@@ -92,10 +95,12 @@ public final class Signature {
 			final String result = new String(base64Bytes, "UTF-8");
 
 			return result;
-
-		} catch (Throwable e) {
-			throw new SignatureException("Failed to generate HMAC : "
-					+ e.getMessage(), e);
+		} catch (UnsupportedEncodingException e) {
+			throw new SignatureException(e);
+		} catch (NoSuchAlgorithmException e) {
+			throw new SignatureException(e);
+		} catch (InvalidKeyException e) {
+			throw new SignatureException(e);
 		}
 	}
 }
