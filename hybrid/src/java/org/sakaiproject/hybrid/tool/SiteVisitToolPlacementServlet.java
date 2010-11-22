@@ -91,7 +91,8 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	 *      javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
-	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.ExcessiveMethodLength" })
+	@SuppressWarnings({ "PMD.CyclomaticComplexity",
+			"PMD.ExcessiveMethodLength", "PMD.NPathComplexity" })
 	protected void doGet(final HttpServletRequest req,
 			final HttpServletResponse resp) throws ServletException,
 			IOException {

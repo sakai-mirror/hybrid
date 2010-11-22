@@ -116,7 +116,8 @@ class MoreSiteViewImpl {
 	 *            sorted by title ascending.
 	 * @return
 	 */
-	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.ExcessiveMethodLength" })
+	@SuppressWarnings({ "PMD.CyclomaticComplexity",
+			"PMD.ExcessiveMethodLength", "PMD.NPathComplexity" })
 	public List<Map<String, List<Site>>> categorizeSites(
 			final List<Site> siteList) {
 		if (LOG.isDebugEnabled()) {

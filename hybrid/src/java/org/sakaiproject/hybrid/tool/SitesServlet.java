@@ -82,7 +82,7 @@ public class SitesServlet extends HttpServlet {
 	protected transient MoreSiteViewImpl moreSiteViewImpl;
 
 	@Override
-	@SuppressWarnings({ "PMD.CyclomaticComplexity" })
+	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.NPathComplexity" })
 	protected void doGet(final HttpServletRequest req,
 			final HttpServletResponse resp) throws ServletException,
 			IOException {
