@@ -71,7 +71,8 @@ public class ToolHelperImpl {
 	 * If the configuration tag is not set or is null, then all users see the
 	 * tool.
 	 */
-	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.NPathComplexity" })
+	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.NPathComplexity",
+			"PMD.DataflowAnomalyAnalysis" })
 	public boolean allowTool(final Site site, final Placement placement) {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("allowTool(Site site, Placement placement)");
@@ -99,7 +100,6 @@ public class ToolHelperImpl {
 			if (LOG.isDebugEnabled())
 				LOG.debug("requiredPermissions="
 						+ Arrays.asList(requiredPermissions));
-			@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 			boolean gotAllInList = true;
 			for (int j = 0; j < requiredPermissions.length; j++) {
 				if (!securityService.unlock(requiredPermissions[j].trim(),

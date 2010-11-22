@@ -83,7 +83,8 @@ public class SitesServlet extends HttpServlet {
 	protected transient MoreSiteViewImpl moreSiteViewImpl;
 
 	@Override
-	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.NPathComplexity" })
+	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.NPathComplexity",
+			"PMD.DataflowAnomalyAnalysis" })
 	protected void doGet(final HttpServletRequest req,
 			final HttpServletResponse resp) throws ServletException,
 			IOException {
@@ -109,9 +110,7 @@ public class SitesServlet extends HttpServlet {
 				org.sakaiproject.site.api.SiteService.SortType.TITLE_ASC, null);
 		if (siteList != null) {
 			// initialize values to an empty map to avoid null check later
-			@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 			Map<String, Integer> unreadForums = Collections.emptyMap();
-			@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 			Map<String, Integer> unreadMessages = unreadForums;
 			if (unread) {
 				final String uuid = sessionManager.getCurrentSession()
@@ -143,7 +142,6 @@ public class SitesServlet extends HttpServlet {
 			if (categorized) {
 				final List<Map<String, List<Site>>> categorizedSitesList = moreSiteViewImpl
 						.categorizeSites(siteList);
-				@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 				final JSONArray categoriesArrayJson = new JSONArray();
 				for (final Map<String, List<Site>> map : categorizedSitesList) {
 					if (map.size() != 1) {
