@@ -68,10 +68,14 @@ public class NakamuraAuthenticationHelper {
 			.getName() + ".AuthInfo.cache";
 
 	/**
-	 * The anonymous nakamura principal name. A good default is provided.
+	 * The anonymous nakamura principal name. A good default is provided. Must
+	 * be declared static to allow access from {@link AuthInfo} but must also be
+	 * mutable to allow configuration from sakai.properties.
 	 * 
 	 * @see #CONFIG_ANONYMOUS
+	 * @see AuthInfo
 	 */
+	@SuppressWarnings({ "PMD.AssignmentToNonFinalStatic" })
 	private static String anonymous = "anonymous";
 	/**
 	 * The name of the cookie that is set by nakamura. A good default is
