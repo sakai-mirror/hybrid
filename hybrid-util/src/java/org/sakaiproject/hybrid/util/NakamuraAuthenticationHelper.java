@@ -257,6 +257,8 @@ public class NakamuraAuthenticationHelper {
 	 * (e.g. principal could in theory be null).
 	 */
 	public static class AuthInfo {
+		// PMD does not like the class name
+		@SuppressWarnings("PMD.ProperLogger")
 		private static final Log AILOG = LogFactory.getLog(AuthInfo.class);
 
 		private final transient String principal;
