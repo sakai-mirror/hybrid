@@ -17,22 +17,46 @@
  */
 package org.sakaiproject.hybrid.util;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Properties;
+
 import javax.servlet.http.HttpServletRequest;
 
-import junit.framework.TestCase;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-public class ToolRequestWrapperTest extends TestCase {
+@RunWith(MockitoJUnitRunner.class)
+public class ToolRequestWrapperTest {
 	ToolRequestWrapper toolRequestWrapper;
+
+	@Mock
 	HttpServletRequest request;
 
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
+	@BeforeClass
+	public static void beforeClass() {
+		Properties log4jProperties = new Properties();
+		log4jProperties.put("log4j.rootLogger", "ALL, A1");
+		log4jProperties.put("log4j.appender.A1",
+				"org.apache.log4j.ConsoleAppender");
+		log4jProperties.put("log4j.appender.A1.layout",
+				"org.apache.log4j.PatternLayout");
+		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
+				PatternLayout.TTCC_CONVERSION_PATTERN);
+		log4jProperties.put("log4j.threshold", "ALL");
+		PropertyConfigurator.configure(log4jProperties);
+	}
+
+	@Before
+	public void setUp() throws Exception {
 		request = mock(HttpServletRequest.class);
 		when(request.getRemoteUser()).thenReturn("username");
 	}
@@ -42,6 +66,7 @@ public class ToolRequestWrapperTest extends TestCase {
 	 * {@link org.sakaiproject.hybrid.util.ToolRequestWrapper#ToolRequestWrapper(javax.servlet.http.HttpServletRequest)}
 	 * .
 	 */
+	@Test
 	public void testToolRequestWrapperHttpServletRequest() {
 		toolRequestWrapper = new ToolRequestWrapper(request);
 		assertEquals("username", toolRequestWrapper.getRemoteUser());
@@ -52,6 +77,7 @@ public class ToolRequestWrapperTest extends TestCase {
 	 * {@link org.sakaiproject.hybrid.util.ToolRequestWrapper#ToolRequestWrapper(javax.servlet.http.HttpServletRequest, java.lang.String)}
 	 * .
 	 */
+	@Test
 	public void testToolRequestWrapperHttpServletRequestString() {
 		toolRequestWrapper = new ToolRequestWrapper(request, "username2");
 		assertEquals("username2", toolRequestWrapper.getRemoteUser());

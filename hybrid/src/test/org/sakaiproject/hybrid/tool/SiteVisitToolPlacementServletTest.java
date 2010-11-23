@@ -17,10 +17,10 @@
  */
 package org.sakaiproject.hybrid.tool;
 
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,10 +34,14 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import junit.framework.TestCase;
-
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
@@ -55,23 +59,45 @@ import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.api.Tool;
 
-public class SiteVisitToolPlacementServletTest extends TestCase {
+@RunWith(MockitoJUnitRunner.class)
+public class SiteVisitToolPlacementServletTest {
 	protected SiteVisitToolPlacementServlet siteVisitToolPlacementServlet;
 
+	@Mock
 	protected SessionManager sessionManager;
+	@Mock
 	protected SiteService siteService;
+	@Mock
 	protected EventTrackingService eventTrackingService;
+	@Mock
 	protected AuthzGroupService authzGroupService;
+	@Mock
 	protected ToolHelperImpl toolHelper;
-
+	@Mock
 	protected HttpServletRequest request;
+	@Mock
 	protected HttpServletResponse response;
+	@Mock
+	protected Session session;
+	@Mock
+	protected Site site;
+	@Mock
+	protected Role role;
+	@Mock
+	protected SitePage page;
+	@Mock
+	protected ToolConfiguration toolConfig;
+	@Mock
+	protected Tool tool;
+	@Mock
+	protected AuthzGroup group;
+	@Mock
+	protected PrintWriter writer;
+	@Mock
+	protected Event event;
 
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
+	@BeforeClass
+	public static void beforeClass() {
 		Properties log4jProperties = new Properties();
 		log4jProperties.put("log4j.rootLogger", "ALL, A1");
 		log4jProperties.put("log4j.appender.A1",
@@ -82,52 +108,42 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 				PatternLayout.TTCC_CONVERSION_PATTERN);
 		log4jProperties.put("log4j.threshold", "ALL");
 		PropertyConfigurator.configure(log4jProperties);
+	}
+
+	@Before
+	public void setUp() throws Exception {
 		siteVisitToolPlacementServlet = new SiteVisitToolPlacementServlet();
-		request = mock(HttpServletRequest.class);
-		response = mock(HttpServletResponse.class);
-		sessionManager = mock(SessionManager.class);
 		siteVisitToolPlacementServlet.sessionManager = sessionManager;
-		siteService = mock(SiteService.class);
 		siteVisitToolPlacementServlet.siteService = siteService;
-		eventTrackingService = mock(EventTrackingService.class);
 		siteVisitToolPlacementServlet.eventTrackingService = eventTrackingService;
-		authzGroupService = mock(AuthzGroupService.class);
 		siteVisitToolPlacementServlet.authzGroupService = authzGroupService;
-		toolHelper = mock(ToolHelperImpl.class);
 		when(toolHelper.allowTool(any(Site.class), any(Placement.class)))
 				.thenReturn(true);
 		siteVisitToolPlacementServlet.toolHelper = toolHelper;
-		authzGroupService = mock(AuthzGroupService.class);
 		siteVisitToolPlacementServlet.authzGroupService = authzGroupService;
 
 		// pass siteId parameter
 		when(request.getParameter("siteId")).thenReturn("!admin");
 
-		final Session session = mock(Session.class);
 		when(sessionManager.getCurrentSession()).thenReturn(session);
 		when(session.getUserEid()).thenReturn("admin");
 
-		Site site = mock(Site.class);
 		when(site.getTitle()).thenReturn("Administration Workspace");
 		when(site.getId()).thenReturn("!admin");
 		when(siteService.getSiteVisit("!admin")).thenReturn(site);
 
-		Role role = mock(Role.class);
 		when(role.getId()).thenReturn("admin");
 		when(role.getDescription()).thenReturn(null);
 		final Set<Role> roles = new HashSet<Role>();
 		roles.add(role);
 
-		SitePage page = mock(SitePage.class);
 		when(page.getId()).thenReturn("!admin-100");
 		when(page.getTitle()).thenReturn("Home");
 		when(page.getLayout()).thenReturn(0);
 		when(page.isPopUp()).thenReturn(false);
 		List<ToolConfiguration> tools = new ArrayList<ToolConfiguration>();
-		ToolConfiguration toolConfig = mock(ToolConfiguration.class);
 		when(toolConfig.getToolId()).thenReturn("sakai.motd");
 		when(toolConfig.getId()).thenReturn("!admin-110");
-		Tool tool = mock(Tool.class);
 		when(tool.getId()).thenReturn("!admin-110");
 		when(tool.getTitle()).thenReturn("Message of The Day");
 		when(toolConfig.getTool()).thenReturn(tool);
@@ -138,14 +154,13 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 		pages.add(page);
 		when(site.getOrderedPages()).thenReturn(pages);
 
-		AuthzGroup group = mock(AuthzGroup.class);
 		when(group.getRoles()).thenReturn(roles);
 		when(authzGroupService.getAuthzGroup(anyString())).thenReturn(group);
 
-		PrintWriter writer = mock(PrintWriter.class);
 		when(response.getWriter()).thenReturn(writer);
 	}
 
+	@Test
 	public void testNullSiteId() {
 		try {
 			when(request.getParameter("siteId")).thenReturn(null);
@@ -156,6 +171,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testNullSite() {
 		try {
 			when(siteService.getSiteVisit("!admin")).thenReturn(null);
@@ -166,6 +182,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testNormalBehavior() {
 		try {
 			siteVisitToolPlacementServlet.doGet(request, response);
@@ -176,10 +193,9 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testNormalBehaviorWriteEvent() {
 		when(request.getParameter("writeEvent")).thenReturn("true");
-		eventTrackingService = mock(EventTrackingService.class);
-		Event event = mock(Event.class);
 		when(
 				eventTrackingService.newEvent(anyString(), anyString(),
 						anyBoolean())).thenReturn(event);
@@ -193,6 +209,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testIdUnusedException() {
 		try {
 			when(siteService.getSiteVisit("!admin")).thenThrow(
@@ -204,6 +221,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testPermissionException() {
 		try {
 			when(siteService.getSiteVisit("!admin")).thenThrow(
@@ -215,6 +233,7 @@ public class SiteVisitToolPlacementServletTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testGroupNotDefinedException() {
 		try {
 			when(authzGroupService.getAuthzGroup(anyString())).thenThrow(

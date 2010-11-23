@@ -17,34 +17,43 @@
  */
 package org.sakaiproject.hybrid.tool;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.tool.api.Placement;
 
-public class ToolHelperImplTest extends TestCase {
+@RunWith(MockitoJUnitRunner.class)
+public class ToolHelperImplTest {
 	ToolHelperImpl toolHelperImpl = null;
+
+	@Mock
 	SecurityService securityService = null;
+	@Mock
 	Site site = null;
+	@Mock
 	Placement placement = null;
+	@Mock
 	Properties properties = null;
 
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
+	@BeforeClass
+	public static void beforeClass() {
 		Properties log4jProperties = new Properties();
 		log4jProperties.put("log4j.rootLogger", "ALL, A1");
 		log4jProperties.put("log4j.appender.A1",
@@ -55,13 +64,23 @@ public class ToolHelperImplTest extends TestCase {
 				PatternLayout.TTCC_CONVERSION_PATTERN);
 		log4jProperties.put("log4j.threshold", "ALL");
 		PropertyConfigurator.configure(log4jProperties);
-		securityService = mock(SecurityService.class);
+	}
+
+	@Before
+	public void setUp() throws Exception {
+		Properties log4jProperties = new Properties();
+		log4jProperties.put("log4j.rootLogger", "ALL, A1");
+		log4jProperties.put("log4j.appender.A1",
+				"org.apache.log4j.ConsoleAppender");
+		log4jProperties.put("log4j.appender.A1.layout",
+				"org.apache.log4j.PatternLayout");
+		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
+				PatternLayout.TTCC_CONVERSION_PATTERN);
+		log4jProperties.put("log4j.threshold", "ALL");
+		PropertyConfigurator.configure(log4jProperties);
 		toolHelperImpl = new ToolHelperImpl(securityService);
 		toolHelperImpl.securityService = securityService;
-		site = mock(Site.class);
 		when(site.getReference()).thenReturn("/foo/bar/baz");
-		placement = mock(Placement.class);
-		properties = mock(Properties.class);
 		when(
 				properties
 						.getProperty(ToolHelperImpl.TOOLCONFIG_REQUIRED_PERMISSIONS))
@@ -80,6 +99,7 @@ public class ToolHelperImplTest extends TestCase {
 	 * {@link org.sakaiproject.hybrid.tool.ToolHelperImpl#allowTool(org.sakaiproject.site.api.Site, org.sakaiproject.tool.api.Placement)}
 	 * .
 	 */
+	@Test
 	public void testAllowToolNullParameters() {
 		boolean allowed = toolHelperImpl.allowTool(null, null);
 		assertTrue("allowTool should return true", allowed == true);
@@ -93,6 +113,7 @@ public class ToolHelperImplTest extends TestCase {
 	 * {@link org.sakaiproject.hybrid.tool.ToolHelperImpl#allowTool(org.sakaiproject.site.api.Site, org.sakaiproject.tool.api.Placement)}
 	 * .
 	 */
+	@Test
 	public void testAllowToolNullToolConfigRequiredParameters() {
 		when(
 				properties
@@ -108,6 +129,7 @@ public class ToolHelperImplTest extends TestCase {
 	 * {@link org.sakaiproject.hybrid.tool.ToolHelperImpl#allowTool(org.sakaiproject.site.api.Site, org.sakaiproject.tool.api.Placement)}
 	 * .
 	 */
+	@Test
 	public void testAllowToolEmptyToolConfigRequiredParameters() {
 		when(
 				properties
@@ -123,6 +145,7 @@ public class ToolHelperImplTest extends TestCase {
 	 * {@link org.sakaiproject.hybrid.tool.ToolHelperImpl#allowTool(org.sakaiproject.site.api.Site, org.sakaiproject.tool.api.Placement)}
 	 * .
 	 */
+	@Test
 	public void testAllowToolAffirmative() {
 		boolean allowed = toolHelperImpl.allowTool(site, placement);
 		assertTrue("allowTool should return true", allowed == true);
@@ -136,6 +159,7 @@ public class ToolHelperImplTest extends TestCase {
 	 * {@link org.sakaiproject.hybrid.tool.ToolHelperImpl#allowTool(org.sakaiproject.site.api.Site, org.sakaiproject.tool.api.Placement)}
 	 * .
 	 */
+	@Test
 	public void testAllowToolNegative() {
 		when(securityService.unlock("site.visit", "/foo/bar/baz")).thenReturn(
 				false);
@@ -146,6 +170,7 @@ public class ToolHelperImplTest extends TestCase {
 		verify(securityService).unlock("site.visit", "/foo/bar/baz");
 	}
 
+	@Test
 	public void testConstructor() {
 		try {
 			toolHelperImpl = new ToolHelperImpl(null);
