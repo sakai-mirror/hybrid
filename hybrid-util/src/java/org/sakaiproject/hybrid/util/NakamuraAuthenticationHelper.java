@@ -115,10 +115,6 @@ public class NakamuraAuthenticationHelper {
 	/**
 	 * Class is immutable and thread safe.
 	 * 
-	 * @param threadLocalManager
-	 *            Required. Used to get a reference to
-	 *            {@link HttpServletRequest} from {@link ThreadLocalManager}
-	 * @param serverConfigurationService
 	 * @param validateUrl
 	 *            The Nakamura REST end-point we will use to validate the
 	 *            cookie.

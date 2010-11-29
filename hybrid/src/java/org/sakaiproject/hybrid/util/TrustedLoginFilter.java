@@ -194,7 +194,7 @@ public class TrustedLoginFilter implements Filter {
 
 	/**
 	 * @param token
-	 * @return
+	 * @return username OR null if token could not be decoded.
 	 */
 	protected String decodeToken(final String token) {
 		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
