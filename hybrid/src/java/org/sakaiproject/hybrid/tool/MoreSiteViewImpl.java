@@ -40,6 +40,7 @@ import org.sakaiproject.site.api.Site;
  * <p>
  * Object is thread safe.
  */
+@SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 class MoreSiteViewImpl {
 	private static final Log LOG = LogFactory.getLog(MoreSiteViewImpl.class);
 
@@ -47,7 +48,7 @@ class MoreSiteViewImpl {
 	 * How much additional capacity will the Map&lt String, List&lt Site&gt&gt
 	 * terms require? For example: All sites, Portfolio, Project, Other.
 	 */
-	protected static int ADDITIONAL_TERMS_CAPACITY = 6;
+	protected static final int ADDITIONAL_TERMS_CAPACITY = 6;
 
 	// key naming scheme allows for natural sort order if no
 	// sakai.properties->portal.term.order is supplied.
@@ -86,7 +87,7 @@ class MoreSiteViewImpl {
 	/**
 	 * Injected via constructor
 	 */
-	ServerConfigurationService serverConfigurationService;
+	protected transient ServerConfigurationService serverConfigurationService;
 
 	/**
 	 * Dependencies get injected at creation of object to help with unit
@@ -115,6 +116,8 @@ class MoreSiteViewImpl {
 	 *            sorted by title ascending.
 	 * @return
 	 */
+	@SuppressWarnings({ "PMD.CyclomaticComplexity",
+			"PMD.ExcessiveMethodLength", "PMD.NPathComplexity" })
 	public List<Map<String, List<Site>>> categorizeSites(
 			final List<Site> siteList) {
 		if (LOG.isDebugEnabled()) {
@@ -138,6 +141,7 @@ class MoreSiteViewImpl {
 				.getStrings("portal.term.order");
 
 		// try to determine a good initial capacity for Map terms
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		int size = -1;
 		if (termOrder != null) {
 			size = termOrder.length + ADDITIONAL_TERMS_CAPACITY;
@@ -153,6 +157,7 @@ class MoreSiteViewImpl {
 		for (Site site : siteList) {
 			final String type = site.getType();
 			// determine term
+			@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 			String term = null;
 			if ("course".equals(type)) {
 				term = site.getProperties().getProperty("term");
@@ -163,8 +168,7 @@ class MoreSiteViewImpl {
 				term = I18N_PROJECT_SITES;
 			} else if ("portfolio".equals(type)) {
 				term = I18N_PORTFOLIO_SITES;
-			} else if ("admin".equals(type) || "portfolioAdmin".equals(type)
-					|| "citationsAdmin".equals(site.getId())) {
+			} else if ("admin".equals(type)) {
 				term = I18N_ADMIN_SITES;
 			} else {
 				term = I18N_OTHER_SITES;
@@ -233,7 +237,7 @@ class MoreSiteViewImpl {
 			final List<Map<String, List<Site>>> sortedTerms) {
 		final List<Site> sites = terms.get(term);
 		if (sites == null || sites.isEmpty()) {
-			; // do nothing
+			return; // do nothing
 		} else {
 			final Map<String, List<Site>> matches = new HashMap<String, List<Site>>(
 					1);

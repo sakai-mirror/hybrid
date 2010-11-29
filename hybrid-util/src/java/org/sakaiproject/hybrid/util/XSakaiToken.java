@@ -33,6 +33,7 @@ import org.sakaiproject.tool.api.SessionManager;
  * Utility class for dealing with x-sakai-token semantics. Note: Class is thread
  * safe.
  */
+@SuppressWarnings("PMD.LongVariable")
 public class XSakaiToken {
 	private static final Log LOG = LogFactory.getLog(XSakaiToken.class);
 	public static final String X_SAKAI_TOKEN_HEADER = "x-sakai-token";
@@ -40,11 +41,11 @@ public class XSakaiToken {
 	public static final String CONFIG_SHARED_SECRET_SUFFIX = "sharedSecret";
 	public static final String TOKEN_SEPARATOR = ";";
 
-	private final SecureRandom secureRandom = new SecureRandom();
+	private transient final SecureRandom secureRandom = new SecureRandom();
 	// dependencies
-	ComponentManager componentManager;
-	ServerConfigurationService serverConfigurationService;
-	SessionManager sessionManager;
+	protected transient ComponentManager componentManager;
+	protected transient ServerConfigurationService serverConfigurationService;
+	protected transient SessionManager sessionManager;
 
 	/**
 	 * @param componentManager
@@ -53,7 +54,7 @@ public class XSakaiToken {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalStateException
 	 */
-	public XSakaiToken(ComponentManager componentManager) {
+	public XSakaiToken(final ComponentManager componentManager) {
 		LOG.debug("new XSakaiToken(ComponentManager componentManager)");
 		if (componentManager == null) {
 			throw new IllegalArgumentException("componentManager == null");
@@ -124,6 +125,7 @@ public class XSakaiToken {
 		if (sharedSecret == null) {
 			throw new IllegalArgumentException("sharedSecret == null");
 		}
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		String userId = null;
 		final String[] parts = token.split(TOKEN_SEPARATOR);
 		if (parts.length == 3) {
@@ -212,6 +214,9 @@ public class XSakaiToken {
 	 * @throws Error
 	 *             Wrapped exception if there is any unexpected trouble.
 	 * @throws IllegalArgumentException
+	 * @throws IllegalStateException
+	 *             Wraps {@link SignatureException} into a
+	 *             {@link RuntimeException}.
 	 */
 	public String signMessage(final String sharedSecret, final String eid) {
 		LOG.debug("signMessage(final String sharedSecret, final String eid)");
@@ -221,6 +226,7 @@ public class XSakaiToken {
 		if (eid == null || "".equals(eid)) {
 			throw new IllegalArgumentException("eid == null OR empty");
 		}
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		String token = null;
 		final String message = eid + TOKEN_SEPARATOR + secureRandom.nextLong();
 		try {
@@ -228,7 +234,7 @@ public class XSakaiToken {
 					sharedSecret);
 			token = hash + TOKEN_SEPARATOR + message;
 		} catch (SignatureException e) {
-			throw new Error(e);
+			throw new IllegalStateException(e);
 		}
 		return token;
 	}

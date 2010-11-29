@@ -23,6 +23,7 @@ import java.util.Set;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -65,23 +66,26 @@ import edu.umd.cs.findbugs.annotations.SuppressWarnings;
  * HttpServletResponse.SC_FORBIDDEN if the current user does not have permission
  * to access the specified site.
  */
+@SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 public class SiteVisitToolPlacementServlet extends HttpServlet {
 	private static final long serialVersionUID = -1182601175544873164L;
 	private static final Log LOG = LogFactory
 			.getLog(SiteVisitToolPlacementServlet.class);
 	private static final String SITE_ID = "siteId";
 
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	private static final String MSF_MUTABLE_SERVLET_FIELD = "MSF_MUTABLE_SERVLET_FIELD";
+	private static final String DEPENDENCY_ONLY_MUTATED_DURING_INIT = "dependency mutated only during init()";
+	@SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient SessionManager sessionManager;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient SiteService siteService;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient EventTrackingService eventTrackingService;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient ToolHelperImpl toolHelper;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient AuthzGroupService authzGroupService;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient SecurityService securityService;
 
 	/**
@@ -89,8 +93,11 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	 *      javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	@SuppressWarnings({ "PMD.CyclomaticComplexity",
+			"PMD.ExcessiveMethodLength", "PMD.NPathComplexity" })
+	protected void doGet(final HttpServletRequest req,
+			final HttpServletResponse resp) throws ServletException,
+			IOException {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("doGet(HttpServletRequest " + req
 					+ ", HttpServletResponse " + resp + ")");
@@ -107,13 +114,16 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 			}
 		}
 		// should we record a site visit event?
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		final boolean writeEvent = Boolean.parseBoolean(req
 				.getParameter("writeEvent"));
 		// current user
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		final String principal = sessionManager.getCurrentSession()
 				.getUserEid();
 		// 1) get the Site object for siteId
 		// 2) ensure user has access to Site via SiteService.getSiteVisit()
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		Site site = null;
 		try {
 			site = siteService.getSiteVisit(siteId);
@@ -140,7 +150,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 			siteJson.element("skin", site.getSkin());
 			siteJson.element("type", site.getType());
 			// get the list of site pages
-			List<SitePage> pages = site.getOrderedPages();
+			final List<SitePage> pages = site.getOrderedPages();
 			int number = 0;
 			if (pages != null && canAccessAtLeastOneTool(site)) {
 				final JSONArray pagesArray = new JSONArray();
@@ -152,7 +162,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 					pageJson.element("number", ++number);
 					pageJson.element("popup", page.isPopUp());
 					// get list of tools for the page
-					List<ToolConfiguration> tools = page.getTools();
+					final List<ToolConfiguration> tools = page.getTools();
 					if (tools != null && !tools.isEmpty()) {
 						pageJson.element(
 								"iconclass",
@@ -230,11 +240,11 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	 * @param site
 	 * @return
 	 */
-	private boolean canAccessAtLeastOneTool(Site site) {
-		List<SitePage> pages = site.getOrderedPages();
+	private boolean canAccessAtLeastOneTool(final Site site) {
+		final List<SitePage> pages = site.getOrderedPages();
 		if (pages != null) {
 			for (SitePage page : pages) {
-				List<ToolConfiguration> tools = page.getTools();
+				final List<ToolConfiguration> tools = page.getTools();
 				for (ToolConfiguration tool : tools) {
 					if (toolHelper.allowTool(site, tool)) {
 						return true;
@@ -253,19 +263,20 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	 * @param errorCode
 	 * @param message
 	 * @throws IOException
+	 * @throws ResponseCommittedException
 	 */
-	private void sendError(HttpServletResponse resp, int errorCode,
-			String message) throws IOException {
+	private void sendError(final HttpServletResponse resp, final int errorCode,
+			final String message) throws IOException {
 		if (!resp.isCommitted()) {
 			resp.sendError(errorCode);
 			return;
 		} else {
-			throw new Error(message);
+			throw new ResponseCommittedException(message);
 		}
 	}
 
 	@Override
-	public void init(ServletConfig config) throws ServletException {
+	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
 		sessionManager = (SessionManager) ComponentManager
 				.get(org.sakaiproject.tool.api.SessionManager.class);
@@ -293,5 +304,20 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 			throw new IllegalStateException("SecurityService == null");
 		}
 		toolHelper = new ToolHelperImpl(securityService);
+	}
+
+	/**
+	 * @see ServletResponse#isCommitted()
+	 */
+	public static class ResponseCommittedException extends RuntimeException {
+		private static final long serialVersionUID = -288866672761140745L;
+
+		/**
+		 * @see RuntimeException#RuntimeException(String)
+		 * @param message
+		 */
+		public ResponseCommittedException(final String message) {
+			super(message);
+		}
 	}
 }

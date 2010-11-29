@@ -25,6 +25,8 @@ import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.tool.api.Placement;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+
 /**
  * Copied from <a href=
  * "https://source.sakaiproject.org/svn/portal/tags/sakai-2.7.1/portal-impl/impl/src/java/org/sakaiproject/portal/charon/ToolHelperImpl.java"
@@ -33,10 +35,11 @@ import org.sakaiproject.tool.api.Placement;
  * <p>
  * Inclusion helps avoid class loader issue with sakai-portal-impl.
  */
+@SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 public class ToolHelperImpl {
-	SecurityService securityService;
+	protected transient SecurityService securityService;
 
-	private static final Log log = LogFactory.getLog(ToolHelperImpl.class);
+	private static final Log LOG = LogFactory.getLog(ToolHelperImpl.class);
 
 	public static final String TOOLCONFIG_REQUIRED_PERMISSIONS = "functions.require";
 
@@ -45,7 +48,7 @@ public class ToolHelperImpl {
 	 * @param securityService
 	 *            Required
 	 */
-	public ToolHelperImpl(SecurityService securityService) {
+	public ToolHelperImpl(final SecurityService securityService) {
 		if (securityService == null) {
 			throw new IllegalArgumentException(
 					"SecurityService cannot be null!");
@@ -68,31 +71,40 @@ public class ToolHelperImpl {
 	 * If the configuration tag is not set or is null, then all users see the
 	 * tool.
 	 */
-	public boolean allowTool(Site site, Placement placement) {
-		if (log.isDebugEnabled()) {
-			log.debug("allowTool(Site site, Placement placement)");
+	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.NPathComplexity",
+			"PMD.DataflowAnomalyAnalysis", "PMD.OnlyOneReturn" })
+	public boolean allowTool(final Site site, final Placement placement) {
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("allowTool(Site site, Placement placement)");
 		}
 		// No way to render an opinion
-		if (placement == null || site == null)
+		if (placement == null || site == null) {
 			return true;
+		}
 
 		String requiredPermissionsString = placement.getConfig().getProperty(
 				TOOLCONFIG_REQUIRED_PERMISSIONS);
-		if (log.isDebugEnabled())
-			log.debug("requiredPermissionsString=" + requiredPermissionsString
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("requiredPermissionsString=" + requiredPermissionsString
 					+ " for " + placement.getToolId());
-		if (requiredPermissionsString == null)
+		}
+		if (requiredPermissionsString == null) {
 			return true;
+		}
 		requiredPermissionsString = requiredPermissionsString.trim();
-		if (requiredPermissionsString.length() == 0)
+		if (requiredPermissionsString.length() == 0) {
 			return true;
+		}
 
-		String[] allowedPermissionSets = requiredPermissionsString.split("\\|");
+		final String[] allowedPermissionSets = requiredPermissionsString
+				.split("\\|");
 		for (int i = 0; i < allowedPermissionSets.length; i++) {
-			String[] requiredPermissions = allowedPermissionSets[i].split(",");
-			if (log.isDebugEnabled())
-				log.debug("requiredPermissions="
+			final String[] requiredPermissions = allowedPermissionSets[i]
+					.split(",");
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("requiredPermissions="
 						+ Arrays.asList(requiredPermissions));
+			}
 			boolean gotAllInList = true;
 			for (int j = 0; j < requiredPermissions.length; j++) {
 				if (!securityService.unlock(requiredPermissions[j].trim(),

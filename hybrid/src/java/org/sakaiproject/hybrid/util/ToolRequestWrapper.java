@@ -22,14 +22,15 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 public class ToolRequestWrapper extends HttpServletRequestWrapper {
 
-	private String remoteUser;
+	private final transient String remoteUser;
 
-	public ToolRequestWrapper(HttpServletRequest request) {
+	public ToolRequestWrapper(final HttpServletRequest request) {
 		super(request);
 		remoteUser = request.getRemoteUser();
 	}
 
-	public ToolRequestWrapper(HttpServletRequest request, String user) {
+	public ToolRequestWrapper(final HttpServletRequest request,
+			final String user) {
 		super(request);
 		remoteUser = user;
 	}

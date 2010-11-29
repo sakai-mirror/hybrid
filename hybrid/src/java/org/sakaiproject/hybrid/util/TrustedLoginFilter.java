@@ -37,6 +37,8 @@ import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+
 /**
  * <pre>
  *  A filter to come after the standard sakai request filter to allow services
@@ -94,6 +96,7 @@ import org.sakaiproject.user.api.UserNotDefinedException;
  * </pre>
  * 
  */
+@SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 public class TrustedLoginFilter implements Filter {
 	private final static Log LOG = LogFactory.getLog(TrustedLoginFilter.class);
 	private static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SHARED_SECRET = "org.sakaiproject.hybrid.util.TrustedLoginFilter.sharedSecret";
@@ -101,32 +104,34 @@ public class TrustedLoginFilter implements Filter {
 	private static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SAFE_HOSTS = "org.sakaiproject.hybrid.util.TrustedLoginFilter.safeHosts";
 	private static final String TOKEN_SEPARATOR = ";";
 
-	protected SessionManager sessionManager;
-	protected UserDirectoryService userDirectoryService;
+	protected transient SessionManager sessionManager;
+	protected transient UserDirectoryService userDirectoryService;
 
 	/**
 	 * Property to contain the shared secret used by all trusted servers. The
 	 * shared secret used for server to server trusted tokens.
 	 */
-	protected String sharedSecret = null;
+	protected transient String sharedSecret = null;
 	/**
 	 * True if server tokens are enabled. If true, trusted tokens from servers
 	 * are accepted considered.
 	 */
-	protected boolean enabled = true;
+	protected transient boolean enabled = true;
 	/**
 	 * A list of all the known safe hosts to trust as servers. A ; separated
 	 * list of hosts that this instance trusts to make server connections.
 	 */
-	protected String safeHosts = ";localhost;";
+	protected transient String safeHosts = ";localhost;";
 
 	/**
 	 * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
 	 *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
 	 */
-	public void doFilter(ServletRequest req, ServletResponse resp,
-			FilterChain chain) throws IOException, ServletException {
+	@SuppressWarnings({ "PMD.CyclomaticComplexity" })
+	public void doFilter(final ServletRequest req, final ServletResponse resp,
+			final FilterChain chain) throws IOException, ServletException {
 		if (enabled && req instanceof HttpServletRequest) {
+			@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 			HttpServletRequest hreq = (HttpServletRequest) req;
 			final String host = req.getRemoteHost();
 			if (safeHosts.indexOf(host) < 0) {
@@ -135,7 +140,9 @@ public class TrustedLoginFilter implements Filter {
 				return;
 			} else {
 				final String token = hreq.getHeader("x-sakai-token");
+				@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 				Session currentSession = null;
+				@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 				Session requestSession = null;
 				if (token != null) {
 					final String trustedUserName = decodeToken(token);
@@ -143,6 +150,7 @@ public class TrustedLoginFilter implements Filter {
 						currentSession = sessionManager.getCurrentSession();
 						if (!trustedUserName
 								.equals(currentSession.getUserEid())) {
+							@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 							org.sakaiproject.user.api.User user = null;
 							try {
 								user = userDirectoryService
@@ -188,7 +196,8 @@ public class TrustedLoginFilter implements Filter {
 	 * @param token
 	 * @return
 	 */
-	protected String decodeToken(String token) {
+	protected String decodeToken(final String token) {
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		String userId = null;
 		final String[] parts = token.split(TOKEN_SEPARATOR);
 		if (parts.length == 3) {
@@ -216,7 +225,7 @@ public class TrustedLoginFilter implements Filter {
 	/**
 	 * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
 	 */
-	public void init(FilterConfig config) throws ServletException {
+	public void init(final FilterConfig config) throws ServletException {
 		sessionManager = (SessionManager) ComponentManager
 				.get(org.sakaiproject.tool.api.SessionManager.class);
 		if (sessionManager == null) {

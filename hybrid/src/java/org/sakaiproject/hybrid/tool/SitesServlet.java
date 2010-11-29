@@ -18,6 +18,8 @@
 package org.sakaiproject.hybrid.tool;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,13 +35,13 @@ import net.sf.json.JSONObject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.api.app.messageforums.SynopticMsgcntrItem;
+import org.sakaiproject.api.app.messageforums.SynopticMsgcntrManager;
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.tool.api.SessionManager;
-
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 
 /**
  * Based on
@@ -50,33 +52,50 @@ import edu.umd.cs.findbugs.annotations.SuppressWarnings;
  * No required get parameters. Runs in the context of the current user. Returns
  * all sites that the user has access to visit.
  */
-@SuppressWarnings(value = "MTIA_SUSPECT_SERVLET_INSTANCE_FIELD", justification = "dependencies only mutated only during init()")
+@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MTIA_SUSPECT_SERVLET_INSTANCE_FIELD", justification = "dependencies only mutated only during init()")
+@SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 public class SitesServlet extends HttpServlet {
+	// TODO i18n category names
 	private static final long serialVersionUID = 7907409301065984518L;
 	private static final Log LOG = LogFactory.getLog(SitesServlet.class);
+	/**
+	 * Optional GET parameter which categorizes the JSON by site term and type.
+	 */
 	private static final String CATEGORIZED = "categorized";
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	/**
+	 * Optional GET parameter which will include Messages and Forums unread
+	 * counts.
+	 */
+	private static final String UNREAD = "unread";
+
+	private static final String MSF_MUTABLE_SERVLET_FIELD = "MSF_MUTABLE_SERVLET_FIELD";
+	private static final String DEPENDENCY_ONLY_MUTATED_DURING_INIT = "dependency mutated only during init()";
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient SessionManager sessionManager;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient SiteService siteService;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient ServerConfigurationService serverConfigurationService;
-	@SuppressWarnings(value = "MSF_MUTABLE_SERVLET_FIELD", justification = "dependency mutated only during init()")
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient ComponentManager componentManager;
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
+	protected transient SynopticMsgcntrManager synopticMsgcntrManager;
 	protected transient MoreSiteViewImpl moreSiteViewImpl;
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.NPathComplexity",
+			"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDeeplyNestedIfStmts",
+			"PMD.AvoidInstantiatingObjectsInLoops" })
+	protected void doGet(final HttpServletRequest req,
+			final HttpServletResponse resp) throws ServletException,
+			IOException {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("doGet(HttpServletRequest " + req
 					+ ", HttpServletResponse " + resp + ")");
 		}
-		final String categorizedParam = req.getParameter(CATEGORIZED);
-		boolean categorized = false;
-		if (categorizedParam != null) {
-			categorized = Boolean.parseBoolean(categorizedParam);
-		}
+		final boolean categorized = Boolean.parseBoolean(req
+				.getParameter(CATEGORIZED));
+		final boolean unread = Boolean.parseBoolean(req.getParameter(UNREAD));
 		// sites for current user
 		final JSONObject json = new JSONObject();
 		final String principal = sessionManager.getCurrentSession()
@@ -91,8 +110,38 @@ public class SitesServlet extends HttpServlet {
 				null, null, null,
 				org.sakaiproject.site.api.SiteService.SortType.TITLE_ASC, null);
 		if (siteList != null) {
+			// initialize values to an empty map to avoid null check later
+			Map<String, Integer> unreadForums = Collections.emptyMap();
+			Map<String, Integer> unreadMessages = unreadForums;
+			if (unread) {
+				final String uuid = sessionManager.getCurrentSession()
+						.getUserId();
+				final List<SynopticMsgcntrItem> synopticMsgcntrItems = synopticMsgcntrManager
+						.getWorkspaceSynopticMsgcntrItems(uuid);
+				if (synopticMsgcntrItems != null) {
+					final int initialCapacity = synopticMsgcntrItems.size();
+					unreadForums = new HashMap<String, Integer>(initialCapacity);
+					unreadMessages = new HashMap<String, Integer>(
+							initialCapacity);
+					for (SynopticMsgcntrItem synopticMsgcntrItem : synopticMsgcntrItems) {
+						final String siteId = synopticMsgcntrItem.getSiteId();
+						final int forumCount = synopticMsgcntrItem
+								.getNewForumCount();
+						// omit counts < 1
+						if (forumCount > 0) {
+							unreadForums.put(siteId, forumCount);
+						}
+						final int messageCount = synopticMsgcntrItem
+								.getNewMessagesCount();
+						// omit counts < 1
+						if (messageCount > 0) {
+							unreadMessages.put(siteId, messageCount);
+						}
+					}
+				}
+			}
 			if (categorized) {
-				List<Map<String, List<Site>>> categorizedSitesList = moreSiteViewImpl
+				final List<Map<String, List<Site>>> categorizedSitesList = moreSiteViewImpl
 						.categorizeSites(siteList);
 				final JSONArray categoriesArrayJson = new JSONArray();
 				for (final Map<String, List<Site>> map : categorizedSitesList) {
@@ -105,23 +154,22 @@ public class SitesServlet extends HttpServlet {
 						final List<Site> sortedSites = entry.getValue();
 						final JSONObject categoryJson = new JSONObject();
 						categoryJson.element("category", category);
-						categoryJson.element("size", sortedSites.size());
 						final JSONArray sitesArrayJson = new JSONArray();
 						for (final Site site : sortedSites) {
-							sitesArrayJson.add(renderSiteJson(site));
+							sitesArrayJson.add(renderSiteJson(site,
+									unreadForums, unreadMessages));
 						}
 						categoryJson.element("sites", sitesArrayJson);
 						categoriesArrayJson.add(categoryJson);
 					}
 				}
-				json.element("size", siteList.size());
 				json.element("categories", categoriesArrayJson);
 			} else { // not categorized
 				final JSONArray sitesArrayJson = new JSONArray();
 				for (Site site : siteList) {
-					sitesArrayJson.add(renderSiteJson(site));
+					sitesArrayJson.add(renderSiteJson(site, unreadForums,
+							unreadMessages));
 				}
-				json.element("size", siteList.size());
 				json.element("sites", sitesArrayJson);
 			}
 		}
@@ -131,12 +179,17 @@ public class SitesServlet extends HttpServlet {
 		json.write(resp.getWriter());
 	}
 
-	private JSONObject renderSiteJson(Site site) {
+	private JSONObject renderSiteJson(final Site site,
+			final Map<String, Integer> unreadForums,
+			final Map<String, Integer> unreadMessages) {
 		final JSONObject siteJson = new JSONObject();
+		final String siteId = site.getId();
 		siteJson.element("title", site.getTitle());
-		siteJson.element("id", site.getId());
+		siteJson.element("id", siteId);
 		siteJson.element("url", site.getUrl());
 		siteJson.element("description", site.getDescription());
+		siteJson.element("forums", unreadForums.get(siteId));
+		siteJson.element("messages", unreadMessages.get(siteId));
 		// siteJson.element("iconUrl", site.getIconUrl());
 		// siteJson.element("owner",
 		// site.getCreatedBy().getDisplayName());
@@ -150,7 +203,7 @@ public class SitesServlet extends HttpServlet {
 	}
 
 	@Override
-	public void init(ServletConfig config) throws ServletException {
+	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
 		if (componentManager == null) {
 			componentManager = org.sakaiproject.component.cover.ComponentManager
@@ -174,6 +227,11 @@ public class SitesServlet extends HttpServlet {
 			throw new IllegalStateException(
 					"ServerConfigurationService == null");
 		}
+		synopticMsgcntrManager = (SynopticMsgcntrManager) componentManager
+				.get(SynopticMsgcntrManager.class);
+		if (synopticMsgcntrManager == null) {
+			throw new IllegalStateException("SynopticMsgcntrManager == null");
+		}
 		moreSiteViewImpl = new MoreSiteViewImpl(serverConfigurationService);
 	}
 
@@ -182,7 +240,7 @@ public class SitesServlet extends HttpServlet {
 	 * 
 	 * @param componentManager
 	 */
-	protected void setupTestCase(ComponentManager componentManager) {
+	protected void setupTestCase(final ComponentManager componentManager) {
 		if (componentManager == null) {
 			throw new IllegalArgumentException("componentManager == null");
 		}

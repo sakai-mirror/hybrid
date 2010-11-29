@@ -17,7 +17,9 @@
  */
 package org.sakaiproject.hybrid.tool;
 
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,10 +36,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import junit.framework.TestCase;
-
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.sakaiproject.api.app.messageforums.SynopticMsgcntrManager;
 import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.component.api.ServerConfigurationService;
@@ -47,21 +54,39 @@ import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.user.api.User;
 
-public class SitesServletTest extends TestCase {
+@RunWith(MockitoJUnitRunner.class)
+public class SitesServletTest {
+	@Mock
 	protected SitesServlet sitesServlet;
+	@Mock
 	protected SessionManager sessionManager;
+	@Mock
 	protected SiteService siteService;
+	@Mock
+	protected SynopticMsgcntrManager synopticMsgcntrManager;
+	@Mock
 	protected HttpServletRequest request;
+	@Mock
 	protected HttpServletResponse response;
+	@Mock
 	protected ComponentManager componentManager;
+	@Mock
 	protected ServerConfigurationService serverConfigurationService;
+	@Mock
 	protected ServletConfig config;
+	@Mock
+	protected Session session;
+	@Mock
+	protected Site site;
+	@Mock
+	protected User user;
+	@Mock
+	protected Set<Member> members;
+	@Mock
+	protected PrintWriter writer;
 
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
+	@BeforeClass
+	public static void beforeClass() {
 		Properties log4jProperties = new Properties();
 		log4jProperties.put("log4j.rootLogger", "ALL, A1");
 		log4jProperties.put("log4j.appender.A1",
@@ -72,26 +97,20 @@ public class SitesServletTest extends TestCase {
 				PatternLayout.TTCC_CONVERSION_PATTERN);
 		log4jProperties.put("log4j.threshold", "ALL");
 		PropertyConfigurator.configure(log4jProperties);
-		serverConfigurationService = mock(ServerConfigurationService.class);
-		request = mock(HttpServletRequest.class);
-		response = mock(HttpServletResponse.class);
-		sessionManager = mock(SessionManager.class);
-		final Session session = mock(Session.class);
+	}
+
+	@Before
+	public void setUp() throws Exception {
 		when(sessionManager.getCurrentSession()).thenReturn(session);
 		when(session.getUserEid()).thenReturn("admin");
-		siteService = mock(SiteService.class);
-		Site site = mock(Site.class);
 		when(site.getTitle()).thenReturn("Administration Workspace");
 		when(site.getId()).thenReturn("!admin");
 		when(site.getUrl())
 				.thenReturn(
 						"http://sakai3-nightly.uits.indiana.edu:8080/portal/site/!admin");
 		when(site.getIconUrl()).thenReturn(null);
-		User user = mock(User.class);
 		when(user.getDisplayName()).thenReturn("Sakai Administrator");
 		when(site.getCreatedBy()).thenReturn(user);
-		@SuppressWarnings("unchecked")
-		Set<Member> members = mock(Set.class);
 		when(members.size()).thenReturn(1);
 		when(site.getMembers()).thenReturn(members);
 		when(site.getDescription()).thenReturn("Administration Workspace");
@@ -108,28 +127,23 @@ public class SitesServletTest extends TestCase {
 								null,
 								org.sakaiproject.site.api.SiteService.SortType.TITLE_ASC,
 								null)).thenReturn(siteList);
-		PrintWriter writer = mock(PrintWriter.class);
 		when(response.getWriter()).thenReturn(writer);
-		componentManager = mock(ComponentManager.class);
 		when(componentManager.get(SessionManager.class)).thenReturn(
 				sessionManager);
 		when(componentManager.get(SiteService.class)).thenReturn(siteService);
 		when(componentManager.get(ServerConfigurationService.class))
 				.thenReturn(serverConfigurationService);
+		when(componentManager.get(SynopticMsgcntrManager.class)).thenReturn(
+				synopticMsgcntrManager);
 		sitesServlet = new SitesServlet();
 		sitesServlet.setupTestCase(componentManager);
-		config = mock(ServletConfig.class);
 		sitesServlet.init(config);
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
 	 */
+	@Test
 	public void testNormalBehavior() {
 		try {
 			sitesServlet.doGet(request, response);
@@ -142,6 +156,7 @@ public class SitesServletTest extends TestCase {
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
 	 */
+	@Test
 	public void testIOException() {
 		try {
 			when(response.getWriter()).thenThrow(new IOException());
@@ -157,6 +172,7 @@ public class SitesServletTest extends TestCase {
 	/**
 	 * Tests {@link SitesServlet#init(ServletConfig)}
 	 */
+	@Test
 	public void testInitNullSessionManager() {
 		when(componentManager.get(SessionManager.class)).thenReturn(null);
 		try {
@@ -172,6 +188,7 @@ public class SitesServletTest extends TestCase {
 	/**
 	 * Tests {@link SitesServlet#init(ServletConfig)}
 	 */
+	@Test
 	public void testInitNullSiteService() {
 		when(componentManager.get(SiteService.class)).thenReturn(null);
 		try {
@@ -187,6 +204,7 @@ public class SitesServletTest extends TestCase {
 	/**
 	 * Tests {@link SitesServlet#init(ServletConfig)}
 	 */
+	@Test
 	public void testInitNullServerConfigurationService() {
 		when(componentManager.get(ServerConfigurationService.class))
 				.thenReturn(null);
@@ -203,6 +221,7 @@ public class SitesServletTest extends TestCase {
 	/**
 	 * Tests {@link SitesServlet#setupTestCase(ComponentManager)}
 	 */
+	@Test
 	public void testSetupTestCase() {
 		try {
 			sitesServlet.setupTestCase(null);

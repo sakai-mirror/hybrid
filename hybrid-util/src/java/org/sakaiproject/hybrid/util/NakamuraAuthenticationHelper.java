@@ -40,11 +40,13 @@ import org.sakaiproject.thread_local.api.ThreadLocalManager;
  * Useful helper for interacting with Nakamura's authentication REST end-points.
  * Note: thread safe.
  */
+@SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 public class NakamuraAuthenticationHelper {
 	/**
 	 * All sakai.properties settings will be prefixed with this string.
 	 */
-	public static final String CONFIG_PREFIX = "org.sakaiproject.hybrid.util.NakamuraAuthenticationHelper";
+	public static final String CONFIG_PREFIX = NakamuraAuthenticationHelper.class
+			.getName();
 	/**
 	 * sakai.properties The name of the nakamura anonymous principal.
 	 */
@@ -62,49 +64,53 @@ public class NakamuraAuthenticationHelper {
 	 * The key that will be used to cache AuthInfo hits in ThreadLocal. This
 	 * will handle cases where AuthInfo is requested more than once per request.
 	 */
-	static final String THREAD_LOCAL_CACHE_KEY = NakamuraAuthenticationHelper.class
+	protected static final String THREAD_LOCAL_CACHE_KEY = NakamuraAuthenticationHelper.class
 			.getName() + ".AuthInfo.cache";
 
 	/**
-	 * The anonymous nakamura principal name. A good default is provided.
+	 * The anonymous nakamura principal name. A good default is provided. Must
+	 * be declared static to allow access from {@link AuthInfo} but must also be
+	 * mutable to allow configuration from sakai.properties.
 	 * 
 	 * @see #CONFIG_ANONYMOUS
+	 * @see AuthInfo
 	 */
-	private static String ANONYMOUS = "anonymous";
+	@SuppressWarnings({ "PMD.AssignmentToNonFinalStatic" })
+	private static String anonymous = "anonymous";
 	/**
 	 * The name of the cookie that is set by nakamura. A good default is
 	 * provided.
 	 * 
 	 * @see #CONFIG_COOKIE_NAME
 	 */
-	protected String cookieName = "SAKAI-TRACKING";
+	private transient final String cookieName;
 	/**
 	 * The Nakamura RESTful service to validate authenticated users. A good
 	 * default is provided.
 	 */
-	protected String validateUrl;
+	protected transient String validateUrl;
 
 	/**
 	 * The nakamura user that has permissions to GET
 	 * /var/cluster/user.cookie.json. A good default is provided.
 	 */
-	protected String principal;
+	protected transient String principal;
 
 	/**
 	 * The hostname we will use to lookup the sharedSecret for access to
 	 * validateUrl. A good default is provided.
 	 */
-	protected String hostname;
+	protected transient String hostname;
 
 	/**
 	 * A simple abstraction to allow for proper unit testing
 	 */
-	protected HttpClientProvider httpClientProvider = new DefaultHttpClientProvider();
+	protected transient HttpClientProvider httpClientProvider = new DefaultHttpClientProvider();
 
 	// dependencies
-	ThreadLocalManager threadLocalManager;
-	ServerConfigurationService serverConfigurationService;
-	XSakaiToken xSakaiToken;
+	protected transient ThreadLocalManager threadLocalManager;
+	protected transient ServerConfigurationService serverConfigurationService;
+	protected transient XSakaiToken xSakaiToken;
 
 	/**
 	 * Class is immutable and thread safe.
@@ -126,8 +132,10 @@ public class NakamuraAuthenticationHelper {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalStateException
 	 */
-	public NakamuraAuthenticationHelper(ComponentManager componentManager,
-			String validateUrl, String principal, String hostname) {
+	@SuppressWarnings("PMD.CyclomaticComplexity")
+	public NakamuraAuthenticationHelper(
+			final ComponentManager componentManager, final String validateUrl,
+			final String principal, final String hostname) {
 		if (componentManager == null) {
 			throw new IllegalArgumentException("componentManager == null;");
 		}
@@ -154,10 +162,10 @@ public class NakamuraAuthenticationHelper {
 		this.validateUrl = validateUrl;
 		this.principal = principal;
 		this.hostname = hostname;
-		ANONYMOUS = serverConfigurationService.getString(CONFIG_ANONYMOUS,
-				ANONYMOUS);
+		anonymous = serverConfigurationService.getString(CONFIG_ANONYMOUS,
+				anonymous);
 		cookieName = serverConfigurationService.getString(CONFIG_COOKIE_NAME,
-				cookieName);
+				"SAKAI-TRACKING");
 
 		xSakaiToken = new XSakaiToken(componentManager);
 	}
@@ -168,17 +176,21 @@ public class NakamuraAuthenticationHelper {
 	 * @param request
 	 * @return null if user cannot be authenticated.
 	 * @throws IllegalArgumentException
+	 * @throws IllegalStateException
+	 *             For all unexpected cause Exceptions.
 	 */
-	public AuthInfo getPrincipalLoggedIntoNakamura(HttpServletRequest request) {
+	public AuthInfo getPrincipalLoggedIntoNakamura(
+			final HttpServletRequest request) {
 		LOG.debug("getPrincipalLoggedIntoNakamura(HttpServletRequest request)");
 		if (request == null) {
 			throw new IllegalArgumentException("HttpServletRequest == null");
 		}
 		final Object cache = threadLocalManager.get(THREAD_LOCAL_CACHE_KEY);
-		if (cache != null && cache instanceof AuthInfo) {
+		if (cache instanceof AuthInfo) {
 			LOG.debug("cache hit!");
 			return (AuthInfo) cache;
 		}
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		AuthInfo authInfo = null;
 		final String secret = getSecret(request);
 		if (secret != null) {
@@ -203,7 +215,7 @@ public class NakamuraAuthenticationHelper {
 				}
 			} catch (Exception e) {
 				LOG.error(e.getMessage(), e);
-				throw new Error(e);
+				throw new IllegalStateException(e);
 			} finally {
 				httpClient.getConnectionManager().shutdown();
 			}
@@ -221,11 +233,12 @@ public class NakamuraAuthenticationHelper {
 	 * @param request
 	 * @return null if no secret can be found.
 	 */
-	private String getSecret(HttpServletRequest request) {
+	private String getSecret(final HttpServletRequest request) {
 		LOG.debug("getSecret(HttpServletRequest request)");
 		if (request == null) {
 			throw new IllegalArgumentException("HttpServletRequest == null");
 		}
+		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		String secret = null;
 		final Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
@@ -244,12 +257,14 @@ public class NakamuraAuthenticationHelper {
 	 * (e.g. principal could in theory be null).
 	 */
 	public static class AuthInfo {
+		// PMD does not like the class name
+		@SuppressWarnings("PMD.ProperLogger")
 		private static final Log AILOG = LogFactory.getLog(AuthInfo.class);
 
-		private String principal;
-		private String firstName;
-		private String lastName;
-		private String emailAddress;
+		private final transient String principal;
+		private final transient String firstName;
+		private final transient String lastName;
+		private final transient String emailAddress;
 
 		/**
 		 * 
@@ -262,9 +277,12 @@ public class NakamuraAuthenticationHelper {
 			}
 			final JSONObject user = JSONObject.fromObject(json).getJSONObject(
 					"user");
-			final String p = user.getString("principal");
-			if (p != null && !"".equals(p) && !ANONYMOUS.equals(p)) {
-				principal = p;
+			final String principal = user.getString("principal");
+			if (principal != null && !"".equals(principal)
+					&& !anonymous.equals(principal)) {
+				this.principal = principal;
+			} else {
+				this.principal = null;
 			}
 
 			final JSONObject properties = user.getJSONObject("properties");
@@ -321,7 +339,7 @@ public class NakamuraAuthenticationHelper {
 
 		public DefaultHttpClientProvider() {
 			LOG.debug("new DefaultHttpClientProvider()");
-			; // nothing to do
+			// nothing to do
 		}
 
 		/**
