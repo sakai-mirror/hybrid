@@ -121,7 +121,7 @@ public class TrustedLoginFilter implements Filter {
 	 * A list of all the known safe hosts to trust as servers. A ; separated
 	 * list of hosts that this instance trusts to make server connections.
 	 */
-	protected transient String safeHosts = ";localhost;";
+	protected transient String safeHosts = "localhost;127.0.0.1;0:0:0:0:0:0:0:1%0";
 
 	/**
 	 * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
