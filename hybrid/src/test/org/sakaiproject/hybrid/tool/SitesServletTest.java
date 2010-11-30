@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 
@@ -135,6 +136,7 @@ public class SitesServletTest {
 				.thenReturn(serverConfigurationService);
 		when(componentManager.get(SynopticMsgcntrManager.class)).thenReturn(
 				synopticMsgcntrManager);
+		when(request.getLocale()).thenReturn(Locale.getDefault());
 		sitesServlet = new SitesServlet();
 		sitesServlet.setupTestCase(componentManager);
 		sitesServlet.init(config);

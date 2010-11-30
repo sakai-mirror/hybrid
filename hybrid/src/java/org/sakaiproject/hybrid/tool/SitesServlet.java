@@ -21,8 +21,10 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ResourceBundle;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -55,21 +57,30 @@ import org.sakaiproject.tool.api.SessionManager;
 @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MTIA_SUSPECT_SERVLET_INSTANCE_FIELD", justification = "dependencies only mutated only during init()")
 @SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 public class SitesServlet extends HttpServlet {
-	// TODO i18n category names
 	private static final long serialVersionUID = 7907409301065984518L;
 	private static final Log LOG = LogFactory.getLog(SitesServlet.class);
+
 	/**
 	 * Optional GET parameter which categorizes the JSON by site term and type.
 	 */
-	private static final String CATEGORIZED = "categorized";
+	public static final String CATEGORIZED = "categorized";
 	/**
 	 * Optional GET parameter which will include Messages and Forums unread
 	 * counts.
 	 */
-	private static final String UNREAD = "unread";
+	public static final String UNREAD = "unread";
 
+	/**
+	 * Optional GET parameter which specifies locale. For example: en_US.
+	 * 
+	 * @see Locale
+	 */
+	public static final String LOCALE = "l";
+
+	private static final String UNDERSCORE = "_";
 	private static final String MSF_MUTABLE_SERVLET_FIELD = "MSF_MUTABLE_SERVLET_FIELD";
 	private static final String DEPENDENCY_ONLY_MUTATED_DURING_INIT = "dependency mutated only during init()";
+
 	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient SessionManager sessionManager;
 	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
@@ -96,6 +107,49 @@ public class SitesServlet extends HttpServlet {
 		final boolean categorized = Boolean.parseBoolean(req
 				.getParameter(CATEGORIZED));
 		final boolean unread = Boolean.parseBoolean(req.getParameter(UNREAD));
+		// Locale parameter
+		Locale locale = null;
+		final String localeParam = req.getParameter(LOCALE);
+		if (localeParam != null) {
+			final int hyphen = localeParam.indexOf(UNDERSCORE);
+			if (hyphen > -1) {
+				// a multi-part locale has been passed
+				final String[] parts = localeParam.split(UNDERSCORE);
+				switch (parts.length) {
+				case 2:
+					// both language and country code
+					locale = new Locale(parts[0], parts[1]);
+					break;
+				case 3:
+					// language, country code, and variant passed
+					locale = new Locale(parts[0], parts[1], parts[2]);
+					break;
+				default:
+					// language parameter must contain two or three parts!
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("Illegal locale request parameter: "
+								+ localeParam);
+					}
+					resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+					return;
+				}
+			} else {
+				// just language code supplied
+				locale = new Locale(localeParam);
+			}
+		}
+		if (locale == null) {
+			// default to Accept-Language header if none specified
+			locale = req.getLocale();
+		}
+		final ResourceBundle resourceBundle = ResourceBundle.getBundle(
+				"sitenav", locale);
+
+		if (LOG.isDebugEnabled()) {
+			LOG.debug(CATEGORIZED + "=" + categorized + "; " + UNREAD + "="
+					+ unread + "; " + LOCALE + "=" + locale);
+		}
+
 		// sites for current user
 		final JSONObject json = new JSONObject();
 		final String principal = sessionManager.getCurrentSession()
@@ -153,7 +207,8 @@ public class SitesServlet extends HttpServlet {
 						final String category = entry.getKey();
 						final List<Site> sortedSites = entry.getValue();
 						final JSONObject categoryJson = new JSONObject();
-						categoryJson.element("category", category);
+						categoryJson.element("category",
+								resourceBundle.getString(category));
 						final JSONArray sitesArrayJson = new JSONArray();
 						for (final Site site : sortedSites) {
 							sitesArrayJson.add(renderSiteJson(site,

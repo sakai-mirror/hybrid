@@ -55,27 +55,27 @@ class MoreSiteViewImpl {
 	/**
 	 * i18n key for "All sites"
 	 */
-	public static final String I18N_ALL_SITES = "i18n_moresite_01_all_sites";
+	private static final String I18N_ALL_SITES = "moresite_all_sites";
 	/**
 	 * i18n key for "(unknown academic term)"
 	 */
-	public static final String I18N_UNKNOWN_COURSE_TERM_SITES = "i18n_moresite_02_unknown_term";
+	private static final String I18N_UNKNOWN_COURSE_TERM_SITES = "moresite_unknown_term";
 	/**
 	 * i18n key for "Portfolios"
 	 */
-	public static final String I18N_PORTFOLIO_SITES = "i18n_moresite_03_portfolios";
+	private static final String I18N_PORTFOLIO_SITES = "moresite_portfolios";
 	/**
 	 * i18n key for "Other"
 	 */
-	public static final String I18N_OTHER_SITES = "i18n_moresite_04_other";
+	private static final String I18N_OTHER_SITES = "moresite_other";
 	/**
 	 * i18n key for "Projects"
 	 */
-	public static final String I18N_PROJECT_SITES = "i18n_moresite_05_projects";
+	private static final String I18N_PROJECT_SITES = "moresite_projects";
 	/**
 	 * i18n key for "Administration"
 	 */
-	public static final String I18N_ADMIN_SITES = "i18n_moresite_06_administration";
+	private static final String I18N_ADMIN_SITES = "moresite_administration";
 
 	/**
 	 * Helper for proper sorting.
