@@ -17,10 +17,6 @@
  */
 package org.sakaiproject.hybrid.i18n;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -36,6 +32,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Filter to transform i18n message keys into i18n messages.
@@ -73,7 +73,7 @@ public class I18nFilter implements Filter {
 	// ---------- Filter interface ----------
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
 	 */
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -86,7 +86,7 @@ public class I18nFilter implements Filter {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 * @see javax.servlet.Filter#destroy()
 	 */
 	public void destroy() {
@@ -94,7 +94,7 @@ public class I18nFilter implements Filter {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
 	 *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
 	 */
@@ -113,11 +113,12 @@ public class I18nFilter implements Filter {
 
 		// check that the path is something we should filter.
 		boolean filter = false;
-		if ((path.startsWith("/dev/") || path.startsWith("/devwidgets/"))
-				&& path.endsWith(".html")) {
-			httpResponse = new CapturingHttpServletResponse(httpResponse);
-			filter = true;
-		}
+		// TODO logic for paths to filter
+		// if ((path.startsWith("/dev/") || path.startsWith("/devwidgets/"))
+		// && path.endsWith(".html")) {
+		// httpResponse = new CapturingHttpServletResponse(httpResponse);
+		// filter = true;
+		// }
 
 		// allow the chain to process so we can capture the response
 		chain.doFilter(request, httpResponse);
@@ -141,7 +142,7 @@ public class I18nFilter implements Filter {
 	/**
 	 * Filter <code>output</code> of any message keys by replacing them with the
 	 * matching message from the language bundle associated to the user.
-	 *
+	 * 
 	 * @param srequest
 	 * @param response
 	 * @param output
@@ -176,8 +177,7 @@ public class I18nFilter implements Filter {
 				// replace all instances of msgKey with the actual message
 				int keyStart = sb.indexOf(msgKey);
 				while (keyStart >= 0) {
-					sb.replace(keyStart, keyStart + msgKey.length(),
-							message);
+					sb.replace(keyStart, keyStart + msgKey.length(), message);
 					keyStart = sb.indexOf(msgKey, keyStart);
 				}
 
