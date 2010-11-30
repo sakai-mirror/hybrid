@@ -107,40 +107,11 @@ public class SitesServlet extends HttpServlet {
 		final boolean categorized = Boolean.parseBoolean(req
 				.getParameter(CATEGORIZED));
 		final boolean unread = Boolean.parseBoolean(req.getParameter(UNREAD));
-		// Locale parameter
-		Locale locale = null;
-		final String localeParam = req.getParameter(LOCALE);
-		if (localeParam != null) {
-			final int hyphen = localeParam.indexOf(UNDERSCORE);
-			if (hyphen > -1) {
-				// a multi-part locale has been passed
-				final String[] parts = localeParam.split(UNDERSCORE);
-				switch (parts.length) {
-				case 2:
-					// both language and country code
-					locale = new Locale(parts[0], parts[1]);
-					break;
-				case 3:
-					// language, country code, and variant passed
-					locale = new Locale(parts[0], parts[1], parts[2]);
-					break;
-				default:
-					// language parameter must contain two or three parts!
-					if (LOG.isDebugEnabled()) {
-						LOG.debug("Illegal locale request parameter: "
-								+ localeParam);
-					}
-					resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-					return;
-				}
-			} else {
-				// just language code supplied
-				locale = new Locale(localeParam);
-			}
-		}
+
+		Locale locale = getLocale(req);
 		if (locale == null) {
-			// default to Accept-Language header if none specified
-			locale = req.getLocale();
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			return;
 		}
 		final ResourceBundle resourceBundle = ResourceBundle.getBundle(
 				"sitenav", locale);
@@ -255,6 +226,51 @@ public class SitesServlet extends HttpServlet {
 		// SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz")
 		// .format(site.getCreatedDate()));
 		return siteJson;
+	}
+
+	/**
+	 * 
+	 * @param req
+	 *            request
+	 * @return null if Locale cannot be determined.
+	 * @throws IOException
+	 */
+	private Locale getLocale(final HttpServletRequest req) throws IOException {
+		// Locale parameter
+		Locale locale = null;
+		final String localeParam = req.getParameter(LOCALE);
+		if (localeParam != null) {
+			final int hyphen = localeParam.indexOf(UNDERSCORE);
+			if (hyphen > -1) {
+				// a multi-part locale has been passed
+				final String[] parts = localeParam.split(UNDERSCORE);
+				switch (parts.length) {
+				case 2:
+					// both language and country code
+					locale = new Locale(parts[0], parts[1]);
+					break;
+				case 3:
+					// language, country code, and variant passed
+					locale = new Locale(parts[0], parts[1], parts[2]);
+					break;
+				default:
+					// language parameter must contain two or three parts!
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("Illegal locale request parameter: "
+								+ localeParam);
+					}
+					return null;
+				}
+			} else {
+				// just language code supplied
+				locale = new Locale(localeParam);
+			}
+		}
+		if (locale == null) {
+			// default to Accept-Language header if none specified
+			locale = req.getLocale();
+		}
+		return locale;
 	}
 
 	@Override
