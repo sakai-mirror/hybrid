@@ -41,9 +41,14 @@ import org.sakaiproject.api.app.messageforums.SynopticMsgcntrItem;
 import org.sakaiproject.api.app.messageforums.SynopticMsgcntrManager;
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.component.api.ServerConfigurationService;
+import org.sakaiproject.entity.api.EntityPropertyNotDefinedException;
+import org.sakaiproject.entity.api.EntityPropertyTypeException;
+import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.tool.api.SessionManager;
+import org.sakaiproject.user.api.Preferences;
+import org.sakaiproject.user.api.PreferencesService;
 
 /**
  * Based on
@@ -91,6 +96,8 @@ public class SitesServlet extends HttpServlet {
 	protected transient ComponentManager componentManager;
 	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient SynopticMsgcntrManager synopticMsgcntrManager;
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
+	protected transient PreferencesService preferencesService;
 	protected transient MoreSiteViewImpl moreSiteViewImpl;
 
 	@Override
@@ -135,6 +142,11 @@ public class SitesServlet extends HttpServlet {
 				null, null, null,
 				org.sakaiproject.site.api.SiteService.SortType.TITLE_ASC, null);
 		if (siteList != null) {
+			// collect the user's preferences
+			final PortalSiteNavUserPreferences userPrefs = new PortalSiteNavUserPreferences(
+					preferencesService.getPreferences(principal));
+			json.element("display", userPrefs.getPrefTabs());
+
 			// initialize values to an empty map to avoid null check later
 			Map<String, Integer> unreadForums = Collections.emptyMap();
 			Map<String, Integer> unreadMessages = unreadForums;
@@ -303,6 +315,11 @@ public class SitesServlet extends HttpServlet {
 		if (synopticMsgcntrManager == null) {
 			throw new IllegalStateException("SynopticMsgcntrManager == null");
 		}
+		preferencesService = (PreferencesService) componentManager
+				.get(PreferencesService.class);
+		if (preferencesService == null) {
+			throw new IllegalStateException("PreferencesService == null");
+		}
 		moreSiteViewImpl = new MoreSiteViewImpl(serverConfigurationService);
 	}
 
@@ -316,5 +333,64 @@ public class SitesServlet extends HttpServlet {
 			throw new IllegalArgumentException("componentManager == null");
 		}
 		this.componentManager = componentManager;
+	}
+
+	/**
+	 * Wraps Sakai2 portal functionality around number of sites to display.
+	 * Immutable helper class.
+	 * <p>
+	 * Logic inspired by: <a href=
+	 * "https://source.sakaiproject.org/svn/portal/trunk/portal-impl/impl/src/java/org/sakaiproject/portal/charon/CharonPortal.java"
+	 * >CharonPortal.java@85021</a> Lines 2412-2442
+	 */
+	protected static class PortalSiteNavUserPreferences {
+		/**
+		 * The default number of sites that will be displayed
+		 */
+		public static final int DEFAULT_TABS = 4;
+
+		private final static Log LOG = LogFactory
+				.getLog(PortalSiteNavUserPreferences.class);
+
+		/**
+		 * Number of sites to display according to Sakai2
+		 */
+		private final int prefTabs;
+
+		/**
+		 * @param preferences
+		 *            Null values are supported and will return default
+		 *            behavior.
+		 */
+		protected PortalSiteNavUserPreferences(final Preferences preferences) {
+			LOG.debug("new PortalSiteNavUserPreferences(final Preferences preferences)");
+			if (preferences != null) {
+				final ResourceProperties props = preferences
+						.getProperties("sakai:portal:sitenav");
+				int prefTabs = -1;
+				try {
+					prefTabs = (int) props.getLongProperty("tabs");
+				} catch (EntityPropertyNotDefinedException e) {
+					// no property defined
+					prefTabs = DEFAULT_TABS;
+				} catch (EntityPropertyTypeException e) {
+					// admin should investigate such a case
+					LOG.error(e.getLocalizedMessage(), e);
+					throw new IllegalStateException(e);
+				}
+				this.prefTabs = prefTabs;
+			} else { // null Preferences
+				this.prefTabs = DEFAULT_TABS;
+				return;
+			}
+		}
+
+		/**
+		 * @return the prefTabs
+		 */
+		protected Integer getPrefTabs() {
+			return prefTabs;
+		}
+
 	}
 }
