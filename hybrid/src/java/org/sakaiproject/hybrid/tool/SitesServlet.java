@@ -103,7 +103,7 @@ public class SitesServlet extends HttpServlet {
 	@Override
 	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.NPathComplexity",
 			"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDeeplyNestedIfStmts",
-			"PMD.AvoidInstantiatingObjectsInLoops" })
+			"PMD.AvoidInstantiatingObjectsInLoops", "PMD.ExcessiveMethodLength" })
 	protected void doGet(final HttpServletRequest req,
 			final HttpServletResponse resp) throws ServletException,
 			IOException {
@@ -115,7 +115,7 @@ public class SitesServlet extends HttpServlet {
 				.getParameter(CATEGORIZED));
 		final boolean unread = Boolean.parseBoolean(req.getParameter(UNREAD));
 
-		Locale locale = getLocale(req);
+		final Locale locale = getLocale(req);
 		if (locale == null) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
@@ -247,6 +247,7 @@ public class SitesServlet extends HttpServlet {
 	 * @return null if Locale cannot be determined.
 	 * @throws IOException
 	 */
+	@SuppressWarnings({ "PMD.DataflowAnomalyAnalysis", "PMD.OnlyOneReturn" })
 	private Locale getLocale(final HttpServletRequest req) throws IOException {
 		// Locale parameter
 		Locale locale = null;
@@ -355,13 +356,14 @@ public class SitesServlet extends HttpServlet {
 		/**
 		 * Number of sites to display according to Sakai2
 		 */
-		private final int prefTabs;
+		private final transient int prefTabs;
 
 		/**
 		 * @param preferences
 		 *            Null values are supported and will return default
 		 *            behavior.
 		 */
+		@SuppressWarnings({ "PMD.ConfusingTernary" })
 		protected PortalSiteNavUserPreferences(final Preferences preferences) {
 			LOG.debug("new PortalSiteNavUserPreferences(final Preferences preferences)");
 			if (preferences != null) {
