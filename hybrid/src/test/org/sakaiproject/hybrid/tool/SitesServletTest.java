@@ -108,16 +108,7 @@ public class SitesServletTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		Properties log4jProperties = new Properties();
-		log4jProperties.put("log4j.rootLogger", "ALL, A1");
-		log4jProperties.put("log4j.appender.A1",
-				"org.apache.log4j.ConsoleAppender");
-		log4jProperties.put("log4j.appender.A1.layout",
-				"org.apache.log4j.PatternLayout");
-		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
-				PatternLayout.TTCC_CONVERSION_PATTERN);
-		log4jProperties.put("log4j.threshold", "ALL");
-		PropertyConfigurator.configure(log4jProperties);
+		enableLog4jDebug();
 	}
 
 	@Before
@@ -201,16 +192,7 @@ public class SitesServletTest {
 	 */
 	@Test
 	public void testDoGetNormalBehaviorLogDebugDisabled() {
-		Properties log4jProperties = new Properties();
-		log4jProperties.put("log4j.rootLogger", "ERROR, A1");
-		log4jProperties.put("log4j.appender.A1",
-				"org.apache.log4j.ConsoleAppender");
-		log4jProperties.put("log4j.appender.A1.layout",
-				"org.apache.log4j.PatternLayout");
-		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
-				PatternLayout.TTCC_CONVERSION_PATTERN);
-		log4jProperties.put("log4j.threshold", "ERROR");
-		PropertyConfigurator.configure(log4jProperties);
+		disableLog4jDebug();
 		try {
 			sitesServlet.doGet(request, response);
 			verify(response).setStatus(HttpServletResponse.SC_OK);
@@ -459,6 +441,7 @@ public class SitesServletTest {
 	 */
 	@Test
 	public void testIdUnusedException() {
+		disableLog4jDebug();
 		try {
 			when(siteService.getSite("~admin")).thenThrow(
 					new IdUnusedException("message"));
@@ -527,4 +510,66 @@ public class SitesServletTest {
 		}
 	}
 
+	/**
+	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 */
+	@Test
+	public void testDoGetNullSiteList() {
+		try {
+			when(
+					siteService
+							.getSites(
+									org.sakaiproject.site.api.SiteService.SelectionType.ACCESS,
+									null,
+									null,
+									null,
+									org.sakaiproject.site.api.SiteService.SortType.TITLE_ASC,
+									null)).thenReturn(null);
+			sitesServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			assertNull("Exception should not be thrown: " + e, e);
+		}
+	}
+
+	/**
+	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 */
+	@Test
+	public void testDoGetNullSynopticMsgcntrItems() {
+		when(synopticMsgcntrManager.getWorkspaceSynopticMsgcntrItems(UID))
+				.thenReturn(null);
+		try {
+			sitesServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			assertNull("Exception should not be thrown: " + e, e);
+		}
+	}
+
+	private static void enableLog4jDebug() {
+		Properties log4jProperties = new Properties();
+		log4jProperties.put("log4j.rootLogger", "ALL, A1");
+		log4jProperties.put("log4j.appender.A1",
+				"org.apache.log4j.ConsoleAppender");
+		log4jProperties.put("log4j.appender.A1.layout",
+				"org.apache.log4j.PatternLayout");
+		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
+				PatternLayout.TTCC_CONVERSION_PATTERN);
+		log4jProperties.put("log4j.threshold", "ALL");
+		PropertyConfigurator.configure(log4jProperties);
+	}
+
+	private static void disableLog4jDebug() {
+		Properties log4jProperties = new Properties();
+		log4jProperties.put("log4j.rootLogger", "ERROR, A1");
+		log4jProperties.put("log4j.appender.A1",
+				"org.apache.log4j.ConsoleAppender");
+		log4jProperties.put("log4j.appender.A1.layout",
+				"org.apache.log4j.PatternLayout");
+		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
+				PatternLayout.TTCC_CONVERSION_PATTERN);
+		log4jProperties.put("log4j.threshold", "ERROR");
+		PropertyConfigurator.configure(log4jProperties);
+	}
 }
