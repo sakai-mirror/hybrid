@@ -44,6 +44,7 @@ import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.entity.api.EntityPropertyNotDefinedException;
 import org.sakaiproject.entity.api.EntityPropertyTypeException;
 import org.sakaiproject.entity.api.ResourceProperties;
+import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.tool.api.SessionManager;
@@ -60,7 +61,8 @@ import org.sakaiproject.user.api.PreferencesService;
  * all sites that the user has access to visit.
  */
 @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MTIA_SUSPECT_SERVLET_INSTANCE_FIELD", justification = "dependencies only mutated only during init()")
-@SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
+@SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity",
+		"PMD.ExcessiveImports" })
 public class SitesServlet extends HttpServlet {
 	private static final long serialVersionUID = 7907409301065984518L;
 	private static final Log LOG = LogFactory.getLog(SitesServlet.class);
@@ -83,6 +85,7 @@ public class SitesServlet extends HttpServlet {
 	public static final String LOCALE = "l";
 
 	private static final String UNDERSCORE = "_";
+	private static final char TILDE = "~".charAt(0);
 	private static final String MSF_MUTABLE_SERVLET_FIELD = "MSF_MUTABLE_SERVLET_FIELD";
 	private static final String DEPENDENCY_ONLY_MUTATED_DURING_INIT = "dependency mutated only during init()";
 
@@ -129,22 +132,36 @@ public class SitesServlet extends HttpServlet {
 		}
 
 		// sites for current user
+		Site myWorkSpace = null;
 		final JSONObject json = new JSONObject();
-		final String principal = sessionManager.getCurrentSession()
-				.getUserEid();
-		if (principal == null || "".equals(principal)) {
+		final String uid = sessionManager.getCurrentSessionUserId();
+		final String eid = sessionManager.getCurrentSession().getUserEid();
+		if (eid == null || "".equals(eid)) {
 			json.element("principal", "anonymous");
 		} else {
-			json.element("principal", principal);
+			json.element("principal", eid);
+			try {
+				myWorkSpace = siteService.getSite(siteService
+						.getUserSiteId(uid));
+			} catch (IdUnusedException e) {
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("My Workspace could not be found for user: "
+							+ eid);
+				}
+			}
 		}
 		final List<Site> siteList = siteService.getSites(
 				org.sakaiproject.site.api.SiteService.SelectionType.ACCESS,
 				null, null, null,
 				org.sakaiproject.site.api.SiteService.SortType.TITLE_ASC, null);
 		if (siteList != null) {
+			// add My Workspace to beginning of list
+			if (myWorkSpace != null) {
+				siteList.add(0, myWorkSpace);
+			}
 			// collect the user's preferences
 			final PortalSiteNavUserPreferences userPrefs = new PortalSiteNavUserPreferences(
-					preferencesService.getPreferences(principal));
+					preferencesService.getPreferences(uid));
 			json.element("display", userPrefs.getPrefTabs());
 
 			// initialize values to an empty map to avoid null check later
@@ -195,7 +212,8 @@ public class SitesServlet extends HttpServlet {
 						final JSONArray sitesArrayJson = new JSONArray();
 						for (final Site site : sortedSites) {
 							sitesArrayJson.add(renderSiteJson(site,
-									unreadForums, unreadMessages));
+									unreadForums, unreadMessages,
+									resourceBundle));
 						}
 						categoryJson.element("sites", sitesArrayJson);
 						categoriesArrayJson.add(categoryJson);
@@ -206,7 +224,7 @@ public class SitesServlet extends HttpServlet {
 				final JSONArray sitesArrayJson = new JSONArray();
 				for (Site site : siteList) {
 					sitesArrayJson.add(renderSiteJson(site, unreadForums,
-							unreadMessages));
+							unreadMessages, resourceBundle));
 				}
 				json.element("sites", sitesArrayJson);
 			}
@@ -219,10 +237,16 @@ public class SitesServlet extends HttpServlet {
 
 	private JSONObject renderSiteJson(final Site site,
 			final Map<String, Integer> unreadForums,
-			final Map<String, Integer> unreadMessages) {
+			final Map<String, Integer> unreadMessages,
+			final ResourceBundle resourceBundle) {
 		final JSONObject siteJson = new JSONObject();
 		final String siteId = site.getId();
-		siteJson.element("title", site.getTitle());
+		// i18n My Workspace
+		if (TILDE == siteId.charAt(0)) { // startsWith "~"
+			siteJson.element("title", resourceBundle.getString("sit_mywor"));
+		} else {
+			siteJson.element("title", site.getTitle());
+		}
 		siteJson.element("id", siteId);
 		siteJson.element("url", site.getUrl());
 		siteJson.element("description", site.getDescription());
@@ -365,7 +389,10 @@ public class SitesServlet extends HttpServlet {
 		 */
 		@SuppressWarnings({ "PMD.ConfusingTernary" })
 		protected PortalSiteNavUserPreferences(final Preferences preferences) {
-			LOG.debug("new PortalSiteNavUserPreferences(final Preferences preferences)");
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("new PortalSiteNavUserPreferences(final Preferences "
+						+ preferences + ")");
+			}
 			if (preferences != null) {
 				final ResourceProperties props = preferences
 						.getProperties("sakai:portal:sitenav");
