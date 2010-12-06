@@ -196,6 +196,30 @@ public class SitesServletTest {
 	}
 
 	/**
+	 * Increases cobertura coverage report. Tests
+	 * {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 */
+	@Test
+	public void testDoGetNormalBehaviorLogDebugDisabled() {
+		Properties log4jProperties = new Properties();
+		log4jProperties.put("log4j.rootLogger", "ERROR, A1");
+		log4jProperties.put("log4j.appender.A1",
+				"org.apache.log4j.ConsoleAppender");
+		log4jProperties.put("log4j.appender.A1.layout",
+				"org.apache.log4j.PatternLayout");
+		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
+				PatternLayout.TTCC_CONVERSION_PATTERN);
+		log4jProperties.put("log4j.threshold", "ERROR");
+		PropertyConfigurator.configure(log4jProperties);
+		try {
+			sitesServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			assertNull("Exception should not be thrown: " + e, e);
+		}
+	}
+
+	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
 	 */
 	@Test
@@ -480,6 +504,21 @@ public class SitesServletTest {
 	@Test
 	public void testDoGetNoLocale() {
 		when(request.getParameter(SitesServlet.LOCALE)).thenReturn(null);
+		try {
+			sitesServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			assertNull("Exception should not be thrown: " + e, e);
+		}
+	}
+
+	/**
+	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 */
+	@Test
+	public void testDoGetZeroCountSynoptic() {
+		when(synopticMsgcntrItem1.getNewForumCount()).thenReturn(0);
+		when(synopticMsgcntrItem1.getNewMessagesCount()).thenReturn(0);
 		try {
 			sitesServlet.doGet(request, response);
 			verify(response).setStatus(HttpServletResponse.SC_OK);
