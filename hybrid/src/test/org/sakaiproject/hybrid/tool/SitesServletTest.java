@@ -199,6 +199,7 @@ public class SitesServletTest {
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
+		enableLog4jDebug();
 	}
 
 	/**
@@ -450,6 +451,7 @@ public class SitesServletTest {
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
+		enableLog4jDebug();
 	}
 
 	/**
