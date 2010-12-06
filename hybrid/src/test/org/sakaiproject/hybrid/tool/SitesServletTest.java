@@ -180,7 +180,7 @@ public class SitesServletTest {
 	public void testDoGetNormalBehavior() {
 		try {
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
@@ -195,7 +195,7 @@ public class SitesServletTest {
 		disableLog4jDebug();
 		try {
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
@@ -210,7 +210,7 @@ public class SitesServletTest {
 		when(session.getUserEid()).thenReturn(null);
 		try {
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
@@ -224,7 +224,7 @@ public class SitesServletTest {
 		when(session.getUserEid()).thenReturn("");
 		try {
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
@@ -238,7 +238,7 @@ public class SitesServletTest {
 		when(request.getParameter(SitesServlet.LOCALE)).thenReturn("es");
 		try {
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
@@ -253,7 +253,7 @@ public class SitesServletTest {
 				"es_ES_Traditional");
 		try {
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
@@ -272,7 +272,7 @@ public class SitesServletTest {
 				"es_ES_Traditional_MAC");
 		try {
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
@@ -400,7 +400,7 @@ public class SitesServletTest {
 			when(resourceProperties.getLongProperty("tabs")).thenThrow(
 					new EntityPropertyNotDefinedException());
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
@@ -431,7 +431,7 @@ public class SitesServletTest {
 		when(preferencesService.getPreferences(UID)).thenReturn(null);
 		try {
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
@@ -442,16 +442,14 @@ public class SitesServletTest {
 	 */
 	@Test
 	public void testIdUnusedException() {
-		disableLog4jDebug();
 		try {
 			when(siteService.getSite("~admin")).thenThrow(
 					new IdUnusedException("message"));
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
-		enableLog4jDebug();
 	}
 
 	/**
@@ -463,7 +461,7 @@ public class SitesServletTest {
 				.thenReturn("false");
 		try {
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
@@ -477,7 +475,7 @@ public class SitesServletTest {
 		when(request.getParameter(SitesServlet.UNREAD)).thenReturn("false");
 		try {
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
@@ -491,7 +489,7 @@ public class SitesServletTest {
 		when(request.getParameter(SitesServlet.LOCALE)).thenReturn(null);
 		try {
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
@@ -506,7 +504,7 @@ public class SitesServletTest {
 		when(synopticMsgcntrItem1.getNewMessagesCount()).thenReturn(0);
 		try {
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
@@ -528,7 +526,7 @@ public class SitesServletTest {
 									org.sakaiproject.site.api.SiteService.SortType.TITLE_ASC,
 									null)).thenReturn(null);
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
@@ -543,12 +541,15 @@ public class SitesServletTest {
 				.thenReturn(null);
 		try {
 			sitesServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
+			verifyDoGet(response);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
 	}
 
+	/**
+	 * Sets log4j threshold to ALL
+	 */
 	private static void enableLog4jDebug() {
 		Properties log4jProperties = new Properties();
 		log4jProperties.put("log4j.rootLogger", "ALL, A1");
@@ -562,6 +563,9 @@ public class SitesServletTest {
 		PropertyConfigurator.configure(log4jProperties);
 	}
 
+	/**
+	 * Sets log4j threshold to ERROR
+	 */
 	private static void disableLog4jDebug() {
 		Properties log4jProperties = new Properties();
 		log4jProperties.put("log4j.rootLogger", "ERROR, A1");
@@ -573,5 +577,21 @@ public class SitesServletTest {
 				PatternLayout.TTCC_CONVERSION_PATTERN);
 		log4jProperties.put("log4j.threshold", "ERROR");
 		PropertyConfigurator.configure(log4jProperties);
+	}
+
+	/**
+	 * Verifies the normal flow of
+	 * {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @param response
+	 *            response
+	 * @throws IOException
+	 */
+	private void verifyDoGet(final HttpServletResponse response)
+			throws IOException {
+		verify(response).setContentType("application/json");
+		verify(response).setCharacterEncoding("UTF-8");
+		verify(response).setStatus(HttpServletResponse.SC_OK);
+		verify(response).getWriter();
 	}
 }
