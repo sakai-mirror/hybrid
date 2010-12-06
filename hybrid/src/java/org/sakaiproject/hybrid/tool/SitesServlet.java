@@ -210,7 +210,8 @@ public class SitesServlet extends HttpServlet {
 						final JSONArray sitesArrayJson = new JSONArray();
 						for (final Site site : sortedSites) {
 							sitesArrayJson.add(renderSiteJson(site,
-									unreadForums, unreadMessages));
+									unreadForums, unreadMessages,
+									resourceBundle));
 						}
 						categoryJson.element("sites", sitesArrayJson);
 						categoriesArrayJson.add(categoryJson);
@@ -221,7 +222,7 @@ public class SitesServlet extends HttpServlet {
 				final JSONArray sitesArrayJson = new JSONArray();
 				for (Site site : siteList) {
 					sitesArrayJson.add(renderSiteJson(site, unreadForums,
-							unreadMessages));
+							unreadMessages, resourceBundle));
 				}
 				json.element("sites", sitesArrayJson);
 			}
@@ -234,10 +235,16 @@ public class SitesServlet extends HttpServlet {
 
 	private JSONObject renderSiteJson(final Site site,
 			final Map<String, Integer> unreadForums,
-			final Map<String, Integer> unreadMessages) {
+			final Map<String, Integer> unreadMessages,
+			final ResourceBundle resourceBundle) {
 		final JSONObject siteJson = new JSONObject();
 		final String siteId = site.getId();
-		siteJson.element("title", site.getTitle());
+		// i18n My Workspace
+		if (siteId.startsWith("~")) {
+			siteJson.element("title", resourceBundle.getString("sit_mywor"));
+		} else {
+			siteJson.element("title", site.getTitle());
+		}
 		siteJson.element("id", siteId);
 		siteJson.element("url", site.getUrl());
 		siteJson.element("description", site.getDescription());
