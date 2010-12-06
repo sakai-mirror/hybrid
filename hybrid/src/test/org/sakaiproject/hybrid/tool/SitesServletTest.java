@@ -460,4 +460,32 @@ public class SitesServletTest {
 		}
 	}
 
+	/**
+	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 */
+	@Test
+	public void testDoGetNoUnread() {
+		when(request.getParameter(SitesServlet.UNREAD)).thenReturn("false");
+		try {
+			sitesServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			assertNull("Exception should not be thrown: " + e, e);
+		}
+	}
+
+	/**
+	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 */
+	@Test
+	public void testDoGetNoLocale() {
+		when(request.getParameter(SitesServlet.LOCALE)).thenReturn(null);
+		try {
+			sitesServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			assertNull("Exception should not be thrown: " + e, e);
+		}
+	}
+
 }
