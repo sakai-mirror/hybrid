@@ -61,7 +61,8 @@ import org.sakaiproject.user.api.PreferencesService;
  * all sites that the user has access to visit.
  */
 @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MTIA_SUSPECT_SERVLET_INSTANCE_FIELD", justification = "dependencies only mutated only during init()")
-@SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
+@SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity",
+		"PMD.ExcessiveImports" })
 public class SitesServlet extends HttpServlet {
 	private static final long serialVersionUID = 7907409301065984518L;
 	private static final Log LOG = LogFactory.getLog(SitesServlet.class);
