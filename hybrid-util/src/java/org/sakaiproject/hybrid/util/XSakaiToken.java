@@ -78,7 +78,7 @@ public class XSakaiToken {
 	 * results; i.e. raw data retrieval from request.
 	 * 
 	 * @param request
-	 * @return
+	 * @return token
 	 * @throws IllegalArgumentException
 	 */
 	public String getToken(final HttpServletRequest request) {
@@ -94,7 +94,7 @@ public class XSakaiToken {
 	 * 
 	 * @param request
 	 * @param sharedSecret
-	 * @return
+	 * @return eid
 	 * @throws IllegalArgumentException
 	 */
 	public String getValidatedEid(final HttpServletRequest request,
@@ -158,7 +158,7 @@ public class XSakaiToken {
 	 * @param hostname
 	 *            Fully qualified domain name or an IP address. See:
 	 *            {@link #getSharedSecret(String)}.
-	 * @return
+	 * @return token
 	 * @throws IllegalArgumentException
 	 */
 	public String createToken(final String hostname) {
@@ -185,7 +185,7 @@ public class XSakaiToken {
 	 *            {@link #getSharedSecret(String)}.
 	 * @param eid
 	 *            Enterprise user id; usually a username.
-	 * @return
+	 * @return token
 	 * @throws Error
 	 *             Wrapped exception if there is any unexpected trouble.
 	 * @throws IllegalArgumentException

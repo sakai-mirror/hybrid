@@ -115,10 +115,6 @@ public class NakamuraAuthenticationHelper {
 	/**
 	 * Class is immutable and thread safe.
 	 * 
-	 * @param threadLocalManager
-	 *            Required. Used to get a reference to
-	 *            {@link HttpServletRequest} from {@link ThreadLocalManager}
-	 * @param serverConfigurationService
 	 * @param validateUrl
 	 *            The Nakamura REST end-point we will use to validate the
 	 *            cookie.
@@ -257,6 +253,11 @@ public class NakamuraAuthenticationHelper {
 	 * (e.g. principal could in theory be null).
 	 */
 	public static class AuthInfo {
+		private static final String FIRST_NAME = "firstName";
+		private static final String LAST_NAME = "lastName";
+		private static final String EMAIL = "email";
+		private static final String EMPTY_STRING = "";
+
 		// PMD does not like the class name
 		@SuppressWarnings("PMD.ProperLogger")
 		private static final Log AILOG = LogFactory.getLog(AuthInfo.class);
@@ -278,7 +279,7 @@ public class NakamuraAuthenticationHelper {
 			final JSONObject user = JSONObject.fromObject(json).getJSONObject(
 					"user");
 			final String principal = user.getString("principal");
-			if (principal != null && !"".equals(principal)
+			if (principal != null && !EMPTY_STRING.equals(principal)
 					&& !anonymous.equals(principal)) {
 				this.principal = principal;
 			} else {
@@ -286,9 +287,21 @@ public class NakamuraAuthenticationHelper {
 			}
 
 			final JSONObject properties = user.getJSONObject("properties");
-			firstName = properties.getString("firstName");
-			lastName = properties.getString("lastName");
-			emailAddress = properties.getString("email");
+			if (properties.has(FIRST_NAME)) {
+				firstName = properties.getString(FIRST_NAME);
+			} else {
+				firstName = EMPTY_STRING;
+			}
+			if (properties.has(LAST_NAME)) {
+				lastName = properties.getString(LAST_NAME);
+			} else {
+				lastName = EMPTY_STRING;
+			}
+			if (properties.has(EMAIL)) {
+				emailAddress = properties.getString(EMAIL);
+			} else {
+				emailAddress = EMPTY_STRING;
+			}
 		}
 
 		/**

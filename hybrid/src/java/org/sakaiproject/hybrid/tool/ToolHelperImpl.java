@@ -75,7 +75,8 @@ public class ToolHelperImpl {
 			"PMD.DataflowAnomalyAnalysis", "PMD.OnlyOneReturn" })
 	public boolean allowTool(final Site site, final Placement placement) {
 		if (LOG.isDebugEnabled()) {
-			LOG.debug("allowTool(Site site, Placement placement)");
+			LOG.debug("allowTool(Site " + site + ", Placement " + placement
+					+ ")");
 		}
 		// No way to render an opinion
 		if (placement == null || site == null) {

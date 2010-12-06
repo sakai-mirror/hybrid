@@ -21,8 +21,10 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ResourceBundle;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -39,9 +41,14 @@ import org.sakaiproject.api.app.messageforums.SynopticMsgcntrItem;
 import org.sakaiproject.api.app.messageforums.SynopticMsgcntrManager;
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.component.api.ServerConfigurationService;
+import org.sakaiproject.entity.api.EntityPropertyNotDefinedException;
+import org.sakaiproject.entity.api.EntityPropertyTypeException;
+import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.tool.api.SessionManager;
+import org.sakaiproject.user.api.Preferences;
+import org.sakaiproject.user.api.PreferencesService;
 
 /**
  * Based on
@@ -55,21 +62,30 @@ import org.sakaiproject.tool.api.SessionManager;
 @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "MTIA_SUSPECT_SERVLET_INSTANCE_FIELD", justification = "dependencies only mutated only during init()")
 @SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 public class SitesServlet extends HttpServlet {
-	// TODO i18n category names
 	private static final long serialVersionUID = 7907409301065984518L;
 	private static final Log LOG = LogFactory.getLog(SitesServlet.class);
+
 	/**
 	 * Optional GET parameter which categorizes the JSON by site term and type.
 	 */
-	private static final String CATEGORIZED = "categorized";
+	public static final String CATEGORIZED = "categorized";
 	/**
 	 * Optional GET parameter which will include Messages and Forums unread
 	 * counts.
 	 */
-	private static final String UNREAD = "unread";
+	public static final String UNREAD = "unread";
 
+	/**
+	 * Optional GET parameter which specifies locale. For example: en_US.
+	 * 
+	 * @see Locale
+	 */
+	public static final String LOCALE = "l";
+
+	private static final String UNDERSCORE = "_";
 	private static final String MSF_MUTABLE_SERVLET_FIELD = "MSF_MUTABLE_SERVLET_FIELD";
 	private static final String DEPENDENCY_ONLY_MUTATED_DURING_INIT = "dependency mutated only during init()";
+
 	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient SessionManager sessionManager;
 	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
@@ -80,12 +96,14 @@ public class SitesServlet extends HttpServlet {
 	protected transient ComponentManager componentManager;
 	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient SynopticMsgcntrManager synopticMsgcntrManager;
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
+	protected transient PreferencesService preferencesService;
 	protected transient MoreSiteViewImpl moreSiteViewImpl;
 
 	@Override
 	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.NPathComplexity",
 			"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDeeplyNestedIfStmts",
-			"PMD.AvoidInstantiatingObjectsInLoops" })
+			"PMD.AvoidInstantiatingObjectsInLoops", "PMD.ExcessiveMethodLength" })
 	protected void doGet(final HttpServletRequest req,
 			final HttpServletResponse resp) throws ServletException,
 			IOException {
@@ -96,6 +114,20 @@ public class SitesServlet extends HttpServlet {
 		final boolean categorized = Boolean.parseBoolean(req
 				.getParameter(CATEGORIZED));
 		final boolean unread = Boolean.parseBoolean(req.getParameter(UNREAD));
+
+		final Locale locale = getLocale(req);
+		if (locale == null) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
+		final ResourceBundle resourceBundle = ResourceBundle.getBundle(
+				"sitenav", locale);
+
+		if (LOG.isDebugEnabled()) {
+			LOG.debug(CATEGORIZED + "=" + categorized + "; " + UNREAD + "="
+					+ unread + "; " + LOCALE + "=" + locale);
+		}
+
 		// sites for current user
 		final JSONObject json = new JSONObject();
 		final String principal = sessionManager.getCurrentSession()
@@ -110,6 +142,11 @@ public class SitesServlet extends HttpServlet {
 				null, null, null,
 				org.sakaiproject.site.api.SiteService.SortType.TITLE_ASC, null);
 		if (siteList != null) {
+			// collect the user's preferences
+			final PortalSiteNavUserPreferences userPrefs = new PortalSiteNavUserPreferences(
+					preferencesService.getPreferences(principal));
+			json.element("display", userPrefs.getPrefTabs());
+
 			// initialize values to an empty map to avoid null check later
 			Map<String, Integer> unreadForums = Collections.emptyMap();
 			Map<String, Integer> unreadMessages = unreadForums;
@@ -153,7 +190,8 @@ public class SitesServlet extends HttpServlet {
 						final String category = entry.getKey();
 						final List<Site> sortedSites = entry.getValue();
 						final JSONObject categoryJson = new JSONObject();
-						categoryJson.element("category", category);
+						categoryJson.element("category",
+								resourceBundle.getString(category));
 						final JSONArray sitesArrayJson = new JSONArray();
 						for (final Site site : sortedSites) {
 							sitesArrayJson.add(renderSiteJson(site,
@@ -202,6 +240,52 @@ public class SitesServlet extends HttpServlet {
 		return siteJson;
 	}
 
+	/**
+	 * 
+	 * @param req
+	 *            request
+	 * @return null if Locale cannot be determined.
+	 * @throws IOException
+	 */
+	@SuppressWarnings({ "PMD.DataflowAnomalyAnalysis", "PMD.OnlyOneReturn" })
+	private Locale getLocale(final HttpServletRequest req) throws IOException {
+		// Locale parameter
+		Locale locale = null;
+		final String localeParam = req.getParameter(LOCALE);
+		if (localeParam != null) {
+			final int hyphen = localeParam.indexOf(UNDERSCORE);
+			if (hyphen > -1) {
+				// a multi-part locale has been passed
+				final String[] parts = localeParam.split(UNDERSCORE);
+				switch (parts.length) {
+				case 2:
+					// both language and country code
+					locale = new Locale(parts[0], parts[1]);
+					break;
+				case 3:
+					// language, country code, and variant passed
+					locale = new Locale(parts[0], parts[1], parts[2]);
+					break;
+				default:
+					// language parameter must contain two or three parts!
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("Illegal locale request parameter: "
+								+ localeParam);
+					}
+					return null;
+				}
+			} else {
+				// just language code supplied
+				locale = new Locale(localeParam);
+			}
+		}
+		if (locale == null) {
+			// default to Accept-Language header if none specified
+			locale = req.getLocale();
+		}
+		return locale;
+	}
+
 	@Override
 	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
@@ -232,6 +316,11 @@ public class SitesServlet extends HttpServlet {
 		if (synopticMsgcntrManager == null) {
 			throw new IllegalStateException("SynopticMsgcntrManager == null");
 		}
+		preferencesService = (PreferencesService) componentManager
+				.get(PreferencesService.class);
+		if (preferencesService == null) {
+			throw new IllegalStateException("PreferencesService == null");
+		}
 		moreSiteViewImpl = new MoreSiteViewImpl(serverConfigurationService);
 	}
 
@@ -245,5 +334,65 @@ public class SitesServlet extends HttpServlet {
 			throw new IllegalArgumentException("componentManager == null");
 		}
 		this.componentManager = componentManager;
+	}
+
+	/**
+	 * Wraps Sakai2 portal functionality around number of sites to display.
+	 * Immutable helper class.
+	 * <p>
+	 * Logic inspired by: <a href=
+	 * "https://source.sakaiproject.org/svn/portal/trunk/portal-impl/impl/src/java/org/sakaiproject/portal/charon/CharonPortal.java"
+	 * >CharonPortal.java@85021</a> Lines 2412-2442
+	 */
+	protected static class PortalSiteNavUserPreferences {
+		/**
+		 * The default number of sites that will be displayed
+		 */
+		public static final int DEFAULT_TABS = 4;
+
+		private final static Log LOG = LogFactory
+				.getLog(PortalSiteNavUserPreferences.class);
+
+		/**
+		 * Number of sites to display according to Sakai2
+		 */
+		private final transient int prefTabs;
+
+		/**
+		 * @param preferences
+		 *            Null values are supported and will return default
+		 *            behavior.
+		 */
+		@SuppressWarnings({ "PMD.ConfusingTernary" })
+		protected PortalSiteNavUserPreferences(final Preferences preferences) {
+			LOG.debug("new PortalSiteNavUserPreferences(final Preferences preferences)");
+			if (preferences != null) {
+				final ResourceProperties props = preferences
+						.getProperties("sakai:portal:sitenav");
+				int prefTabs = -1;
+				try {
+					prefTabs = (int) props.getLongProperty("tabs");
+				} catch (EntityPropertyNotDefinedException e) {
+					// no property defined
+					prefTabs = DEFAULT_TABS;
+				} catch (EntityPropertyTypeException e) {
+					// admin should investigate such a case
+					LOG.error(e.getLocalizedMessage(), e);
+					throw new IllegalStateException(e);
+				}
+				this.prefTabs = prefTabs;
+			} else { // null Preferences
+				this.prefTabs = DEFAULT_TABS;
+				return;
+			}
+		}
+
+		/**
+		 * @return the prefTabs
+		 */
+		protected Integer getPrefTabs() {
+			return prefTabs;
+		}
+
 	}
 }

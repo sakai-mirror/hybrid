@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 
@@ -52,6 +53,7 @@ import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.SessionManager;
+import org.sakaiproject.user.api.PreferencesService;
 import org.sakaiproject.user.api.User;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -72,6 +74,8 @@ public class SitesServletTest {
 	protected ComponentManager componentManager;
 	@Mock
 	protected ServerConfigurationService serverConfigurationService;
+	@Mock
+	protected transient PreferencesService preferencesService;
 	@Mock
 	protected ServletConfig config;
 	@Mock
@@ -135,6 +139,9 @@ public class SitesServletTest {
 				.thenReturn(serverConfigurationService);
 		when(componentManager.get(SynopticMsgcntrManager.class)).thenReturn(
 				synopticMsgcntrManager);
+		when(componentManager.get(PreferencesService.class)).thenReturn(
+				preferencesService);
+		when(request.getLocale()).thenReturn(Locale.getDefault());
 		sitesServlet = new SitesServlet();
 		sitesServlet.setupTestCase(componentManager);
 		sitesServlet.init(config);

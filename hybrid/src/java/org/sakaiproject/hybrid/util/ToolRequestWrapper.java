@@ -39,4 +39,12 @@ public class ToolRequestWrapper extends HttpServletRequestWrapper {
 		return remoteUser;
 	}
 
+	/**
+	 * @see Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return super.toString() + "::" + remoteUser;
+	}
+
 }
