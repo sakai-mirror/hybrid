@@ -132,15 +132,15 @@ public class SitesServlet extends HttpServlet {
 		// sites for current user
 		Site myWorkSpace = null;
 		final JSONObject json = new JSONObject();
+		final String uid = sessionManager.getCurrentSessionUserId();
 		final String eid = sessionManager.getCurrentSession().getUserEid();
 		if (eid == null || "".equals(eid)) {
 			json.element("principal", "anonymous");
 		} else {
 			json.element("principal", eid);
 			try {
-				myWorkSpace = siteService
-						.getSite(siteService.getUserSiteId(sessionManager
-								.getCurrentSessionUserId()));
+				myWorkSpace = siteService.getSite(siteService
+						.getUserSiteId(uid));
 			} catch (IdUnusedException e) {
 				if (LOG.isDebugEnabled()) {
 					LOG.debug("My Workspace could not be found for user: "
@@ -159,7 +159,7 @@ public class SitesServlet extends HttpServlet {
 			}
 			// collect the user's preferences
 			final PortalSiteNavUserPreferences userPrefs = new PortalSiteNavUserPreferences(
-					preferencesService.getPreferences(eid));
+					preferencesService.getPreferences(uid));
 			json.element("display", userPrefs.getPrefTabs());
 
 			// initialize values to an empty map to avoid null check later
