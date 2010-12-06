@@ -85,6 +85,7 @@ public class SitesServlet extends HttpServlet {
 	public static final String LOCALE = "l";
 
 	private static final String UNDERSCORE = "_";
+	private static final char TILDE = "~".charAt(0);
 	private static final String MSF_MUTABLE_SERVLET_FIELD = "MSF_MUTABLE_SERVLET_FIELD";
 	private static final String DEPENDENCY_ONLY_MUTATED_DURING_INIT = "dependency mutated only during init()";
 
@@ -241,7 +242,7 @@ public class SitesServlet extends HttpServlet {
 		final JSONObject siteJson = new JSONObject();
 		final String siteId = site.getId();
 		// i18n My Workspace
-		if (siteId.startsWith("~")) {
+		if (TILDE == siteId.charAt(0)) { // startsWith "~"
 			siteJson.element("title", resourceBundle.getString("sit_mywor"));
 		} else {
 			siteJson.element("title", site.getTitle());
