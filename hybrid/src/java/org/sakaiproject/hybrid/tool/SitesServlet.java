@@ -44,6 +44,7 @@ import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.entity.api.EntityPropertyNotDefinedException;
 import org.sakaiproject.entity.api.EntityPropertyTypeException;
 import org.sakaiproject.entity.api.ResourceProperties;
+import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.tool.api.SessionManager;
@@ -129,22 +130,36 @@ public class SitesServlet extends HttpServlet {
 		}
 
 		// sites for current user
+		Site myWorkSpace = null;
 		final JSONObject json = new JSONObject();
-		final String principal = sessionManager.getCurrentSession()
-				.getUserEid();
-		if (principal == null || "".equals(principal)) {
+		final String eid = sessionManager.getCurrentSession().getUserEid();
+		if (eid == null || "".equals(eid)) {
 			json.element("principal", "anonymous");
 		} else {
-			json.element("principal", principal);
+			json.element("principal", eid);
+			try {
+				myWorkSpace = siteService
+						.getSite(siteService.getUserSiteId(sessionManager
+								.getCurrentSessionUserId()));
+			} catch (IdUnusedException e) {
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("My Workspace could not be found for user: "
+							+ eid);
+				}
+			}
 		}
 		final List<Site> siteList = siteService.getSites(
 				org.sakaiproject.site.api.SiteService.SelectionType.ACCESS,
 				null, null, null,
 				org.sakaiproject.site.api.SiteService.SortType.TITLE_ASC, null);
 		if (siteList != null) {
+			// add My Workspace to beginning of list
+			if (myWorkSpace != null) {
+				siteList.add(0, myWorkSpace);
+			}
 			// collect the user's preferences
 			final PortalSiteNavUserPreferences userPrefs = new PortalSiteNavUserPreferences(
-					preferencesService.getPreferences(principal));
+					preferencesService.getPreferences(eid));
 			json.element("display", userPrefs.getPrefTabs());
 
 			// initialize values to an empty map to avoid null check later
@@ -365,7 +380,10 @@ public class SitesServlet extends HttpServlet {
 		 */
 		@SuppressWarnings({ "PMD.ConfusingTernary" })
 		protected PortalSiteNavUserPreferences(final Preferences preferences) {
-			LOG.debug("new PortalSiteNavUserPreferences(final Preferences preferences)");
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("new PortalSiteNavUserPreferences(final Preferences "
+						+ preferences + ")");
+			}
 			if (preferences != null) {
 				final ResourceProperties props = preferences
 						.getProperties("sakai:portal:sitenav");
