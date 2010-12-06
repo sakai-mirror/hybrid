@@ -38,7 +38,7 @@ import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
 import org.sakaiproject.authz.api.Role;
 import org.sakaiproject.authz.api.SecurityService;
-import org.sakaiproject.component.cover.ComponentManager;
+import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.event.api.Event;
 import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.exception.IdUnusedException;
@@ -75,18 +75,21 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 
 	private static final String MSF_MUTABLE_SERVLET_FIELD = "MSF_MUTABLE_SERVLET_FIELD";
 	private static final String DEPENDENCY_ONLY_MUTATED_DURING_INIT = "dependency mutated only during init()";
+
 	@SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
-	protected transient SessionManager sessionManager;
+	private transient ComponentManager componentManager;
 	@SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
-	protected transient SiteService siteService;
+	private transient SessionManager sessionManager;
 	@SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
-	protected transient EventTrackingService eventTrackingService;
+	private transient SiteService siteService;
+	@SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
+	private transient EventTrackingService eventTrackingService;
+	@SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
+	private transient AuthzGroupService authzGroupService;
+	@SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
+	private transient SecurityService securityService;
 	@SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	protected transient ToolHelperImpl toolHelper;
-	@SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
-	protected transient AuthzGroupService authzGroupService;
-	@SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
-	protected transient SecurityService securityService;
 
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
@@ -240,7 +243,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	 * @param site
 	 * @return
 	 */
-	private boolean canAccessAtLeastOneTool(final Site site) {
+	protected boolean canAccessAtLeastOneTool(final Site site) {
 		final List<SitePage> pages = site.getOrderedPages();
 		if (pages != null) {
 			for (SitePage page : pages) {
@@ -265,8 +268,8 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	 * @throws IOException
 	 * @throws ResponseCommittedException
 	 */
-	private void sendError(final HttpServletResponse resp, final int errorCode,
-			final String message) throws IOException {
+	protected void sendError(final HttpServletResponse resp,
+			final int errorCode, final String message) throws IOException {
 		if (!resp.isCommitted()) {
 			resp.sendError(errorCode);
 			return;
@@ -278,32 +281,50 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	@Override
 	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
-		sessionManager = (SessionManager) ComponentManager
-				.get(org.sakaiproject.tool.api.SessionManager.class);
+		if (componentManager == null) {
+			componentManager = org.sakaiproject.component.cover.ComponentManager
+					.getInstance();
+		}
+		if (componentManager == null) {
+			throw new IllegalStateException("componentManager == null");
+		}
+		sessionManager = (SessionManager) componentManager
+				.get(SessionManager.class);
 		if (sessionManager == null) {
 			throw new IllegalStateException("SessionManager == null");
 		}
-		siteService = (SiteService) ComponentManager
-				.get(org.sakaiproject.site.api.SiteService.class);
+		siteService = (SiteService) componentManager.get(SiteService.class);
 		if (siteService == null) {
 			throw new IllegalStateException("SiteService == null");
 		}
-		eventTrackingService = (EventTrackingService) ComponentManager
-				.get(org.sakaiproject.event.api.EventTrackingService.class);
+		eventTrackingService = (EventTrackingService) componentManager
+				.get(EventTrackingService.class);
 		if (eventTrackingService == null) {
 			throw new IllegalStateException("EventTrackingService == null");
 		}
-		authzGroupService = (AuthzGroupService) ComponentManager
-				.get(org.sakaiproject.authz.api.AuthzGroupService.class);
+		authzGroupService = (AuthzGroupService) componentManager
+				.get(AuthzGroupService.class);
 		if (authzGroupService == null) {
 			throw new IllegalStateException("AuthzGroupService == null");
 		}
-		securityService = (SecurityService) ComponentManager
+		securityService = (SecurityService) componentManager
 				.get(SecurityService.class);
 		if (securityService == null) {
 			throw new IllegalStateException("SecurityService == null");
 		}
 		toolHelper = new ToolHelperImpl(securityService);
+	}
+
+	/**
+	 * Only used for unit testing setup.
+	 * 
+	 * @param componentManager
+	 */
+	protected void setupTestCase(final ComponentManager componentManager) {
+		if (componentManager == null) {
+			throw new IllegalArgumentException("componentManager == null");
+		}
+		this.componentManager = componentManager;
 	}
 
 	/**
