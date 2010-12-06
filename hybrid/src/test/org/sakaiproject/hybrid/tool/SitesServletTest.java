@@ -22,6 +22,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sakaiproject.hybrid.test.TestHelper.disableLog4jDebug;
+import static org.sakaiproject.hybrid.test.TestHelper.enableLog4jDebug;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -29,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.servlet.ServletConfig;
@@ -37,8 +38,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -282,6 +281,27 @@ public class SitesServletTest {
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
 	 */
 	@Test
+	public void testDoGetLocaleWithVariant2LogDebugDisabled() {
+		disableLog4jDebug();
+		/*
+		 * While multiple variants is not currently supported in the get
+		 * parameter parser, they should not break anything.
+		 */
+		when(request.getParameter(SitesServlet.LOCALE)).thenReturn(
+				"es_ES_Traditional_MAC");
+		try {
+			sitesServlet.doGet(request, response);
+			verifyDoGet(response);
+		} catch (Throwable e) {
+			assertNull("Exception should not be thrown: " + e, e);
+		}
+		enableLog4jDebug();
+	}
+
+	/**
+	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 */
+	@Test
 	public void testIOException() {
 		try {
 			when(response.getWriter()).thenThrow(new IOException());
@@ -456,6 +476,23 @@ public class SitesServletTest {
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
 	 */
 	@Test
+	public void testIdUnusedException2() {
+		disableLog4jDebug();
+		try {
+			when(siteService.getSite("~admin")).thenThrow(
+					new IdUnusedException("message"));
+			sitesServlet.doGet(request, response);
+			verifyDoGet(response);
+		} catch (Throwable e) {
+			assertNull("Exception should not be thrown: " + e, e);
+		}
+		enableLog4jDebug();
+	}
+
+	/**
+	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 */
+	@Test
 	public void testDoGetNotCategorized() {
 		when(request.getParameter(SitesServlet.CATEGORIZED))
 				.thenReturn("false");
@@ -545,38 +582,6 @@ public class SitesServletTest {
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
-	}
-
-	/**
-	 * Sets log4j threshold to ALL
-	 */
-	private static void enableLog4jDebug() {
-		Properties log4jProperties = new Properties();
-		log4jProperties.put("log4j.rootLogger", "ALL, A1");
-		log4jProperties.put("log4j.appender.A1",
-				"org.apache.log4j.ConsoleAppender");
-		log4jProperties.put("log4j.appender.A1.layout",
-				"org.apache.log4j.PatternLayout");
-		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
-				PatternLayout.TTCC_CONVERSION_PATTERN);
-		log4jProperties.put("log4j.threshold", "ALL");
-		PropertyConfigurator.configure(log4jProperties);
-	}
-
-	/**
-	 * Sets log4j threshold to ERROR
-	 */
-	private static void disableLog4jDebug() {
-		Properties log4jProperties = new Properties();
-		log4jProperties.put("log4j.rootLogger", "ERROR, A1");
-		log4jProperties.put("log4j.appender.A1",
-				"org.apache.log4j.ConsoleAppender");
-		log4jProperties.put("log4j.appender.A1.layout",
-				"org.apache.log4j.PatternLayout");
-		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
-				PatternLayout.TTCC_CONVERSION_PATTERN);
-		log4jProperties.put("log4j.threshold", "ERROR");
-		PropertyConfigurator.configure(log4jProperties);
 	}
 
 	/**
