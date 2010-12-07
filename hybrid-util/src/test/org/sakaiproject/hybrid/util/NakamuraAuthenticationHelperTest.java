@@ -84,6 +84,26 @@ public class NakamuraAuthenticationHelperTest {
 			+ "\"testproperty\": \"newvalue2\"," + "\"path\": \"/a/ad/admin\","
 			+ "}," + "\"declaredMembership\": [" + "]," + "\"membership\": ["
 			+ "]" + "}" + "}";
+	private static final String MOCK_JSON_ANONYMOUS = "{"
+			+ "\"server\": \"10968-sakai3-nightly.foo.bar.edu\","
+			+ "\"user\": {" + "\"lastUpdate\": 1289584757709,"
+			+ "\"homeServer\": \"10968-sakai3-nightly.foo.bar.edu\","
+			+ "\"id\": \"anonymous\"," + "\"principal\": \"anonymous\","
+			+ "\"properties\": {" + "\"sakai:search-exclude-tree\": \"true\","
+			+ "\"testproperty\": \"newvalue2\","
+			+ "\"path\": \"/a/an/anonymous\"," + "},"
+			+ "\"declaredMembership\": [" + "]," + "\"membership\": [" + "]"
+			+ "}" + "}";
+	private static final String MOCK_JSON_EMPTY_PRINCIPAL = "{"
+			+ "\"server\": \"10968-sakai3-nightly.foo.bar.edu\","
+			+ "\"user\": {" + "\"lastUpdate\": 1289584757709,"
+			+ "\"homeServer\": \"10968-sakai3-nightly.foo.bar.edu\","
+			+ "\"id\": \"anonymous\"," + "\"principal\": \"\","
+			+ "\"properties\": {" + "\"sakai:search-exclude-tree\": \"true\","
+			+ "\"testproperty\": \"newvalue2\","
+			+ "\"path\": \"/a/an/anonymous\"," + "},"
+			+ "\"declaredMembership\": [" + "]," + "\"membership\": [" + "]"
+			+ "}" + "}";
 	/**
 	 * HYB-70 net.sf.json.JSONException: JSONObject["firstName"] not found
 	 */
@@ -372,6 +392,45 @@ public class NakamuraAuthenticationHelperTest {
 				httpClient.execute(any(HttpUriRequest.class),
 						any(BasicResponseHandler.class))).thenReturn(
 				MOCK_JSON_NO_PRINCIPAL);
+		try {
+			AuthInfo authInfo = nakamuraAuthenticationHelper
+					.getPrincipalLoggedIntoNakamura(request);
+			assertNotNull(authInfo);
+			assertNull(authInfo.getPrincipal());
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown: " + e);
+		}
+	}
+
+	/**
+	 * @see NakamuraAuthenticationHelper#getPrincipalLoggedIntoNakamura(HttpServletRequest)
+	 */
+	@Test
+	public void testGetPrincipalLoggedIntoNakamuraAnonymous() throws Exception {
+		when(
+				httpClient.execute(any(HttpUriRequest.class),
+						any(BasicResponseHandler.class))).thenReturn(
+				MOCK_JSON_ANONYMOUS);
+		try {
+			AuthInfo authInfo = nakamuraAuthenticationHelper
+					.getPrincipalLoggedIntoNakamura(request);
+			assertNotNull(authInfo);
+			assertNull(authInfo.getPrincipal());
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown: " + e);
+		}
+	}
+
+	/**
+	 * @see NakamuraAuthenticationHelper#getPrincipalLoggedIntoNakamura(HttpServletRequest)
+	 */
+	@Test
+	public void testGetPrincipalLoggedIntoNakamuraEmptyPrincipal()
+			throws Exception {
+		when(
+				httpClient.execute(any(HttpUriRequest.class),
+						any(BasicResponseHandler.class))).thenReturn(
+				MOCK_JSON_EMPTY_PRINCIPAL);
 		try {
 			AuthInfo authInfo = nakamuraAuthenticationHelper
 					.getPrincipalLoggedIntoNakamura(request);
