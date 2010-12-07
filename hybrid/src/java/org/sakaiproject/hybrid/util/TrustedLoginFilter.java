@@ -33,6 +33,7 @@ import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.SessionManager;
+import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
 
@@ -97,6 +98,7 @@ import edu.umd.cs.findbugs.annotations.SuppressWarnings;
  */
 @SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 public class TrustedLoginFilter implements Filter {
+	private static final String PMD_DATAFLOW_ANOMALY_ANALYSIS = "PMD.DataflowAnomalyAnalysis";
 	private final static Log LOG = LogFactory.getLog(TrustedLoginFilter.class);
 	/**
 	 * sakai.properties
@@ -110,7 +112,6 @@ public class TrustedLoginFilter implements Filter {
 	 * sakai.properties
 	 */
 	public static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SAFE_HOSTS = "org.sakaiproject.hybrid.util.TrustedLoginFilter.safeHosts";
-	private static final String TOKEN_SEPARATOR = ";";
 
 	protected transient Signature signature = new Signature();
 	protected transient XSakaiToken xSakaiToken = null;
@@ -140,11 +141,12 @@ public class TrustedLoginFilter implements Filter {
 	 * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
 	 *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
 	 */
-	@SuppressWarnings({ "PMD.CyclomaticComplexity" })
+	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.OnlyOneReturn",
+			"PMD.AvoidDeeplyNestedIfStmts" })
 	public void doFilter(final ServletRequest req, final ServletResponse resp,
 			final FilterChain chain) throws IOException, ServletException {
 		if (enabled && req instanceof HttpServletRequest) {
-			@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+			@SuppressWarnings(PMD_DATAFLOW_ANOMALY_ANALYSIS)
 			HttpServletRequest hreq = (HttpServletRequest) req;
 			final String host = req.getRemoteHost();
 			if (safeHosts.indexOf(host) < 0) {
@@ -152,17 +154,17 @@ public class TrustedLoginFilter implements Filter {
 				chain.doFilter(req, resp);
 				return;
 			} else {
-				@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+				@SuppressWarnings(PMD_DATAFLOW_ANOMALY_ANALYSIS)
 				Session currentSession = null;
-				@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+				@SuppressWarnings(PMD_DATAFLOW_ANOMALY_ANALYSIS)
 				Session requestSession = null;
 				final String trustedUserName = xSakaiToken.getValidatedEid(
 						hreq, sharedSecret);
 				if (trustedUserName != null) {
 					currentSession = sessionManager.getCurrentSession();
 					if (!trustedUserName.equals(currentSession.getUserEid())) {
-						@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-						org.sakaiproject.user.api.User user = null;
+						@SuppressWarnings(PMD_DATAFLOW_ANOMALY_ANALYSIS)
+						User user = null;
 						try {
 							user = userDirectoryService
 									.getUserByEid(trustedUserName);
