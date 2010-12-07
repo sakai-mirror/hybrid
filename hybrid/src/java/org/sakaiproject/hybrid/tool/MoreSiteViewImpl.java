@@ -50,37 +50,35 @@ class MoreSiteViewImpl {
 	 */
 	protected static final int ADDITIONAL_TERMS_CAPACITY = 6;
 
-	// key naming scheme allows for natural sort order if no
-	// sakai.properties->portal.term.order is supplied.
 	/**
 	 * i18n key for "All sites"
 	 */
-	private static final String I18N_ALL_SITES = "moresite_all_sites";
+	protected static final String I18N_ALL_SITES = "moresite_all_sites";
 	/**
 	 * i18n key for "(unknown academic term)"
 	 */
-	private static final String I18N_UNKNOWN_COURSE_TERM_SITES = "moresite_unknown_term";
+	protected static final String I18N_UNKNOWN_COURSE_TERM_SITES = "moresite_unknown_term";
 	/**
 	 * i18n key for "Portfolios"
 	 */
-	private static final String I18N_PORTFOLIO_SITES = "moresite_portfolios";
+	protected static final String I18N_PORTFOLIO_SITES = "moresite_portfolios";
 	/**
 	 * i18n key for "Other"
 	 */
-	private static final String I18N_OTHER_SITES = "moresite_other";
+	protected static final String I18N_OTHER_SITES = "moresite_other";
 	/**
 	 * i18n key for "Projects"
 	 */
-	private static final String I18N_PROJECT_SITES = "moresite_projects";
+	protected static final String I18N_PROJECT_SITES = "moresite_projects";
 	/**
 	 * i18n key for "Administration"
 	 */
-	private static final String I18N_ADMIN_SITES = "moresite_administration";
+	protected static final String I18N_ADMIN_SITES = "moresite_administration";
 
 	/**
-	 * Helper for proper sorting.
+	 * Default sort order if no sakai.properties->portal.term.order is supplied.
 	 */
-	private static final String[] DEFAULT_SORT_ORDER = {
+	protected static final String[] DEFAULT_SORT_ORDER = {
 			I18N_UNKNOWN_COURSE_TERM_SITES, I18N_PORTFOLIO_SITES,
 			I18N_PROJECT_SITES, I18N_OTHER_SITES, I18N_ADMIN_SITES };
 
