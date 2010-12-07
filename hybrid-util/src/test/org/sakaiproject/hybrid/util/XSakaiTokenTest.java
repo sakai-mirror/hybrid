@@ -131,6 +131,43 @@ public class XSakaiTokenTest {
 
 	/**
 	 * Test method for
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#XSakaiToken(org.sakaiproject.component.api.ComponentManager)}
+	 * .
+	 */
+	@Test
+	public void testXSakaiTokenNullServerConfigurationService() {
+		when(componentManager.get(ServerConfigurationService.class))
+				.thenReturn(null);
+		try {
+			xSakaiToken = new XSakaiToken(componentManager);
+			fail("IllegalStateException should be thrown: ");
+		} catch (IllegalStateException e) {
+			assertNotNull("IllegalStateException should be thrown: " + e);
+		} catch (Throwable e) {
+			fail("IllegalStateException should be thrown: " + e);
+		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#XSakaiToken(org.sakaiproject.component.api.ComponentManager)}
+	 * .
+	 */
+	@Test
+	public void testXSakaiTokenNullSessionManager() {
+		when(componentManager.get(SessionManager.class)).thenReturn(null);
+		try {
+			xSakaiToken = new XSakaiToken(componentManager);
+			fail("IllegalStateException should be thrown: ");
+		} catch (IllegalStateException e) {
+			assertNotNull("IllegalStateException should be thrown: " + e);
+		} catch (Throwable e) {
+			fail("IllegalStateException should be thrown: " + e);
+		}
+	}
+
+	/**
+	 * Test method for
 	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#getToken(javax.servlet.http.HttpServletRequest)}
 	 * .
 	 */
