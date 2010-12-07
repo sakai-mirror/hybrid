@@ -21,16 +21,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
+import static org.sakaiproject.hybrid.test.TestHelper.disableLog4jDebug;
+import static org.sakaiproject.hybrid.test.TestHelper.enableLog4jDebug;
 import static org.sakaiproject.hybrid.tool.MoreSiteViewImpl.DEFAULT_SORT_ORDER;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -71,16 +70,7 @@ public class MoreSiteViewImplTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		Properties log4jProperties = new Properties();
-		log4jProperties.put("log4j.rootLogger", "ALL, A1");
-		log4jProperties.put("log4j.appender.A1",
-				"org.apache.log4j.ConsoleAppender");
-		log4jProperties.put("log4j.appender.A1.layout",
-				"org.apache.log4j.PatternLayout");
-		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
-				PatternLayout.TTCC_CONVERSION_PATTERN);
-		log4jProperties.put("log4j.threshold", "ALL");
-		PropertyConfigurator.configure(log4jProperties);
+		enableLog4jDebug();
 	}
 
 	/**
@@ -129,6 +119,22 @@ public class MoreSiteViewImplTest {
 		} catch (Throwable e) {
 			fail("Throwable should not be thrown");
 		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.sakaiproject.hybrid.tool.MoreSiteViewImpl#MoreSiteViewImpl(org.sakaiproject.component.api.ServerConfigurationService)}
+	 * .
+	 */
+	@Test
+	public void testMoreSiteViewImplLogDebugDisabled() {
+		disableLog4jDebug();
+		try {
+			moreSiteViewImpl = new MoreSiteViewImpl(serverConfigurationService);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown");
+		}
+		enableLog4jDebug();
 	}
 
 	/**

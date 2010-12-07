@@ -241,13 +241,11 @@ class MoreSiteViewImpl {
 	 * @param sortedTerms
 	 *            Will be mutated by method.
 	 */
-	private void addSitesToTerm(final String term,
+	protected void addSitesToTerm(final String term,
 			final Map<String, List<Site>> terms,
 			final List<Map<String, List<Site>>> sortedTerms) {
 		final List<Site> sites = terms.get(term);
-		if (sites == null || sites.isEmpty()) {
-			return; // do nothing
-		} else {
+		if (sites != null) {
 			final Map<String, List<Site>> matches = new HashMap<String, List<Site>>(
 					1);
 			matches.put(term, sites);
