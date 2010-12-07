@@ -26,7 +26,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
-import java.security.SignatureException;
+import java.security.InvalidKeyException;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
@@ -108,7 +108,7 @@ public class XSakaiTokenTest {
 		when(session.getUserEid()).thenReturn(MOCK_EID);
 		when(sessionManager.getCurrentSession()).thenReturn(session);
 		when(signature.calculateRFC2104HMAC(anyString(), anyString()))
-				.thenThrow(new SignatureException());
+				.thenThrow(new InvalidKeyException());
 		xSakaiToken = new XSakaiToken(componentManager);
 	}
 
@@ -251,7 +251,7 @@ public class XSakaiTokenTest {
 	 * .
 	 */
 	@Test
-	public void testGetValidatedEidSignatureException() {
+	public void testGetValidatedEidInvalidKeyException() {
 		xSakaiToken.signature = signature;
 		try {
 			final String eid = xSakaiToken.getValidatedEid(request,
@@ -479,7 +479,7 @@ public class XSakaiTokenTest {
 	 * .
 	 */
 	@Test
-	public void testSignMessageSignatureException() {
+	public void testSignMessageInvalidKeyException() {
 		xSakaiToken.signature = signature;
 		try {
 			xSakaiToken.signMessage(MOCK_SHARED_SECRET, MOCK_EID);

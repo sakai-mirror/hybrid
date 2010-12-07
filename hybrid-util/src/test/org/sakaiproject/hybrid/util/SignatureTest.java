@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.security.SignatureException;
+import java.security.InvalidKeyException;
 import java.util.Properties;
 
 import org.apache.log4j.PatternLayout;
@@ -80,7 +80,7 @@ public class SignatureTest {
 					MOCK_KEY);
 			assertNotNull(hmac);
 			assertEquals(TEST_HMAC, hmac);
-		} catch (SignatureException e) {
+		} catch (InvalidKeyException e) {
 			fail("No exception should be thrown: " + e);
 		}
 		// bad parameters
@@ -115,7 +115,7 @@ public class SignatureTest {
 					MOCK_DATA, MOCK_KEY, true);
 			assertNotNull(hmac);
 			assertEquals(TEST_HMAC_URLSAFE, hmac);
-		} catch (SignatureException e) {
+		} catch (InvalidKeyException e) {
 			fail("No exception should be thrown: " + e);
 		}
 		// bad parameters
@@ -137,4 +137,21 @@ public class SignatureTest {
 		}
 	}
 
+	/**
+	 * @see Signature#Signature()
+	 * @see Signature#Signature(String)
+	 */
+	@Test(expected = IllegalStateException.class)
+	public void testSignatureNoSuchAlgorithmException() {
+		new Signature("some bad algorithm");
+	}
+
+	/**
+	 * @see Signature#Signature()
+	 * @see Signature#Signature(String)
+	 */
+	@Test()
+	public void testSignatureString() {
+		new Signature("HmacSHA1");
+	}
 }

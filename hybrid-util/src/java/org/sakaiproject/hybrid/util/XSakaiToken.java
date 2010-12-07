@@ -17,6 +17,7 @@
  */
 package org.sakaiproject.hybrid.util;
 
+import java.security.InvalidKeyException;
 import java.security.SecureRandom;
 import java.security.SignatureException;
 
@@ -140,7 +141,7 @@ public class XSakaiToken {
 						// the user is Ok, we will trust it.
 						userId = user;
 					}
-				} catch (SignatureException e) {
+				} catch (InvalidKeyException e) {
 					LOG.error("Failed to validate server token: " + token, e);
 				}
 			} else {
@@ -234,7 +235,7 @@ public class XSakaiToken {
 			final String hash = signature.calculateRFC2104HMAC(message,
 					sharedSecret);
 			token = hash + TOKEN_SEPARATOR + message;
-		} catch (SignatureException e) {
+		} catch (InvalidKeyException e) {
 			throw new IllegalStateException(e);
 		}
 		return token;
