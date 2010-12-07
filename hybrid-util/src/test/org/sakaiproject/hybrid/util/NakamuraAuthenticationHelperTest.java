@@ -44,6 +44,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.hybrid.util.NakamuraAuthenticationHelper.AuthInfo;
+import org.sakaiproject.hybrid.util.NakamuraAuthenticationHelper.DefaultHttpClientProvider;
 import org.sakaiproject.hybrid.util.NakamuraAuthenticationHelper.HttpClientProvider;
 import org.sakaiproject.thread_local.api.ThreadLocalManager;
 import org.sakaiproject.tool.api.SessionManager;
@@ -80,6 +81,18 @@ public class NakamuraAuthenticationHelperTest {
 			+ "\"homeServer\": \"10968-sakai3-nightly.foo.bar.edu\","
 			+ "\"id\": \"admin\"," + "\"principal\": \"admin\","
 			+ "\"properties\": {" + "\"sakai:search-exclude-tree\": \"true\","
+			+ "\"testproperty\": \"newvalue2\"," + "\"path\": \"/a/ad/admin\","
+			+ "}," + "\"declaredMembership\": [" + "]," + "\"membership\": ["
+			+ "]" + "}" + "}";
+	/**
+	 * HYB-70 net.sf.json.JSONException: JSONObject["firstName"] not found
+	 */
+	private static final String MOCK_JSON_NO_PRINCIPAL = "{"
+			+ "\"server\": \"10968-sakai3-nightly.foo.bar.edu\","
+			+ "\"user\": {" + "\"lastUpdate\": 1289584757709,"
+			+ "\"homeServer\": \"10968-sakai3-nightly.foo.bar.edu\","
+			+ "\"id\": \"admin\"," + "\"properties\": {"
+			+ "\"sakai:search-exclude-tree\": \"true\","
 			+ "\"testproperty\": \"newvalue2\"," + "\"path\": \"/a/ad/admin\","
 			+ "}," + "\"declaredMembership\": [" + "]," + "\"membership\": ["
 			+ "]" + "}" + "}";
@@ -314,16 +327,56 @@ public class NakamuraAuthenticationHelperTest {
 	 * @see NakamuraAuthenticationHelper#getPrincipalLoggedIntoNakamura(HttpServletRequest)
 	 */
 	@Test
+	public void testGetPrincipalLoggedIntoNakamuraNoSecretFound()
+			throws Exception {
+		when(request.getCookies()).thenReturn(new Cookie[] { otherCookie });
+		AuthInfo authInfo = null;
+		try {
+			authInfo = nakamuraAuthenticationHelper
+					.getPrincipalLoggedIntoNakamura(request);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown: " + e);
+		}
+		assertNull(authInfo);
+	}
+
+	/**
+	 * @see NakamuraAuthenticationHelper#getPrincipalLoggedIntoNakamura(HttpServletRequest)
+	 */
+	@Test
 	public void testGetPrincipalLoggedIntoNakamuraHyb70() throws Exception {
 		when(
 				httpClient.execute(any(HttpUriRequest.class),
 						any(BasicResponseHandler.class))).thenReturn(
 				MOCK_JSON_NO_NAMES_NO_EMAIL);
+		AuthInfo authInfo = null;
+		try {
+			authInfo = nakamuraAuthenticationHelper
+					.getPrincipalLoggedIntoNakamura(request);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown: " + e);
+		}
+		assertNotNull(authInfo);
+		assertEquals(MOCK_PRINCIPAL, authInfo.getPrincipal());
+		assertEquals("", authInfo.getFirstName());
+		assertEquals("", authInfo.getLastName());
+		assertEquals("", authInfo.getEmailAddress());
+	}
+
+	/**
+	 * @see NakamuraAuthenticationHelper#getPrincipalLoggedIntoNakamura(HttpServletRequest)
+	 */
+	@Test
+	public void testGetPrincipalLoggedIntoNakamuraHyb70A() throws Exception {
+		when(
+				httpClient.execute(any(HttpUriRequest.class),
+						any(BasicResponseHandler.class))).thenReturn(
+				MOCK_JSON_NO_PRINCIPAL);
 		try {
 			AuthInfo authInfo = nakamuraAuthenticationHelper
 					.getPrincipalLoggedIntoNakamura(request);
 			assertNotNull(authInfo);
-			assertEquals(MOCK_PRINCIPAL, authInfo.getPrincipal());
+			assertNull(authInfo.getPrincipal());
 		} catch (Throwable e) {
 			fail("Throwable should not be thrown: " + e);
 		}
@@ -443,6 +496,17 @@ public class NakamuraAuthenticationHelperTest {
 		} catch (Throwable e) {
 			fail("IllegalStateException should be thrown");
 		}
+	}
+
+	/**
+	 * @see DefaultHttpClientProvider#DefaultHttpClientProvider()
+	 */
+	@Test
+	public void testDefaultHttpClientProvider() {
+		final DefaultHttpClientProvider defaultHttpClientProvider = new DefaultHttpClientProvider();
+		assertNotNull(defaultHttpClientProvider);
+		final HttpClient httpClient = defaultHttpClientProvider.getHttpClient();
+		assertNotNull(httpClient);
 	}
 
 	/**

@@ -278,7 +278,10 @@ public class NakamuraAuthenticationHelper {
 			}
 			final JSONObject user = JSONObject.fromObject(json).getJSONObject(
 					"user");
-			final String principal = user.getString("principal");
+			String principal = null;
+			if (user.has("principal")) {
+				principal = user.getString("principal");
+			}
 			if (principal != null && !EMPTY_STRING.equals(principal)
 					&& !anonymous.equals(principal)) {
 				this.principal = principal;
@@ -345,8 +348,7 @@ public class NakamuraAuthenticationHelper {
 	/**
 	 * Implementation is thread safe.
 	 */
-	private static class DefaultHttpClientProvider implements
-			HttpClientProvider {
+	public static class DefaultHttpClientProvider implements HttpClientProvider {
 		private static final Log LOG = LogFactory
 				.getLog(DefaultHttpClientProvider.class);
 
