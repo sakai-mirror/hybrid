@@ -27,20 +27,20 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sakaiproject.hybrid.test.TestHelper.disableLog4jDebug;
+import static org.sakaiproject.hybrid.test.TestHelper.enableLog4jDebug;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -112,16 +112,7 @@ public class SiteVisitToolPlacementServletTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		Properties log4jProperties = new Properties();
-		log4jProperties.put("log4j.rootLogger", "ALL, A1");
-		log4jProperties.put("log4j.appender.A1",
-				"org.apache.log4j.ConsoleAppender");
-		log4jProperties.put("log4j.appender.A1.layout",
-				"org.apache.log4j.PatternLayout");
-		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
-				PatternLayout.TTCC_CONVERSION_PATTERN);
-		log4jProperties.put("log4j.threshold", "ALL");
-		PropertyConfigurator.configure(log4jProperties);
+		enableLog4jDebug();
 	}
 
 	@Before
@@ -232,6 +223,40 @@ public class SiteVisitToolPlacementServletTest {
 	 *      HttpServletResponse)
 	 */
 	@Test
+	public void testNormalBehaviorAllowToolFalse() {
+		when(toolHelper.allowTool(any(Site.class), any(Placement.class)))
+				.thenReturn(false);
+		try {
+			siteVisitToolPlacementServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			assertNull("Exception should not be thrown", e);
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
+	public void testNormalBehaviorLogDebugDisabled() {
+		disableLog4jDebug();
+		try {
+			siteVisitToolPlacementServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			assertNull("Exception should not be thrown", e);
+		}
+		enableLog4jDebug();
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
 	public void testNormalBehaviorNullTool() {
 		when(toolConfig.getTool()).thenReturn(null);
 		try {
@@ -250,6 +275,55 @@ public class SiteVisitToolPlacementServletTest {
 	@Test
 	public void testNormalBehaviorNullToolId() {
 		when(tool.getId()).thenReturn(null);
+		try {
+			siteVisitToolPlacementServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			assertNull("Exception should not be thrown", e);
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
+	public void testNormalBehaviorNullOrderedPages() {
+		when(site.getOrderedPages()).thenReturn(null);
+		try {
+			siteVisitToolPlacementServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			assertNull("Exception should not be thrown", e);
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
+	public void testNormalBehaviorNullTools() {
+		when(page.getTools()).thenReturn(null);
+		try {
+			siteVisitToolPlacementServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			assertNull("Exception should not be thrown", e);
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
+	public void testNormalBehaviorEmptyTools() {
+		final List<ToolConfiguration> list = Collections.emptyList();
+		when(page.getTools()).thenReturn(list);
 		try {
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).setStatus(HttpServletResponse.SC_OK);
@@ -286,7 +360,7 @@ public class SiteVisitToolPlacementServletTest {
 	public void testIdUnusedException() {
 		try {
 			when(siteService.getSiteVisit("!admin")).thenThrow(
-					new IdUnusedException(""));
+					new IdUnusedException("!admin"));
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
 		} catch (Throwable e) {
@@ -475,7 +549,8 @@ public class SiteVisitToolPlacementServletTest {
 	@Test
 	public void testCanAccessAtLeastOneToolNoPages() {
 		when(site.getOrderedPages()).thenReturn(null);
-		assertFalse(siteVisitToolPlacementServlet.canAccessAtLeastOneTool(site));
+		assertFalse(siteVisitToolPlacementServlet.canAccessAtLeastOneTool(site,
+				null));
 	}
 
 	/**

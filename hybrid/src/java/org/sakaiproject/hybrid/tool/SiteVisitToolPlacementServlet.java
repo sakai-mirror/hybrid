@@ -154,7 +154,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 			// get the list of site pages
 			final List<SitePage> pages = site.getOrderedPages();
 			int number = 0;
-			if (pages != null && canAccessAtLeastOneTool(site)) {
+			if (pages != null && canAccessAtLeastOneTool(site, pages)) {
 				final JSONArray pagesArray = new JSONArray();
 				for (SitePage page : pages) { // for each page
 					final JSONObject pageJson = new JSONObject();
@@ -242,14 +242,16 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	 * @param site
 	 * @return
 	 */
-	protected boolean canAccessAtLeastOneTool(final Site site) {
-		final List<SitePage> pages = site.getOrderedPages();
+	protected boolean canAccessAtLeastOneTool(final Site site,
+			final List<SitePage> pages) {
 		if (pages != null) {
 			for (SitePage page : pages) {
 				final List<ToolConfiguration> tools = page.getTools();
-				for (ToolConfiguration tool : tools) {
-					if (toolHelper.allowTool(site, tool)) {
-						return true;
+				if (tools != null) {
+					for (ToolConfiguration tool : tools) {
+						if (toolHelper.allowTool(site, tool)) {
+							return true;
+						}
 					}
 				}
 			}
