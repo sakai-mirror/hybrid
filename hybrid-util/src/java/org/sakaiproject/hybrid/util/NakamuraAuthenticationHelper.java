@@ -229,7 +229,7 @@ public class NakamuraAuthenticationHelper {
 	 * @param request
 	 * @return null if no secret can be found.
 	 */
-	private String getSecret(final HttpServletRequest request) {
+	protected String getSecret(final HttpServletRequest request) {
 		LOG.debug("getSecret(HttpServletRequest request)");
 		if (request == null) {
 			throw new IllegalArgumentException("HttpServletRequest == null");

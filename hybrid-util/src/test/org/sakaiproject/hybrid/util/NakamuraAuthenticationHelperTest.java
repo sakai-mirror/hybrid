@@ -24,8 +24,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
-
-import java.util.Properties;
+import static org.sakaiproject.hybrid.test.TestHelper.disableLog4jDebug;
+import static org.sakaiproject.hybrid.test.TestHelper.enableLog4jDebug;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -35,8 +35,6 @@ import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -73,6 +71,18 @@ public class NakamuraAuthenticationHelperTest {
 			+ "\"path\": \"/a/ad/admin\"," + "\"lastName\": \"User\"" + "},"
 			+ "\"declaredMembership\": [" + "]," + "\"membership\": [" + "]"
 			+ "}" + "}";
+	/**
+	 * HYB-70 net.sf.json.JSONException: JSONObject["firstName"] not found
+	 */
+	private static final String MOCK_JSON_NO_NAMES_NO_EMAIL = "{"
+			+ "\"server\": \"10968-sakai3-nightly.foo.bar.edu\","
+			+ "\"user\": {" + "\"lastUpdate\": 1289584757709,"
+			+ "\"homeServer\": \"10968-sakai3-nightly.foo.bar.edu\","
+			+ "\"id\": \"admin\"," + "\"principal\": \"admin\","
+			+ "\"properties\": {" + "\"sakai:search-exclude-tree\": \"true\","
+			+ "\"testproperty\": \"newvalue2\"," + "\"path\": \"/a/ad/admin\","
+			+ "}," + "\"declaredMembership\": [" + "]," + "\"membership\": ["
+			+ "]" + "}" + "}";
 	NakamuraAuthenticationHelper nakamuraAuthenticationHelper = null;
 	@Mock
 	ComponentManager componentManager;
@@ -81,7 +91,9 @@ public class NakamuraAuthenticationHelperTest {
 	@Mock
 	ServerConfigurationService serverConfigurationService;
 	@Mock
-	Cookie cookie;
+	Cookie sakaiTrackingCookie;
+	@Mock
+	Cookie otherCookie;
 	@Mock
 	ThreadLocalManager threadLocalManager;
 	@Mock
@@ -93,16 +105,7 @@ public class NakamuraAuthenticationHelperTest {
 
 	@BeforeClass
 	public static void setupClass() {
-		Properties log4jProperties = new Properties();
-		log4jProperties.put("log4j.rootLogger", "ALL, A1");
-		log4jProperties.put("log4j.appender.A1",
-				"org.apache.log4j.ConsoleAppender");
-		log4jProperties.put("log4j.appender.A1.layout",
-				"org.apache.log4j.PatternLayout");
-		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
-				PatternLayout.TTCC_CONVERSION_PATTERN);
-		log4jProperties.put("log4j.threshold", "ALL");
-		PropertyConfigurator.configure(log4jProperties);
+		enableLog4jDebug();
 	}
 
 	/**
@@ -127,9 +130,10 @@ public class NakamuraAuthenticationHelperTest {
 		// XSakaiToken
 		when(serverConfigurationService.getString(MOCK_SAKAI_PROP_KEY, null))
 				.thenReturn(MOCK_SHARED_SECRET);
-		when(cookie.getName()).thenReturn("SAKAI-TRACKING");
-		when(cookie.getValue()).thenReturn("theSecret");
-		final Cookie[] cookies = { cookie };
+		when(sakaiTrackingCookie.getName()).thenReturn("SAKAI-TRACKING");
+		when(sakaiTrackingCookie.getValue()).thenReturn("theSecret");
+		when(otherCookie.getName()).thenReturn("FOO");
+		final Cookie[] cookies = { sakaiTrackingCookie, otherCookie };
 		when(request.getCookies()).thenReturn(cookies);
 		nakamuraAuthenticationHelper = new NakamuraAuthenticationHelper(
 				componentManager, MOCK_VALIDATE_URL, MOCK_PRINCIPAL,
@@ -283,6 +287,49 @@ public class NakamuraAuthenticationHelperTest {
 	}
 
 	/**
+	 * @see NakamuraAuthenticationHelper#getPrincipalLoggedIntoNakamura(HttpServletRequest)
+	 */
+	@Test
+	public void testGetPrincipalLoggedIntoNakamuraLogDebugDisabled()
+			throws Exception {
+		disableLog4jDebug();
+		try {
+			AuthInfo authInfo = nakamuraAuthenticationHelper
+					.getPrincipalLoggedIntoNakamura(request);
+			assertNotNull(authInfo);
+			assertEquals(MOCK_PRINCIPAL, authInfo.getPrincipal());
+			assertNotNull(authInfo.getFirstName());
+			assertEquals("Admin", authInfo.getFirstName());
+			assertNotNull(authInfo.getLastName());
+			assertEquals("User", authInfo.getLastName());
+			assertNotNull(authInfo.getEmailAddress());
+			assertEquals("admin@sakai.invalid", authInfo.getEmailAddress());
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown: " + e);
+		}
+		enableLog4jDebug();
+	}
+
+	/**
+	 * @see NakamuraAuthenticationHelper#getPrincipalLoggedIntoNakamura(HttpServletRequest)
+	 */
+	@Test
+	public void testGetPrincipalLoggedIntoNakamuraHyb70() throws Exception {
+		when(
+				httpClient.execute(any(HttpUriRequest.class),
+						any(BasicResponseHandler.class))).thenReturn(
+				MOCK_JSON_NO_NAMES_NO_EMAIL);
+		try {
+			AuthInfo authInfo = nakamuraAuthenticationHelper
+					.getPrincipalLoggedIntoNakamura(request);
+			assertNotNull(authInfo);
+			assertEquals(MOCK_PRINCIPAL, authInfo.getPrincipal());
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown: " + e);
+		}
+	}
+
+	/**
 	 * With a good cache hit.
 	 * 
 	 * @see NakamuraAuthenticationHelper#getPrincipalLoggedIntoNakamura(HttpServletRequest)
@@ -306,6 +353,36 @@ public class NakamuraAuthenticationHelperTest {
 	}
 
 	/**
+	 * @see NakamuraAuthenticationHelper#getSecret(HttpServletRequest)
+	 */
+	@Test
+	public void testGetSecretNullRequest() {
+		try {
+			nakamuraAuthenticationHelper.getSecret(null);
+			fail("IllegalArgumentException should be thrown");
+		} catch (IllegalArgumentException e) {
+			assertNotNull("IllegalArgumentException should be thrown", e);
+		} catch (Throwable e) {
+			fail("IllegalArgumentException should be thrown");
+		}
+	}
+
+	/**
+	 * @see NakamuraAuthenticationHelper#getSecret(HttpServletRequest)
+	 */
+	@Test
+	public void testGetSecretNullCookies() {
+		when(request.getCookies()).thenReturn(null);
+		try {
+			final String secret = nakamuraAuthenticationHelper
+					.getSecret(request);
+			assertNull(secret);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown");
+		}
+	}
+
+	/**
 	 * @see NakamuraAuthenticationHelper#getPrincipalLoggedIntoNakamura(HttpServletRequest)
 	 */
 	@Test
@@ -323,6 +400,28 @@ public class NakamuraAuthenticationHelperTest {
 		} catch (Throwable e) {
 			fail("Throwable should not be thrown: " + e);
 		}
+	}
+
+	/**
+	 * @see NakamuraAuthenticationHelper#getPrincipalLoggedIntoNakamura(HttpServletRequest)
+	 */
+	@Test
+	public void testHttpResponseExceptionLogDebugDisabled() throws Exception {
+		disableLog4jDebug();
+		// HttpResponseException
+		when(
+				httpClient.execute(any(HttpUriRequest.class),
+						any(BasicResponseHandler.class))).thenThrow(
+				new HttpResponseException(404,
+						"could not find cookie / not valid"));
+		try {
+			AuthInfo authInfo = nakamuraAuthenticationHelper
+					.getPrincipalLoggedIntoNakamura(request);
+			assertNull(authInfo);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown: " + e);
+		}
+		enableLog4jDebug();
 	}
 
 	/**
