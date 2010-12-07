@@ -36,16 +36,11 @@ import org.apache.commons.codec.binary.Base64;
  * Utility to calculate signatures for information.
  */
 @SuppressWarnings("PMD.LongVariable")
-public final class Signature {
+public class Signature {
 	private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
-	/**
-	 * If you have a class that has nothing but static methods, consider making
-	 * it a Singleton. Also, if you want this class to be a Singleton, remember
-	 * to add a private constructor to prevent instantiation.
-	 */
-	private Signature() {
-		// PMD.UseSingleton
+	public Signature() {
+		// do nothing
 	}
 
 	/**
@@ -62,12 +57,12 @@ public final class Signature {
 	 * @throws java.security.SignatureException
 	 *             when signature generation fails
 	 */
-	public static String calculateRFC2104HMAC(final String data,
-			final String key) throws java.security.SignatureException {
+	public String calculateRFC2104HMAC(final String data, final String key)
+			throws java.security.SignatureException {
 		return calculateRFC2104HMACWithEncoding(data, key, false);
 	}
 
-	public static String calculateRFC2104HMACWithEncoding(final String data,
+	public String calculateRFC2104HMACWithEncoding(final String data,
 			final String key, final boolean urlSafe)
 			throws java.security.SignatureException {
 		if (data == null) {

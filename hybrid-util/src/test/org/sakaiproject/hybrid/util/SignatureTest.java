@@ -34,6 +34,7 @@ import org.junit.Test;
  * Unit tests for {@link Signature} class.
  */
 public class SignatureTest {
+	protected transient Signature signature = new Signature();
 	private static final String MOCK_DATA = "data";
 	private static final String MOCK_KEY = "key";
 	/**
@@ -75,7 +76,7 @@ public class SignatureTest {
 	public void testCalculateRFC2104HMAC() {
 		// good parameters
 		try {
-			final String hmac = Signature.calculateRFC2104HMAC(MOCK_DATA,
+			final String hmac = signature.calculateRFC2104HMAC(MOCK_DATA,
 					MOCK_KEY);
 			assertNotNull(hmac);
 			assertEquals(TEST_HMAC, hmac);
@@ -84,7 +85,7 @@ public class SignatureTest {
 		}
 		// bad parameters
 		try {
-			Signature.calculateRFC2104HMAC(null, MOCK_KEY);
+			signature.calculateRFC2104HMAC(null, MOCK_KEY);
 			fail("IllegalArgumentException should be thrown");
 		} catch (IllegalArgumentException e) {
 			assertNotNull("IllegalArgumentException should be thrown", e);
@@ -92,7 +93,7 @@ public class SignatureTest {
 			fail("IllegalArgumentException should be thrown");
 		}
 		try {
-			Signature.calculateRFC2104HMAC(MOCK_DATA, null);
+			signature.calculateRFC2104HMAC(MOCK_DATA, null);
 			fail("IllegalArgumentException should be thrown");
 		} catch (IllegalArgumentException e) {
 			assertNotNull("IllegalArgumentException should be thrown", e);
@@ -110,7 +111,7 @@ public class SignatureTest {
 	public void testCalculateRFC2104HMACWithEncoding() {
 		// good parameters
 		try {
-			final String hmac = Signature.calculateRFC2104HMACWithEncoding(
+			final String hmac = signature.calculateRFC2104HMACWithEncoding(
 					MOCK_DATA, MOCK_KEY, true);
 			assertNotNull(hmac);
 			assertEquals(TEST_HMAC_URLSAFE, hmac);
@@ -119,7 +120,7 @@ public class SignatureTest {
 		}
 		// bad parameters
 		try {
-			Signature.calculateRFC2104HMACWithEncoding(null, MOCK_KEY, true);
+			signature.calculateRFC2104HMACWithEncoding(null, MOCK_KEY, true);
 			fail("IllegalArgumentException should be thrown");
 		} catch (IllegalArgumentException e) {
 			assertNotNull("IllegalArgumentException should be thrown", e);
@@ -127,7 +128,7 @@ public class SignatureTest {
 			fail("IllegalArgumentException should be thrown");
 		}
 		try {
-			Signature.calculateRFC2104HMACWithEncoding(MOCK_DATA, null, true);
+			signature.calculateRFC2104HMACWithEncoding(MOCK_DATA, null, true);
 			fail("IllegalArgumentException should be thrown");
 		} catch (IllegalArgumentException e) {
 			assertNotNull("IllegalArgumentException should be thrown", e);

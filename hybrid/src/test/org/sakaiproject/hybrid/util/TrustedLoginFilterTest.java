@@ -165,6 +165,35 @@ public class TrustedLoginFilterTest extends TestCase {
 	}
 
 	/**
+	 * Ensure that possible recursive calls with a {@link ToolRequestWrapper} do
+	 * not break in strange ways. Test method for
+	 * {@link org.sakaiproject.hybrid.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
+	 * .
+	 * 
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	@Test
+	public void testDoFilterDefaultBehaviorToolRequestWrapper()
+			throws IOException, ServletException {
+		final ToolRequestWrapper toolRequestWrapper = new ToolRequestWrapper(
+				request, "username");
+		try {
+			trustedLoginFilter.doFilter(toolRequestWrapper, response, chain);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown");
+		}
+		verify(sessionManager).startSession();
+		verify(sessionManager, times(1)).setCurrentSession(newSession);
+		verify(sessionManager, times(1)).setCurrentSession(existingSession);
+		verify(sessionManager, times(2)).setCurrentSession(isA(Session.class));
+		verify(newSession).setActive();
+		verify(chain).doFilter(isA(ToolRequestWrapper.class), eq(response));
+		verify(chain, never()).doFilter(request, response);
+		verify(newSession).invalidate();
+	}
+
+	/**
 	 * Test method for
 	 * {@link org.sakaiproject.hybrid.util.TrustedLoginFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)}
 	 * .

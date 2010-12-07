@@ -18,7 +18,6 @@
 package org.sakaiproject.hybrid.util;
 
 import java.io.IOException;
-import java.security.SignatureException;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -113,6 +112,9 @@ public class TrustedLoginFilter implements Filter {
 	public static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SAFE_HOSTS = "org.sakaiproject.hybrid.util.TrustedLoginFilter.safeHosts";
 	private static final String TOKEN_SEPARATOR = ";";
 
+	protected transient Signature signature = new Signature();
+	protected transient XSakaiToken xSakaiToken = null;
+
 	protected transient ComponentManager componentManager;
 	protected transient ServerConfigurationService serverConfigurationService;
 	protected transient SessionManager sessionManager;
@@ -150,38 +152,34 @@ public class TrustedLoginFilter implements Filter {
 				chain.doFilter(req, resp);
 				return;
 			} else {
-				final String token = hreq.getHeader("x-sakai-token");
 				@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 				Session currentSession = null;
 				@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 				Session requestSession = null;
-				if (token != null) {
-					final String trustedUserName = decodeToken(token);
-					if (trustedUserName != null) {
-						currentSession = sessionManager.getCurrentSession();
-						if (!trustedUserName
-								.equals(currentSession.getUserEid())) {
-							@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-							org.sakaiproject.user.api.User user = null;
-							try {
-								user = userDirectoryService
-										.getUserByEid(trustedUserName);
-							} catch (UserNotDefinedException e) {
-								LOG.warn(trustedUserName + " not found!");
-							}
-							if (user != null) {
-								requestSession = sessionManager.startSession();
-								requestSession.setUserEid(user.getEid());
-								requestSession.setUserId(user.getId());
-								requestSession.setActive();
-								sessionManager
-										.setCurrentSession(requestSession);
-								// wrap the request so that we can get the user
-								// via getRemoteUser() in other places.
-								if (!(hreq instanceof ToolRequestWrapper)) {
-									hreq = new ToolRequestWrapper(hreq,
-											trustedUserName);
-								}
+				final String trustedUserName = xSakaiToken.getValidatedEid(
+						hreq, sharedSecret);
+				if (trustedUserName != null) {
+					currentSession = sessionManager.getCurrentSession();
+					if (!trustedUserName.equals(currentSession.getUserEid())) {
+						@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+						org.sakaiproject.user.api.User user = null;
+						try {
+							user = userDirectoryService
+									.getUserByEid(trustedUserName);
+						} catch (UserNotDefinedException e) {
+							LOG.warn(trustedUserName + " not found!");
+						}
+						if (user != null) {
+							requestSession = sessionManager.startSession();
+							requestSession.setUserEid(user.getEid());
+							requestSession.setUserId(user.getId());
+							requestSession.setActive();
+							sessionManager.setCurrentSession(requestSession);
+							// wrap the request so that we can get the user
+							// via getRemoteUser() in other places.
+							if (!(hreq instanceof ToolRequestWrapper)) {
+								hreq = new ToolRequestWrapper(hreq,
+										trustedUserName);
 							}
 						}
 					}
@@ -201,36 +199,6 @@ public class TrustedLoginFilter implements Filter {
 			chain.doFilter(req, resp);
 			return;
 		}
-	}
-
-	/**
-	 * @param token
-	 * @return username OR null if token could not be decoded.
-	 */
-	protected String decodeToken(final String token) {
-		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-		String userId = null;
-		final String[] parts = token.split(TOKEN_SEPARATOR);
-		if (parts.length == 3) {
-			try {
-				final String hash = parts[0];
-				final String user = parts[1];
-				final String timestamp = parts[2];
-				final String message = user + TOKEN_SEPARATOR + timestamp;
-				final String hmac = Signature.calculateRFC2104HMAC(message,
-						sharedSecret);
-				if (hmac.equals(hash)) {
-					// the user is Ok, we will trust it.
-					userId = user;
-				}
-			} catch (SignatureException e) {
-				LOG.error("Failed to validate server token: " + token, e);
-			}
-		} else {
-			LOG.error("Illegal number of elements in trusted server token: "
-					+ token);
-		}
-		return userId;
 	}
 
 	/**
@@ -260,6 +228,7 @@ public class TrustedLoginFilter implements Filter {
 		if (userDirectoryService == null) {
 			throw new IllegalStateException("UserDirectoryService == null");
 		}
+		xSakaiToken = new XSakaiToken(componentManager);
 		// default to true - enabled
 		enabled = serverConfigurationService.getBoolean(
 				ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_ENABLED, enabled);

@@ -41,6 +41,7 @@ public class XSakaiToken {
 	public static final String CONFIG_SHARED_SECRET_SUFFIX = "sharedSecret";
 	public static final String TOKEN_SEPARATOR = ";";
 
+	protected transient Signature signature = new Signature();
 	private transient final SecureRandom secureRandom = new SecureRandom();
 	// dependencies
 	protected transient ComponentManager componentManager;
@@ -113,39 +114,39 @@ public class XSakaiToken {
 	 * Validate the token using the passed sharedSecret and return username.
 	 * 
 	 * @param token
+	 *            null values are acceptable.
 	 * @param sharedSecret
 	 * @return eid if valid. null if not valid.
 	 * @throws IllegalArgumentException
 	 */
 	public String getValidatedEid(final String token, final String sharedSecret) {
 		LOG.debug("getValidatedEid(final String token, final String sharedSecret)");
-		if (token == null) {
-			throw new IllegalArgumentException("token == null");
-		}
 		if (sharedSecret == null) {
 			throw new IllegalArgumentException("sharedSecret == null");
 		}
 		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 		String userId = null;
-		final String[] parts = token.split(TOKEN_SEPARATOR);
-		if (parts.length == 3) {
-			try {
-				final String hash = parts[0];
-				final String user = parts[1];
-				final String nonce = parts[2];
-				final String message = user + TOKEN_SEPARATOR + nonce;
-				final String hmac = Signature.calculateRFC2104HMAC(message,
-						sharedSecret);
-				if (hmac.equals(hash)) {
-					// the user is Ok, we will trust it.
-					userId = user;
+		if (token != null) {
+			final String[] parts = token.split(TOKEN_SEPARATOR);
+			if (parts.length == 3) {
+				try {
+					final String hash = parts[0];
+					final String user = parts[1];
+					final String nonce = parts[2];
+					final String message = user + TOKEN_SEPARATOR + nonce;
+					final String hmac = signature.calculateRFC2104HMAC(message,
+							sharedSecret);
+					if (hmac.equals(hash)) {
+						// the user is Ok, we will trust it.
+						userId = user;
+					}
+				} catch (SignatureException e) {
+					LOG.error("Failed to validate server token: " + token, e);
 				}
-			} catch (SignatureException e) {
-				LOG.error("Failed to validate server token: " + token, e);
+			} else {
+				LOG.error("Illegal number of elements in trusted server token: "
+						+ token);
 			}
-		} else {
-			LOG.error("Illegal number of elements in trusted server token: "
-					+ token);
 		}
 		return userId;
 	}
@@ -230,7 +231,7 @@ public class XSakaiToken {
 		String token = null;
 		final String message = eid + TOKEN_SEPARATOR + secureRandom.nextLong();
 		try {
-			final String hash = Signature.calculateRFC2104HMAC(message,
+			final String hash = signature.calculateRFC2104HMAC(message,
 					sharedSecret);
 			token = hash + TOKEN_SEPARATOR + message;
 		} catch (SignatureException e) {

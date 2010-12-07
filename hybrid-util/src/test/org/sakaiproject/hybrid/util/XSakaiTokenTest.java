@@ -205,15 +205,14 @@ public class XSakaiTokenTest {
 		} catch (Throwable e) {
 			fail("No exception should be thrown: " + e);
 		}
-		// bad parameters
 		try {
-			xSakaiToken.getValidatedEid((String) null, MOCK_SHARED_SECRET);
-			fail("IllegalArgumentException should be thrown");
-		} catch (IllegalArgumentException e) {
-			assertNotNull("IllegalArgumentException should be thrown", e);
+			final String eid = xSakaiToken.getValidatedEid((String) null,
+					MOCK_SHARED_SECRET);
+			assertNull("eid should be null", eid);
 		} catch (Throwable e) {
-			fail("IllegalArgumentException should be thrown");
+			fail("Throwable should not be thrown");
 		}
+		// bad parameters
 		try {
 			xSakaiToken.getValidatedEid(MOCK_TOKEN, (String) null);
 			fail("IllegalArgumentException should be thrown");
@@ -226,7 +225,8 @@ public class XSakaiTokenTest {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#createToken(java.lang.String)}.
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#createToken(java.lang.String)}
+	 * .
 	 */
 	@Test
 	public void testCreateTokenString() {
