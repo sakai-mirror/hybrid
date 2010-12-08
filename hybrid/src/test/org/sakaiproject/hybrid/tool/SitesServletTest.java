@@ -20,6 +20,7 @@ package org.sakaiproject.hybrid.tool;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sakaiproject.hybrid.test.TestHelper.disableLog4jDebug;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.FilterConfig;
@@ -105,12 +107,18 @@ public class SitesServletTest {
 	protected ResourceProperties resourceProperties;
 	@Mock
 	SynopticMsgcntrItem synopticMsgcntrItem1;
+	@Mock
+	MoreSiteViewImpl moreSiteViewImpl;
+	List<Map<String, List<Site>>> categorizedSitesList = null;
+	@Mock
+	Map<String, List<Site>> map;
 
 	@BeforeClass
 	public static void beforeClass() {
 		enableLog4jDebug();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
 		when(sessionManager.getCurrentSession()).thenReturn(session);
@@ -604,6 +612,25 @@ public class SitesServletTest {
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown: " + e, e);
 		}
+	}
+
+	/**
+	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	@SuppressWarnings("unchecked")
+	@Test(expected = IllegalStateException.class)
+	public void testDoGetMapSizeIllegalStateException()
+			throws ServletException, IOException {
+		when(map.size()).thenReturn(7);
+		categorizedSitesList = new ArrayList<Map<String, List<Site>>>();
+		categorizedSitesList.add(map);
+		when(moreSiteViewImpl.categorizeSites((List<Site>) anyObject()))
+				.thenReturn(categorizedSitesList);
+		sitesServlet.moreSiteViewImpl = moreSiteViewImpl;
+		sitesServlet.doGet(request, response);
 	}
 
 	/**

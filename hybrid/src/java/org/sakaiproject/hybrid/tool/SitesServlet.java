@@ -194,7 +194,10 @@ public class SitesServlet extends HttpServlet {
 						.categorizeSites(siteList);
 				final JSONArray categoriesArrayJson = new JSONArray();
 				for (final Map<String, List<Site>> map : categorizedSitesList) {
-					assert (map.size() == 1) : "The categorized maps must contain only one key per map!";
+					if (map.size() != 1) {
+						throw new IllegalStateException(
+								"The categorized maps must contain only one key per map!");
+					}
 					for (final Entry<String, List<Site>> entry : map.entrySet()) {
 						final String category = entry.getKey();
 						final List<Site> sortedSites = entry.getValue();
