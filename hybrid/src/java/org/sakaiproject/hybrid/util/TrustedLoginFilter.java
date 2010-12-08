@@ -206,9 +206,6 @@ public class TrustedLoginFilter implements Filter {
 			componentManager = org.sakaiproject.component.cover.ComponentManager
 					.getInstance();
 		}
-		if (componentManager == null) {
-			throw new IllegalStateException("componentManager == null");
-		}
 		serverConfigurationService = (ServerConfigurationService) componentManager
 				.get(ServerConfigurationService.class);
 		if (serverConfigurationService == null) {

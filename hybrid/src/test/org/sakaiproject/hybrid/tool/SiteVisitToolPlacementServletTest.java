@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -412,6 +413,27 @@ public class SiteVisitToolPlacementServletTest {
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown", e);
 		}
+	}
+
+	/**
+	 * @throws ServletException
+	 * @see SiteVisitToolPlacementServlet#init(ServletConfig)
+	 */
+	@Test
+	public void testInitConfig() throws ServletException {
+		final SiteVisitToolPlacementServlet siteVisitToolPlacementServlet = new SiteVisitToolPlacementServlet();
+		siteVisitToolPlacementServlet.componentManager = componentManager;
+		siteVisitToolPlacementServlet.init(config);
+	}
+
+	/**
+	 * @throws ServletException
+	 * @see SiteVisitToolPlacementServlet#init(ServletConfig)
+	 */
+	@Test(expected = NoClassDefFoundError.class)
+	public void testInitConfigNoClassDefFoundError() throws ServletException {
+		final SiteVisitToolPlacementServlet siteVisitToolPlacementServlet = new SiteVisitToolPlacementServlet();
+		siteVisitToolPlacementServlet.init(config);
 	}
 
 	/**

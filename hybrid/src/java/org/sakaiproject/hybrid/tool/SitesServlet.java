@@ -194,7 +194,10 @@ public class SitesServlet extends HttpServlet {
 						.categorizeSites(siteList);
 				final JSONArray categoriesArrayJson = new JSONArray();
 				for (final Map<String, List<Site>> map : categorizedSitesList) {
-					assert (map.size() == 1) : "The categorized maps must contain only one key per map!";
+					if (map.size() != 1) {
+						throw new IllegalStateException(
+								"The categorized maps must contain only one key per map!");
+					}
 					for (final Entry<String, List<Site>> entry : map.entrySet()) {
 						final String category = entry.getKey();
 						final List<Site> sortedSites = entry.getValue();
@@ -311,17 +314,14 @@ public class SitesServlet extends HttpServlet {
 			componentManager = org.sakaiproject.component.cover.ComponentManager
 					.getInstance();
 		}
-		if (componentManager == null) {
-			throw new IllegalStateException("componentManager == null");
-		}
 		sessionManager = (SessionManager) componentManager
 				.get(SessionManager.class);
-		if (sessionManager == null) {
-			throw new IllegalStateException("SessionManager == null");
-		}
 		siteService = (SiteService) componentManager.get(SiteService.class);
 		if (siteService == null) {
 			throw new IllegalStateException("SiteService == null");
+		}
+		if (sessionManager == null) {
+			throw new IllegalStateException("SessionManager == null");
 		}
 		serverConfigurationService = (ServerConfigurationService) componentManager
 				.get(ServerConfigurationService.class);

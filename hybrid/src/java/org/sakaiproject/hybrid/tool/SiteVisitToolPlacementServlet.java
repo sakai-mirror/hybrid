@@ -76,7 +76,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	private static final String DEPENDENCY_ONLY_MUTATED_DURING_INIT = "dependency mutated only during init()";
 
 	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
-	private transient ComponentManager componentManager;
+	protected transient ComponentManager componentManager;
 	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	private transient SessionManager sessionManager;
 	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
@@ -240,7 +240,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	 * can access at least one of those tools.
 	 * 
 	 * @param site
-	 * @return
+	 * @return true if at least one tool can be accessed.
 	 */
 	protected boolean canAccessAtLeastOneTool(final Site site,
 			final List<SitePage> pages) {
@@ -285,9 +285,6 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 		if (componentManager == null) {
 			componentManager = org.sakaiproject.component.cover.ComponentManager
 					.getInstance();
-		}
-		if (componentManager == null) {
-			throw new IllegalStateException("componentManager == null");
 		}
 		sessionManager = (SessionManager) componentManager
 				.get(SessionManager.class);
