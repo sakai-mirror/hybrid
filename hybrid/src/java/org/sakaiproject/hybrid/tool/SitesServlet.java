@@ -321,12 +321,12 @@ public class SitesServlet extends HttpServlet {
 		}
 		sessionManager = (SessionManager) componentManager
 				.get(SessionManager.class);
-		if (sessionManager == null) {
-			throw new IllegalStateException("SessionManager == null");
-		}
 		siteService = (SiteService) componentManager.get(SiteService.class);
 		if (siteService == null) {
 			throw new IllegalStateException("SiteService == null");
+		}
+		if (sessionManager == null) {
+			throw new IllegalStateException("SessionManager == null");
 		}
 		serverConfigurationService = (ServerConfigurationService) componentManager
 				.get(ServerConfigurationService.class);

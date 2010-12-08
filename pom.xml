@@ -111,6 +111,21 @@
           <artifactId>maven-resources-plugin</artifactId>
           <version>2.4.3</version>
       </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <executions>
+              <execution>
+                  <phase>verify</phase>
+                  <goals>
+                      <goal>cpd-check</goal> <!-- Fail the build if copy/paste detector fails -->
+                  </goals>
+                  <configuration>
+                      <verbose>true</verbose>
+                  </configuration>
+              </execution>
+          </executions>
+      </plugin>
     </plugins>
     <pluginManagement>
     	<plugins>
