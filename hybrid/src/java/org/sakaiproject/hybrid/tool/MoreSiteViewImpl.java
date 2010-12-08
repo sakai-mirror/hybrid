@@ -18,9 +18,12 @@
 package org.sakaiproject.hybrid.tool;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -50,39 +53,45 @@ class MoreSiteViewImpl {
 	 */
 	protected static final int ADDITIONAL_TERMS_CAPACITY = 6;
 
-	// key naming scheme allows for natural sort order if no
-	// sakai.properties->portal.term.order is supplied.
 	/**
 	 * i18n key for "All sites"
 	 */
-	private static final String I18N_ALL_SITES = "moresite_all_sites";
+	protected static final String I18N_ALL_SITES = "moresite_all_sites";
 	/**
 	 * i18n key for "(unknown academic term)"
 	 */
-	private static final String I18N_UNKNOWN_COURSE_TERM_SITES = "moresite_unknown_term";
+	protected static final String I18N_UNKNOWN_COURSE_TERM_SITES = "moresite_unknown_term";
 	/**
 	 * i18n key for "Portfolios"
 	 */
-	private static final String I18N_PORTFOLIO_SITES = "moresite_portfolios";
+	protected static final String I18N_PORTFOLIO_SITES = "moresite_portfolios";
 	/**
 	 * i18n key for "Other"
 	 */
-	private static final String I18N_OTHER_SITES = "moresite_other";
+	protected static final String I18N_OTHER_SITES = "moresite_other";
 	/**
 	 * i18n key for "Projects"
 	 */
-	private static final String I18N_PROJECT_SITES = "moresite_projects";
+	protected static final String I18N_PROJECT_SITES = "moresite_projects";
 	/**
 	 * i18n key for "Administration"
 	 */
-	private static final String I18N_ADMIN_SITES = "moresite_administration";
+	protected static final String I18N_ADMIN_SITES = "moresite_administration";
 
 	/**
-	 * Helper for proper sorting.
+	 * Default sort order if no sakai.properties->portal.term.order is supplied.
+	 * All Sites is assumed as it always goes first in the list.
 	 */
-	private static final String[] DEFAULT_SORT_ORDER = {
-			I18N_UNKNOWN_COURSE_TERM_SITES, I18N_PORTFOLIO_SITES,
-			I18N_PROJECT_SITES, I18N_OTHER_SITES, I18N_ADMIN_SITES };
+	public static final List<String> DEFAULT_SORT_ORDER;
+	static {
+		final List<String> defaultSortOrder = new ArrayList<String>(5);
+		defaultSortOrder.add(I18N_UNKNOWN_COURSE_TERM_SITES);
+		defaultSortOrder.add(I18N_PORTFOLIO_SITES);
+		defaultSortOrder.add(I18N_PROJECT_SITES);
+		defaultSortOrder.add(I18N_OTHER_SITES);
+		defaultSortOrder.add(I18N_ADMIN_SITES);
+		DEFAULT_SORT_ORDER = Collections.unmodifiableList(defaultSortOrder);
+	}
 
 	/**
 	 * Injected via constructor
@@ -202,23 +211,23 @@ class MoreSiteViewImpl {
 			for (final String term : termOrder) {
 				addSitesToTerm(term, terms, sortedTerms);
 			}
-			// now add all remaining categories
-			for (final String category : DEFAULT_SORT_ORDER) {
-				addSitesToTerm(category, terms, sortedTerms);
-			}
 		} else { // default sort ordering
-			// display all found terms
+			final Set<String> academicTerms = new HashSet<String>(
+					terms.keySet());
 			/*
-			 * Since terms tend to begin with upper-case characters, the natural
-			 * sort order actually meets the specification. If terms begin with
-			 * lower-case characters, this logic needs to be revisited. Sort
-			 * order should be: 0) All sites, 1) course sites, 2) unknown
-			 * academic term, 3) portfolios, 4) other, 5) projects, 6) admin.
+			 * Remove the well known categories so that we are just left with
+			 * course sites that have a term.
 			 */
-			final SortedSet<String> source = new TreeSet<String>(terms.keySet());
-			for (final String term : source) {
+			academicTerms.removeAll(DEFAULT_SORT_ORDER);
+			final SortedSet<String> sortedAcademicTerms = new TreeSet<String>(
+					academicTerms);
+			for (final String term : sortedAcademicTerms) {
 				addSitesToTerm(term, terms, sortedTerms);
 			}
+		}
+		// now add all remaining categories
+		for (final String category : DEFAULT_SORT_ORDER) {
+			addSitesToTerm(category, terms, sortedTerms);
 		}
 		return sortedTerms;
 	}
@@ -232,13 +241,11 @@ class MoreSiteViewImpl {
 	 * @param sortedTerms
 	 *            Will be mutated by method.
 	 */
-	private void addSitesToTerm(final String term,
+	protected void addSitesToTerm(final String term,
 			final Map<String, List<Site>> terms,
 			final List<Map<String, List<Site>>> sortedTerms) {
 		final List<Site> sites = terms.get(term);
-		if (sites == null || sites.isEmpty()) {
-			return; // do nothing
-		} else {
+		if (sites != null) {
 			final Map<String, List<Site>> matches = new HashMap<String, List<Site>>(
 					1);
 			matches.put(term, sites);

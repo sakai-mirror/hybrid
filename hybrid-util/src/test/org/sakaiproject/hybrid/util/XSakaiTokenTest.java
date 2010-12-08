@@ -23,8 +23,10 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
+import java.security.InvalidKeyException;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,6 +54,8 @@ public class XSakaiTokenTest {
 	@SuppressWarnings(value = "UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR", justification = "gets initialized in setup()")
 	XSakaiToken xSakaiToken;
 	private static final String MOCK_TOKEN = "+5JMkE44awf+2SWWZMyyzKFoJkE=;admin;-7838070940753586218";
+	private static final String MOCK_BAD_TOKEN = "5JMkE44awf+2SWWZMyyzKFoJkE=;admin;-7838070940753586218";
+	private static final String MOCK_MALFORMED_TOKEN = "+5JMkE44awf+2SWWZMyyzKFoJkE=;admin";
 	private static final String MOCK_SHARED_SECRET = "e2KS54H35j6vS5Z38nK40";
 	private static final String MOCK_HOSTNAME = "localhost";
 	private static final String MOCK_EID = "admin";
@@ -71,6 +75,8 @@ public class XSakaiTokenTest {
 	HttpServletRequest request;
 	@Mock
 	Session session;
+	@Mock
+	protected transient Signature signature;
 
 	@BeforeClass
 	public static void setupClass() {
@@ -101,6 +107,8 @@ public class XSakaiTokenTest {
 				.thenReturn(MOCK_SHARED_SECRET);
 		when(session.getUserEid()).thenReturn(MOCK_EID);
 		when(sessionManager.getCurrentSession()).thenReturn(session);
+		when(signature.calculateRFC2104HMAC(anyString(), anyString()))
+				.thenThrow(new InvalidKeyException());
 		xSakaiToken = new XSakaiToken(componentManager);
 	}
 
@@ -126,6 +134,43 @@ public class XSakaiTokenTest {
 			assertNotNull("IllegalArgumentException should be thrown", e);
 		} catch (Throwable e) {
 			fail("IllegalArgumentException should be thrown");
+		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#XSakaiToken(org.sakaiproject.component.api.ComponentManager)}
+	 * .
+	 */
+	@Test
+	public void testXSakaiTokenNullServerConfigurationService() {
+		when(componentManager.get(ServerConfigurationService.class))
+				.thenReturn(null);
+		try {
+			xSakaiToken = new XSakaiToken(componentManager);
+			fail("IllegalStateException should be thrown: ");
+		} catch (IllegalStateException e) {
+			assertNotNull("IllegalStateException should be thrown: " + e);
+		} catch (Throwable e) {
+			fail("IllegalStateException should be thrown: " + e);
+		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#XSakaiToken(org.sakaiproject.component.api.ComponentManager)}
+	 * .
+	 */
+	@Test
+	public void testXSakaiTokenNullSessionManager() {
+		when(componentManager.get(SessionManager.class)).thenReturn(null);
+		try {
+			xSakaiToken = new XSakaiToken(componentManager);
+			fail("IllegalStateException should be thrown: ");
+		} catch (IllegalStateException e) {
+			assertNotNull("IllegalStateException should be thrown: " + e);
+		} catch (Throwable e) {
+			fail("IllegalStateException should be thrown: " + e);
 		}
 	}
 
@@ -171,6 +216,7 @@ public class XSakaiTokenTest {
 		}
 		// bad parameters
 		try {
+			// null HttpServletRequest
 			xSakaiToken.getValidatedEid((HttpServletRequest) null,
 					MOCK_SHARED_SECRET);
 			fail("IllegalArgumentException should be thrown");
@@ -180,12 +226,39 @@ public class XSakaiTokenTest {
 			fail("IllegalArgumentException should be thrown");
 		}
 		try {
+			// null sharedSecret
 			xSakaiToken.getValidatedEid(request, (String) null);
 			fail("IllegalArgumentException should be thrown");
 		} catch (IllegalArgumentException e) {
 			assertNotNull("IllegalArgumentException should be thrown", e);
 		} catch (Throwable e) {
 			fail("IllegalArgumentException should be thrown");
+		}
+		try {
+			// empty sharedSecret
+			xSakaiToken.getValidatedEid(request, "");
+			fail("IllegalArgumentException should be thrown");
+		} catch (IllegalArgumentException e) {
+			assertNotNull("IllegalArgumentException should be thrown", e);
+		} catch (Throwable e) {
+			fail("IllegalArgumentException should be thrown");
+		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#getValidatedEid(javax.servlet.http.HttpServletRequest, java.lang.String)}
+	 * .
+	 */
+	@Test
+	public void testGetValidatedEidInvalidKeyException() {
+		xSakaiToken.signature = signature;
+		try {
+			final String eid = xSakaiToken.getValidatedEid(request,
+					MOCK_SHARED_SECRET);
+			assertNull(eid);
+		} catch (Throwable e) {
+			fail("No exception should be thrown: " + e);
 		}
 	}
 
@@ -205,9 +278,30 @@ public class XSakaiTokenTest {
 		} catch (Throwable e) {
 			fail("No exception should be thrown: " + e);
 		}
+		try {
+			final String eid = xSakaiToken.getValidatedEid((String) null,
+					MOCK_SHARED_SECRET);
+			assertNull("eid should be null", eid);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown");
+		}
+		try {
+			final String eid = xSakaiToken.getValidatedEid(
+					MOCK_MALFORMED_TOKEN, MOCK_SHARED_SECRET);
+			assertNull(eid);
+		} catch (Throwable e) {
+			fail("No exception should be thrown: " + e);
+		}
+		try {
+			final String eid = xSakaiToken.getValidatedEid(MOCK_BAD_TOKEN,
+					MOCK_SHARED_SECRET);
+			assertNull(eid);
+		} catch (Throwable e) {
+			fail("No exception should be thrown: " + e);
+		}
 		// bad parameters
 		try {
-			xSakaiToken.getValidatedEid((String) null, MOCK_SHARED_SECRET);
+			xSakaiToken.getValidatedEid(MOCK_TOKEN, (String) null);
 			fail("IllegalArgumentException should be thrown");
 		} catch (IllegalArgumentException e) {
 			assertNotNull("IllegalArgumentException should be thrown", e);
@@ -215,7 +309,7 @@ public class XSakaiTokenTest {
 			fail("IllegalArgumentException should be thrown");
 		}
 		try {
-			xSakaiToken.getValidatedEid(MOCK_TOKEN, (String) null);
+			xSakaiToken.getValidatedEid(MOCK_TOKEN, "");
 			fail("IllegalArgumentException should be thrown");
 		} catch (IllegalArgumentException e) {
 			assertNotNull("IllegalArgumentException should be thrown", e);
@@ -226,7 +320,8 @@ public class XSakaiTokenTest {
 
 	/**
 	 * Test method for
-	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#createToken(java.lang.String)}.
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#createToken(java.lang.String)}
+	 * .
 	 */
 	@Test
 	public void testCreateTokenString() {
@@ -234,7 +329,7 @@ public class XSakaiTokenTest {
 		try {
 			final String token1 = xSakaiToken.createToken(MOCK_HOSTNAME);
 			final String token2 = xSakaiToken.createToken(MOCK_HOSTNAME);
-			verifyTokens(token1, token2);
+			verifyTokens(token1, token2, MOCK_EID);
 		} catch (Throwable e) {
 			fail("No exception should be thrown: " + e);
 		}
@@ -259,6 +354,23 @@ public class XSakaiTokenTest {
 
 	/**
 	 * Test method for
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#createToken(java.lang.String)}
+	 * .
+	 */
+	@Test
+	public void testCreateTokenStringNullSession() {
+		when(sessionManager.getCurrentSession()).thenReturn(null);
+		try {
+			final String token1 = xSakaiToken.createToken(MOCK_HOSTNAME);
+			final String token2 = xSakaiToken.createToken(MOCK_HOSTNAME);
+			verifyTokens(token1, token2, "anonymous");
+		} catch (Throwable e) {
+			fail("No exception should be thrown: " + e);
+		}
+	}
+
+	/**
+	 * Test method for
 	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#createToken(java.lang.String, java.lang.String)}
 	 * .
 	 */
@@ -270,7 +382,7 @@ public class XSakaiTokenTest {
 					MOCK_EID);
 			final String token2 = xSakaiToken.createToken(MOCK_HOSTNAME,
 					MOCK_EID);
-			verifyTokens(token1, token2);
+			verifyTokens(token1, token2, MOCK_EID);
 		} catch (Throwable e) {
 			fail("No exception should be thrown: " + e);
 		}
@@ -322,7 +434,7 @@ public class XSakaiTokenTest {
 					MOCK_EID);
 			final String token2 = xSakaiToken.signMessage(MOCK_SHARED_SECRET,
 					MOCK_EID);
-			verifyTokens(token1, token2);
+			verifyTokens(token1, token2, MOCK_EID);
 		} catch (Throwable e) {
 			fail("No exception should be thrown: " + e);
 		}
@@ -358,6 +470,24 @@ public class XSakaiTokenTest {
 			assertNotNull("IllegalArgumentException should be thrown", e);
 		} catch (Throwable e) {
 			fail("IllegalArgumentException should be thrown");
+		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.sakaiproject.hybrid.util.XSakaiToken#signMessage(java.lang.String, java.lang.String)}
+	 * .
+	 */
+	@Test
+	public void testSignMessageInvalidKeyException() {
+		xSakaiToken.signature = signature;
+		try {
+			xSakaiToken.signMessage(MOCK_SHARED_SECRET, MOCK_EID);
+			fail("IllegalStateException should be thrown");
+		} catch (IllegalStateException e) {
+			assertNotNull("IllegalStateException should be thrown: " + e);
+		} catch (Throwable e) {
+			fail("IllegalStateException should be thrown: " + e);
 		}
 	}
 
@@ -414,7 +544,7 @@ public class XSakaiTokenTest {
 	 * @param token1
 	 * @param token2
 	 */
-	private void verifyTokens(String token1, String token2) {
+	private void verifyTokens(String token1, String token2, String eid) {
 		assertNotNull(token1);
 		assertNotNull(token2);
 		// each token should be unique
@@ -430,8 +560,8 @@ public class XSakaiTokenTest {
 		assertTrue(parts1[2].length() > 0);
 		assertTrue(parts2[2].length() > 0);
 		// the eid should all be equal
-		assertEquals(MOCK_EID, parts1[1]);
-		assertEquals(MOCK_EID, parts2[1]);
+		assertEquals(eid, parts1[1]);
+		assertEquals(eid, parts2[1]);
 		// hash should not be equal
 		assertNotSame(parts1[0], parts2[0]);
 		// nonce should not be equal

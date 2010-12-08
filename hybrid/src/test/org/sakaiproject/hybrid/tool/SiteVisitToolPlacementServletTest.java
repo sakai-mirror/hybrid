@@ -17,25 +17,30 @@
  */
 package org.sakaiproject.hybrid.tool;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sakaiproject.hybrid.test.TestHelper.disableLog4jDebug;
+import static org.sakaiproject.hybrid.test.TestHelper.enableLog4jDebug;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,10 +51,13 @@ import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
 import org.sakaiproject.authz.api.Role;
+import org.sakaiproject.authz.api.SecurityService;
+import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.event.api.Event;
 import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.PermissionException;
+import org.sakaiproject.hybrid.tool.SiteVisitToolPlacementServlet.ResponseCommittedException;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SitePage;
 import org.sakaiproject.site.api.SiteService;
@@ -63,6 +71,10 @@ import org.sakaiproject.tool.api.Tool;
 public class SiteVisitToolPlacementServletTest {
 	protected SiteVisitToolPlacementServlet siteVisitToolPlacementServlet;
 
+	@Mock
+	protected transient ComponentManager componentManager;
+	@Mock
+	protected transient SecurityService securityService;
 	@Mock
 	protected SessionManager sessionManager;
 	@Mock
@@ -95,32 +107,28 @@ public class SiteVisitToolPlacementServletTest {
 	protected PrintWriter writer;
 	@Mock
 	protected Event event;
+	@Mock
+	protected ServletConfig config;
 
 	@BeforeClass
 	public static void beforeClass() {
-		Properties log4jProperties = new Properties();
-		log4jProperties.put("log4j.rootLogger", "ALL, A1");
-		log4jProperties.put("log4j.appender.A1",
-				"org.apache.log4j.ConsoleAppender");
-		log4jProperties.put("log4j.appender.A1.layout",
-				"org.apache.log4j.PatternLayout");
-		log4jProperties.put("log4j.appender.A1.layout.ConversionPattern",
-				PatternLayout.TTCC_CONVERSION_PATTERN);
-		log4jProperties.put("log4j.threshold", "ALL");
-		PropertyConfigurator.configure(log4jProperties);
+		enableLog4jDebug();
 	}
 
 	@Before
 	public void setUp() throws Exception {
-		siteVisitToolPlacementServlet = new SiteVisitToolPlacementServlet();
-		siteVisitToolPlacementServlet.sessionManager = sessionManager;
-		siteVisitToolPlacementServlet.siteService = siteService;
-		siteVisitToolPlacementServlet.eventTrackingService = eventTrackingService;
-		siteVisitToolPlacementServlet.authzGroupService = authzGroupService;
+		when(componentManager.get(SecurityService.class)).thenReturn(
+				securityService);
+		when(componentManager.get(SessionManager.class)).thenReturn(
+				sessionManager);
+		when(componentManager.get(SiteService.class)).thenReturn(siteService);
+		when(componentManager.get(EventTrackingService.class)).thenReturn(
+				eventTrackingService);
+		when(componentManager.get(AuthzGroupService.class)).thenReturn(
+				authzGroupService);
+
 		when(toolHelper.allowTool(any(Site.class), any(Placement.class)))
 				.thenReturn(true);
-		siteVisitToolPlacementServlet.toolHelper = toolHelper;
-		siteVisitToolPlacementServlet.authzGroupService = authzGroupService;
 
 		// pass siteId parameter
 		when(request.getParameter("siteId")).thenReturn("!admin");
@@ -158,8 +166,17 @@ public class SiteVisitToolPlacementServletTest {
 		when(authzGroupService.getAuthzGroup(anyString())).thenReturn(group);
 
 		when(response.getWriter()).thenReturn(writer);
+
+		siteVisitToolPlacementServlet = new SiteVisitToolPlacementServlet();
+		siteVisitToolPlacementServlet.setupTestCase(componentManager);
+		siteVisitToolPlacementServlet.init(config);
+		siteVisitToolPlacementServlet.toolHelper = toolHelper;
 	}
 
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
 	@Test
 	public void testNullSiteId() {
 		try {
@@ -171,6 +188,10 @@ public class SiteVisitToolPlacementServletTest {
 		}
 	}
 
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
 	@Test
 	public void testNullSite() {
 		try {
@@ -182,6 +203,10 @@ public class SiteVisitToolPlacementServletTest {
 		}
 	}
 
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
 	@Test
 	public void testNormalBehavior() {
 		try {
@@ -193,13 +218,14 @@ public class SiteVisitToolPlacementServletTest {
 		}
 	}
 
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
 	@Test
-	public void testNormalBehaviorWriteEvent() {
-		when(request.getParameter("writeEvent")).thenReturn("true");
-		when(
-				eventTrackingService.newEvent(anyString(), anyString(),
-						anyBoolean())).thenReturn(event);
-		siteVisitToolPlacementServlet.eventTrackingService = eventTrackingService;
+	public void testNormalBehaviorAllowToolFalse() {
+		when(toolHelper.allowTool(any(Site.class), any(Placement.class)))
+				.thenReturn(false);
 		try {
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).setStatus(HttpServletResponse.SC_OK);
@@ -209,11 +235,132 @@ public class SiteVisitToolPlacementServletTest {
 		}
 	}
 
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
+	public void testNormalBehaviorLogDebugDisabled() {
+		disableLog4jDebug();
+		try {
+			siteVisitToolPlacementServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			assertNull("Exception should not be thrown", e);
+		}
+		enableLog4jDebug();
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
+	public void testNormalBehaviorNullTool() {
+		when(toolConfig.getTool()).thenReturn(null);
+		try {
+			siteVisitToolPlacementServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			assertNull("Exception should not be thrown", e);
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
+	public void testNormalBehaviorNullToolId() {
+		when(tool.getId()).thenReturn(null);
+		try {
+			siteVisitToolPlacementServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			assertNull("Exception should not be thrown", e);
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
+	public void testNormalBehaviorNullOrderedPages() {
+		when(site.getOrderedPages()).thenReturn(null);
+		try {
+			siteVisitToolPlacementServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			assertNull("Exception should not be thrown", e);
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
+	public void testNormalBehaviorNullTools() {
+		when(page.getTools()).thenReturn(null);
+		try {
+			siteVisitToolPlacementServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			assertNull("Exception should not be thrown", e);
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
+	public void testNormalBehaviorEmptyTools() {
+		final List<ToolConfiguration> list = Collections.emptyList();
+		when(page.getTools()).thenReturn(list);
+		try {
+			siteVisitToolPlacementServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			assertNull("Exception should not be thrown", e);
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
+	public void testNormalBehaviorWriteEvent() {
+		when(request.getParameter("writeEvent")).thenReturn("true");
+		when(
+				eventTrackingService.newEvent(anyString(), anyString(),
+						anyBoolean())).thenReturn(event);
+		try {
+			siteVisitToolPlacementServlet.doGet(request, response);
+			verify(response).setStatus(HttpServletResponse.SC_OK);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			assertNull("Exception should not be thrown", e);
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
 	@Test
 	public void testIdUnusedException() {
 		try {
 			when(siteService.getSiteVisit("!admin")).thenThrow(
-					new IdUnusedException(""));
+					new IdUnusedException("!admin"));
 			siteVisitToolPlacementServlet.doGet(request, response);
 			verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
 		} catch (Throwable e) {
@@ -221,6 +368,10 @@ public class SiteVisitToolPlacementServletTest {
 		}
 	}
 
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
 	@Test
 	public void testPermissionException() {
 		try {
@@ -233,6 +384,10 @@ public class SiteVisitToolPlacementServletTest {
 		}
 	}
 
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
 	@Test
 	public void testGroupNotDefinedException() {
 		try {
@@ -242,6 +397,195 @@ public class SiteVisitToolPlacementServletTest {
 			verify(response).setStatus(HttpServletResponse.SC_OK);
 		} catch (Throwable e) {
 			assertNull("Exception should not be thrown", e);
+		}
+	}
+
+	/**
+	 * @see ResponseCommittedException#ResponseCommittedException(String)
+	 */
+	@Test
+	public void testResponseCommittedException() {
+		try {
+			final ResponseCommittedException responseCommittedException = new ResponseCommittedException(
+					"message");
+			assertNotNull(responseCommittedException);
+		} catch (Throwable e) {
+			assertNull("Exception should not be thrown", e);
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#init(ServletConfig)
+	 */
+	@Test
+	public void testInitNullSessionManager() {
+		when(componentManager.get(SessionManager.class)).thenReturn(null);
+		try {
+			siteVisitToolPlacementServlet.init(config);
+			fail("IllegalStateException should be thrown");
+		} catch (IllegalStateException e) {
+			assertNotNull(e);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown");
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#init(ServletConfig)
+	 */
+	@Test
+	public void testInitNullSiteService() {
+		when(componentManager.get(SiteService.class)).thenReturn(null);
+		try {
+			siteVisitToolPlacementServlet.init(config);
+			fail("IllegalStateException should be thrown");
+		} catch (IllegalStateException e) {
+			assertNotNull(e);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown");
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#init(ServletConfig)
+	 */
+	@Test
+	public void testInitNullEventTrackingService() {
+		when(componentManager.get(EventTrackingService.class)).thenReturn(null);
+		try {
+			siteVisitToolPlacementServlet.init(config);
+			fail("IllegalStateException should be thrown");
+		} catch (IllegalStateException e) {
+			assertNotNull(e);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown");
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#init(ServletConfig)
+	 */
+	@Test
+	public void testInitNullAuthzGroupService() {
+		when(componentManager.get(AuthzGroupService.class)).thenReturn(null);
+		try {
+			siteVisitToolPlacementServlet.init(config);
+			fail("IllegalStateException should be thrown");
+		} catch (IllegalStateException e) {
+			assertNotNull(e);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown");
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#init(ServletConfig)
+	 */
+	@Test
+	public void testInitNullSecurityService() {
+		when(componentManager.get(SecurityService.class)).thenReturn(null);
+		try {
+			siteVisitToolPlacementServlet.init(config);
+			fail("IllegalStateException should be thrown");
+		} catch (IllegalStateException e) {
+			assertNotNull(e);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown");
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#init(ServletConfig)
+	 */
+	@Test
+	public void testSetupTestCase() {
+		try {
+			siteVisitToolPlacementServlet.setupTestCase(null);
+			fail("IllegalArgumentException should be thrown");
+		} catch (IllegalArgumentException e) {
+			assertNotNull(e);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown");
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#sendError(HttpServletResponse, int,
+	 *      String)
+	 */
+	@Test
+	public void testSendError() {
+		try {
+			siteVisitToolPlacementServlet.sendError(response,
+					HttpServletResponse.SC_BAD_REQUEST, "message");
+			verify(response, times(1)).sendError(
+					HttpServletResponse.SC_BAD_REQUEST);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown");
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#sendError(HttpServletResponse, int,
+	 *      String)
+	 */
+	@Test
+	public void testSendErrorWhenResponseCommitted() {
+		when(response.isCommitted()).thenReturn(true);
+		try {
+			siteVisitToolPlacementServlet.sendError(response,
+					HttpServletResponse.SC_BAD_REQUEST, "message");
+			fail("ResponseCommittedException should be thrown");
+		} catch (ResponseCommittedException e) {
+			assertNotNull(e);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown");
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#canAccessAtLeastOneTool(Site)
+	 */
+	@Test
+	public void testCanAccessAtLeastOneToolNoPages() {
+		when(site.getOrderedPages()).thenReturn(null);
+		assertFalse(siteVisitToolPlacementServlet.canAccessAtLeastOneTool(site,
+				null));
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
+	public void testNormalBehaviorNullSiteIdCommittedResponse() {
+		when(request.getParameter("siteId")).thenReturn(null);
+		when(response.isCommitted()).thenReturn(true);
+		try {
+			siteVisitToolPlacementServlet.doGet(request, response);
+			fail("IllegalAccessError should be thrown");
+		} catch (IllegalAccessError e) {
+			assertNotNull("IllegalAccessError should be thrown", e);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown");
+		}
+	}
+
+	/**
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
+	public void testNormalBehaviorEmptySiteIdCommittedResponse() {
+		when(request.getParameter("siteId")).thenReturn("");
+		when(response.isCommitted()).thenReturn(true);
+		try {
+			siteVisitToolPlacementServlet.doGet(request, response);
+			fail("IllegalAccessError should be thrown");
+		} catch (IllegalAccessError e) {
+			assertNotNull("IllegalAccessError should be thrown", e);
+		} catch (Throwable e) {
+			fail("Throwable should not be thrown");
 		}
 	}
 

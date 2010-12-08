@@ -18,7 +18,6 @@
 package org.sakaiproject.hybrid.util;
 
 import java.io.IOException;
-import java.security.SignatureException;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -30,10 +29,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.sakaiproject.component.cover.ComponentManager;
-import org.sakaiproject.component.cover.ServerConfigurationService;
+import org.sakaiproject.component.api.ComponentManager;
+import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.SessionManager;
+import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
 
@@ -99,11 +99,24 @@ import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 @SuppressWarnings({ "PMD.LongVariable", "PMD.CyclomaticComplexity" })
 public class TrustedLoginFilter implements Filter {
 	private final static Log LOG = LogFactory.getLog(TrustedLoginFilter.class);
-	private static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SHARED_SECRET = "org.sakaiproject.hybrid.util.TrustedLoginFilter.sharedSecret";
-	private static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_ENABLED = "org.sakaiproject.hybrid.util.TrustedLoginFilter.enabled";
-	private static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SAFE_HOSTS = "org.sakaiproject.hybrid.util.TrustedLoginFilter.safeHosts";
-	private static final String TOKEN_SEPARATOR = ";";
+	/**
+	 * sakai.properties
+	 */
+	public static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SHARED_SECRET = "org.sakaiproject.hybrid.util.TrustedLoginFilter.sharedSecret";
+	/**
+	 * sakai.properties
+	 */
+	public static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_ENABLED = "org.sakaiproject.hybrid.util.TrustedLoginFilter.enabled";
+	/**
+	 * sakai.properties
+	 */
+	public static final String ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SAFE_HOSTS = "org.sakaiproject.hybrid.util.TrustedLoginFilter.safeHosts";
 
+	protected transient Signature signature = new Signature();
+	protected transient XSakaiToken xSakaiToken = null;
+
+	protected transient ComponentManager componentManager;
+	protected transient ServerConfigurationService serverConfigurationService;
 	protected transient SessionManager sessionManager;
 	protected transient UserDirectoryService userDirectoryService;
 
@@ -127,11 +140,11 @@ public class TrustedLoginFilter implements Filter {
 	 * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
 	 *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
 	 */
-	@SuppressWarnings({ "PMD.CyclomaticComplexity" })
+	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.OnlyOneReturn",
+			"PMD.AvoidDeeplyNestedIfStmts", "PMD.DataflowAnomalyAnalysis" })
 	public void doFilter(final ServletRequest req, final ServletResponse resp,
 			final FilterChain chain) throws IOException, ServletException {
 		if (enabled && req instanceof HttpServletRequest) {
-			@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 			HttpServletRequest hreq = (HttpServletRequest) req;
 			final String host = req.getRemoteHost();
 			if (safeHosts.indexOf(host) < 0) {
@@ -139,38 +152,31 @@ public class TrustedLoginFilter implements Filter {
 				chain.doFilter(req, resp);
 				return;
 			} else {
-				final String token = hreq.getHeader("x-sakai-token");
-				@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 				Session currentSession = null;
-				@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 				Session requestSession = null;
-				if (token != null) {
-					final String trustedUserName = decodeToken(token);
-					if (trustedUserName != null) {
-						currentSession = sessionManager.getCurrentSession();
-						if (!trustedUserName
-								.equals(currentSession.getUserEid())) {
-							@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-							org.sakaiproject.user.api.User user = null;
-							try {
-								user = userDirectoryService
-										.getUserByEid(trustedUserName);
-							} catch (UserNotDefinedException e) {
-								LOG.warn(trustedUserName + " not found!");
-							}
-							if (user != null) {
-								requestSession = sessionManager.startSession();
-								requestSession.setUserEid(user.getEid());
-								requestSession.setUserId(user.getId());
-								requestSession.setActive();
-								sessionManager
-										.setCurrentSession(requestSession);
-								// wrap the request so that we can get the user
-								// via getRemoteUser() in other places.
-								if (!(hreq instanceof ToolRequestWrapper)) {
-									hreq = new ToolRequestWrapper(hreq,
-											trustedUserName);
-								}
+				final String trustedUserName = xSakaiToken.getValidatedEid(
+						hreq, sharedSecret);
+				if (trustedUserName != null) {
+					currentSession = sessionManager.getCurrentSession();
+					if (!trustedUserName.equals(currentSession.getUserEid())) {
+						User user = null;
+						try {
+							user = userDirectoryService
+									.getUserByEid(trustedUserName);
+						} catch (UserNotDefinedException e) {
+							LOG.warn(trustedUserName + " not found!");
+						}
+						if (user != null) {
+							requestSession = sessionManager.startSession();
+							requestSession.setUserEid(user.getEid());
+							requestSession.setUserId(user.getId());
+							requestSession.setActive();
+							sessionManager.setCurrentSession(requestSession);
+							// wrap the request so that we can get the user
+							// via getRemoteUser() in other places.
+							if (!(hreq instanceof ToolRequestWrapper)) {
+								hreq = new ToolRequestWrapper(hreq,
+										trustedUserName);
 							}
 						}
 					}
@@ -193,57 +199,41 @@ public class TrustedLoginFilter implements Filter {
 	}
 
 	/**
-	 * @param token
-	 * @return username OR null if token could not be decoded.
-	 */
-	protected String decodeToken(final String token) {
-		@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-		String userId = null;
-		final String[] parts = token.split(TOKEN_SEPARATOR);
-		if (parts.length == 3) {
-			try {
-				final String hash = parts[0];
-				final String user = parts[1];
-				final String timestamp = parts[2];
-				final String message = user + TOKEN_SEPARATOR + timestamp;
-				final String hmac = Signature.calculateRFC2104HMAC(message,
-						sharedSecret);
-				if (hmac.equals(hash)) {
-					// the user is Ok, we will trust it.
-					userId = user;
-				}
-			} catch (SignatureException e) {
-				LOG.error("Failed to validate server token: " + token, e);
-			}
-		} else {
-			LOG.error("Illegal number of elements in trusted server token: "
-					+ token);
-		}
-		return userId;
-	}
-
-	/**
 	 * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
 	 */
 	public void init(final FilterConfig config) throws ServletException {
-		sessionManager = (SessionManager) ComponentManager
+		if (componentManager == null) {
+			componentManager = org.sakaiproject.component.cover.ComponentManager
+					.getInstance();
+		}
+		if (componentManager == null) {
+			throw new IllegalStateException("componentManager == null");
+		}
+		serverConfigurationService = (ServerConfigurationService) componentManager
+				.get(ServerConfigurationService.class);
+		if (serverConfigurationService == null) {
+			throw new IllegalStateException(
+					"ServerConfigurationService == null");
+		}
+		sessionManager = (SessionManager) componentManager
 				.get(org.sakaiproject.tool.api.SessionManager.class);
 		if (sessionManager == null) {
 			throw new IllegalStateException("SessionManager == null");
 		}
-		userDirectoryService = (UserDirectoryService) ComponentManager
-				.get(org.sakaiproject.user.api.UserDirectoryService.class);
+		userDirectoryService = (UserDirectoryService) componentManager
+				.get(UserDirectoryService.class);
 		if (userDirectoryService == null) {
 			throw new IllegalStateException("UserDirectoryService == null");
 		}
+		xSakaiToken = new XSakaiToken(componentManager);
 		// default to true - enabled
-		enabled = ServerConfigurationService.getBoolean(
+		enabled = serverConfigurationService.getBoolean(
 				ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_ENABLED, enabled);
-		sharedSecret = ServerConfigurationService.getString(
+		sharedSecret = serverConfigurationService.getString(
 				ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SHARED_SECRET,
 				sharedSecret);
 		// default to localhost
-		safeHosts = ServerConfigurationService.getString(
+		safeHosts = serverConfigurationService.getString(
 				ORG_SAKAIPROJECT_UTIL_TRUSTED_LOGIN_FILTER_SAFE_HOSTS,
 				safeHosts);
 	}
@@ -253,6 +243,18 @@ public class TrustedLoginFilter implements Filter {
 	 */
 	public void destroy() {
 		// nothing to do here
+	}
+
+	/**
+	 * Only used for unit testing setup.
+	 * 
+	 * @param componentManager
+	 */
+	protected void setupTestCase(final ComponentManager componentManager) {
+		if (componentManager == null) {
+			throw new IllegalArgumentException("componentManager == null");
+		}
+		this.componentManager = componentManager;
 	}
 
 }

@@ -18,6 +18,8 @@
 package org.sakaiproject.hybrid.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -81,6 +83,15 @@ public class ToolRequestWrapperTest {
 	public void testToolRequestWrapperHttpServletRequestString() {
 		toolRequestWrapper = new ToolRequestWrapper(request, "username2");
 		assertEquals("username2", toolRequestWrapper.getRemoteUser());
+	}
+
+	@Test
+	public void testToString() {
+		toolRequestWrapper = new ToolRequestWrapper(request);
+		final String str = toolRequestWrapper.toString();
+		assertNotNull(str);
+		// toString should contain wrapped username
+		assertTrue(str.indexOf("username") > -1);
 	}
 
 }

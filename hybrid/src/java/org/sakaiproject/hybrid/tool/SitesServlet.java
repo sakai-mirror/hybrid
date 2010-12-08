@@ -107,22 +107,19 @@ public class SitesServlet extends HttpServlet {
 	@SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.NPathComplexity",
 			"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDeeplyNestedIfStmts",
 			"PMD.AvoidInstantiatingObjectsInLoops", "PMD.ExcessiveMethodLength" })
-	protected void doGet(final HttpServletRequest req,
-			final HttpServletResponse resp) throws ServletException,
+	protected void doGet(final HttpServletRequest request,
+			final HttpServletResponse response) throws ServletException,
 			IOException {
 		if (LOG.isDebugEnabled()) {
-			LOG.debug("doGet(HttpServletRequest " + req
-					+ ", HttpServletResponse " + resp + ")");
+			LOG.debug("doGet(HttpServletRequest " + request
+					+ ", HttpServletResponse " + response + ")");
 		}
-		final boolean categorized = Boolean.parseBoolean(req
+		final boolean categorized = Boolean.parseBoolean(request
 				.getParameter(CATEGORIZED));
-		final boolean unread = Boolean.parseBoolean(req.getParameter(UNREAD));
+		final boolean unread = Boolean.parseBoolean(request
+				.getParameter(UNREAD));
 
-		final Locale locale = getLocale(req);
-		if (locale == null) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-			return;
-		}
+		final Locale locale = getLocale(request);
 		final ResourceBundle resourceBundle = ResourceBundle.getBundle(
 				"sitenav", locale);
 
@@ -168,10 +165,8 @@ public class SitesServlet extends HttpServlet {
 			Map<String, Integer> unreadForums = Collections.emptyMap();
 			Map<String, Integer> unreadMessages = unreadForums;
 			if (unread) {
-				final String uuid = sessionManager.getCurrentSession()
-						.getUserId();
 				final List<SynopticMsgcntrItem> synopticMsgcntrItems = synopticMsgcntrManager
-						.getWorkspaceSynopticMsgcntrItems(uuid);
+						.getWorkspaceSynopticMsgcntrItems(uid);
 				if (synopticMsgcntrItems != null) {
 					final int initialCapacity = synopticMsgcntrItems.size();
 					unreadForums = new HashMap<String, Integer>(initialCapacity);
@@ -199,10 +194,7 @@ public class SitesServlet extends HttpServlet {
 						.categorizeSites(siteList);
 				final JSONArray categoriesArrayJson = new JSONArray();
 				for (final Map<String, List<Site>> map : categorizedSitesList) {
-					if (map.size() != 1) {
-						throw new IllegalStateException(
-								"The categorized maps must contain only one key per map!");
-					}
+					assert (map.size() == 1) : "The categorized maps must contain only one key per map!";
 					for (final Entry<String, List<Site>> entry : map.entrySet()) {
 						final String category = entry.getKey();
 						final List<Site> sortedSites = entry.getValue();
@@ -229,10 +221,10 @@ public class SitesServlet extends HttpServlet {
 				json.element("sites", sitesArrayJson);
 			}
 		}
-		resp.setContentType("application/json");
-		resp.setCharacterEncoding("UTF-8");
-		resp.setStatus(HttpServletResponse.SC_OK);
-		json.write(resp.getWriter());
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.setStatus(HttpServletResponse.SC_OK);
+		json.write(response.getWriter());
 	}
 
 	private JSONObject renderSiteJson(final Site site,
@@ -266,19 +258,21 @@ public class SitesServlet extends HttpServlet {
 
 	/**
 	 * 
-	 * @param req
+	 * @param request
 	 *            request
-	 * @return null if Locale cannot be determined.
+	 * @return Null will not be returned. By default, request.getLocale() if
+	 *         none is specified as get parameter.
 	 * @throws IOException
 	 */
 	@SuppressWarnings({ "PMD.DataflowAnomalyAnalysis", "PMD.OnlyOneReturn" })
-	private Locale getLocale(final HttpServletRequest req) throws IOException {
+	private Locale getLocale(final HttpServletRequest request)
+			throws IOException {
 		// Locale parameter
 		Locale locale = null;
-		final String localeParam = req.getParameter(LOCALE);
+		final String localeParam = request.getParameter(LOCALE);
 		if (localeParam != null) {
-			final int hyphen = localeParam.indexOf(UNDERSCORE);
-			if (hyphen > -1) {
+			final int underscore = localeParam.indexOf(UNDERSCORE);
+			if (underscore > -1) {
 				// a multi-part locale has been passed
 				final String[] parts = localeParam.split(UNDERSCORE);
 				switch (parts.length) {
@@ -296,7 +290,7 @@ public class SitesServlet extends HttpServlet {
 						LOG.debug("Illegal locale request parameter: "
 								+ localeParam);
 					}
-					return null;
+					break;
 				}
 			} else {
 				// just language code supplied
@@ -305,7 +299,7 @@ public class SitesServlet extends HttpServlet {
 		}
 		if (locale == null) {
 			// default to Accept-Language header if none specified
-			locale = req.getLocale();
+			locale = request.getLocale();
 		}
 		return locale;
 	}
@@ -394,11 +388,11 @@ public class SitesServlet extends HttpServlet {
 						+ preferences + ")");
 			}
 			if (preferences != null) {
-				final ResourceProperties props = preferences
+				final ResourceProperties resourceProperties = preferences
 						.getProperties("sakai:portal:sitenav");
 				int prefTabs = -1;
 				try {
-					prefTabs = (int) props.getLongProperty("tabs");
+					prefTabs = (int) resourceProperties.getLongProperty("tabs");
 				} catch (EntityPropertyNotDefinedException e) {
 					// no property defined
 					prefTabs = DEFAULT_TABS;
