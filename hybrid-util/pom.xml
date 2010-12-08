@@ -17,30 +17,6 @@
   <inceptionYear>2009</inceptionYear>
   <packaging>jar</packaging>
 
-  <profiles>
-    <profile>
-      <id>hybrid</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.sakaiproject.kernel</groupId>
-          <artifactId>sakai-kernel-api</artifactId>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.sakaiproject.kernel</groupId>
-          <artifactId>sakai-component-manager</artifactId>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>commons-codec</groupId>
-          <artifactId>commons-codec</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
   <build>
     <resources>
       <resource>
@@ -49,6 +25,20 @@
     </resources>
   </build>
   <dependencies>
+      <dependency>
+          <groupId>org.sakaiproject.kernel</groupId>
+          <artifactId>sakai-kernel-api</artifactId>
+          <scope>provided</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.sakaiproject.kernel</groupId>
+          <artifactId>sakai-component-manager</artifactId>
+          <scope>provided</scope>
+      </dependency>
+      <dependency>
+          <groupId>commons-codec</groupId>
+          <artifactId>commons-codec</artifactId>
+      </dependency>
   	<dependency>
   		<groupId>org.apache.httpcomponents</groupId>
   		<artifactId>httpclient</artifactId>

@@ -35,19 +35,11 @@
 	<inceptionYear>2009</inceptionYear>
 	<packaging>pom</packaging>
 
-	<profiles>
-		<profile>
-			<id>hybrid</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<modules>
-				<module>hybrid</module>
-				<module>hybrid-util</module>
-				<module>hybrid-assembly</module>
-			</modules>
-		</profile>
-	</profiles>
+	<modules>
+		<module>hybrid</module>
+		<module>hybrid-util</module>
+		<module>hybrid-assembly</module>
+	</modules>
 	<properties>
 		<url.localsite>scp://source.sakaiproject.org/var/www/html/release/hybrid/${project.version}</url.localsite>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -79,7 +71,7 @@
           <source>${compileSource}</source>
           <target>${compileSource}</target>
           <showDeprecation>true</showDeprecation>
-          <compilerArgument>-Xlint:unchecked,deprecation,fallthrough,finally</compilerArgument>
+          <compilerArgument>-Xlint:all</compilerArgument>
           <fork>true</fork>
           <encoding>${project.build.sourceEncoding}</encoding>
         </configuration>
