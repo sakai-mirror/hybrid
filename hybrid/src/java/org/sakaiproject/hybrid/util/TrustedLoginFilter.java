@@ -203,11 +203,16 @@ public class TrustedLoginFilter implements Filter {
 	 */
 	public void init(final FilterConfig config) throws ServletException {
 		if (componentManager == null) {
-			componentManager = org.sakaiproject.component.cover.ComponentManager
-					.getInstance();
-		}
-		if (componentManager == null) {
-			throw new IllegalStateException("componentManager == null");
+			try {
+				componentManager = org.sakaiproject.component.cover.ComponentManager
+						.getInstance();
+			} catch (NoClassDefFoundError e) {
+				// java.lang.NoClassDefFoundError:
+				// org/springframework/context/ConfigurableApplicationContext
+				// at
+				// org.sakaiproject.component.cover.ComponentManager.getInstance(ComponentManager.java:97)
+				throw new IllegalStateException(e);
+			}
 		}
 		serverConfigurationService = (ServerConfigurationService) componentManager
 				.get(ServerConfigurationService.class);

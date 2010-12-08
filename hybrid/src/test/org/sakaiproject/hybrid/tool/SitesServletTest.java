@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -312,6 +313,27 @@ public class SitesServletTest {
 		} catch (IOException e) {
 			assertNotNull("IOException should be thrown", e);
 		}
+	}
+
+	/**
+	 * @see SitesServlet#init(FilterConfig)
+	 * @throws ServletException
+	 */
+	@Test
+	public void testInitConfig() throws ServletException {
+		final SitesServlet sitesServlet = new SitesServlet();
+		sitesServlet.componentManager = componentManager;
+		sitesServlet.init(config);
+	}
+
+	/**
+	 * @see SitesServlet#init(FilterConfig)
+	 * @throws ServletException
+	 */
+	@Test(expected = IllegalStateException.class)
+	public void testInitConfigIllegalStateException() throws ServletException {
+		final SitesServlet sitesServlet = new SitesServlet();
+		sitesServlet.init(config);
 	}
 
 	/**

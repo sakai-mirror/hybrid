@@ -455,4 +455,25 @@ public class TrustedLoginFilterTest extends TestCase {
 		}
 	}
 
+	/**
+	 * @see TrustedLoginFilter#init(FilterConfig)
+	 * @throws ServletException
+	 */
+	@Test
+	public void testInitConfig() throws ServletException {
+		final TrustedLoginFilter trustedLoginFilter = new TrustedLoginFilter();
+		trustedLoginFilter.componentManager = componentManager;
+		trustedLoginFilter.init(config);
+	}
+
+	/**
+	 * @see TrustedLoginFilter#init(FilterConfig)
+	 * @throws ServletException
+	 */
+	@Test(expected = IllegalStateException.class)
+	public void testInitConfigIllegalStateException() throws ServletException {
+		final TrustedLoginFilter trustedLoginFilter = new TrustedLoginFilter();
+		trustedLoginFilter.init(config);
+	}
+
 }

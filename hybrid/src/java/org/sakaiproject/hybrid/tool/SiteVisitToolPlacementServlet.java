@@ -76,7 +76,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	private static final String DEPENDENCY_ONLY_MUTATED_DURING_INIT = "dependency mutated only during init()";
 
 	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
-	private transient ComponentManager componentManager;
+	protected transient ComponentManager componentManager;
 	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
 	private transient SessionManager sessionManager;
 	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = MSF_MUTABLE_SERVLET_FIELD, justification = DEPENDENCY_ONLY_MUTATED_DURING_INIT)
@@ -283,11 +283,16 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
 		if (componentManager == null) {
-			componentManager = org.sakaiproject.component.cover.ComponentManager
-					.getInstance();
-		}
-		if (componentManager == null) {
-			throw new IllegalStateException("componentManager == null");
+			try {
+				componentManager = org.sakaiproject.component.cover.ComponentManager
+						.getInstance();
+			} catch (NoClassDefFoundError e) {
+				// java.lang.NoClassDefFoundError:
+				// org/springframework/context/ConfigurableApplicationContext
+				// at
+				// org.sakaiproject.component.cover.ComponentManager.getInstance(ComponentManager.java:97)
+				throw new IllegalStateException(e);
+			}
 		}
 		sessionManager = (SessionManager) componentManager
 				.get(SessionManager.class);
