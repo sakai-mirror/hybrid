@@ -430,8 +430,8 @@ public class SiteVisitToolPlacementServletTest {
 	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#init(ServletConfig)
 	 */
-	@Test(expected = IllegalStateException.class)
-	public void testInitConfigIllegalStateException() throws ServletException {
+	@Test(expected = NoClassDefFoundError.class)
+	public void testInitConfigNoClassDefFoundError() throws ServletException {
 		final SiteVisitToolPlacementServlet siteVisitToolPlacementServlet = new SiteVisitToolPlacementServlet();
 		siteVisitToolPlacementServlet.init(config);
 	}

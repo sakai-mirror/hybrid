@@ -330,8 +330,8 @@ public class SitesServletTest {
 	 * @see SitesServlet#init(FilterConfig)
 	 * @throws ServletException
 	 */
-	@Test(expected = IllegalStateException.class)
-	public void testInitConfigIllegalStateException() throws ServletException {
+	@Test(expected = NoClassDefFoundError.class)
+	public void testInitConfigNoClassDefFoundError() throws ServletException {
 		final SitesServlet sitesServlet = new SitesServlet();
 		sitesServlet.init(config);
 	}

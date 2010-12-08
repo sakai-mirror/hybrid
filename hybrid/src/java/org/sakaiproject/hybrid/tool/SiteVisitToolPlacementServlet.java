@@ -283,16 +283,8 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
 		if (componentManager == null) {
-			try {
-				componentManager = org.sakaiproject.component.cover.ComponentManager
-						.getInstance();
-			} catch (NoClassDefFoundError e) {
-				// java.lang.NoClassDefFoundError:
-				// org/springframework/context/ConfigurableApplicationContext
-				// at
-				// org.sakaiproject.component.cover.ComponentManager.getInstance(ComponentManager.java:97)
-				throw new IllegalStateException(e);
-			}
+			componentManager = org.sakaiproject.component.cover.ComponentManager
+					.getInstance();
 		}
 		sessionManager = (SessionManager) componentManager
 				.get(SessionManager.class);
