@@ -342,23 +342,24 @@ public class NakamuraAuthenticationHelper {
 	 * 
 	 */
 	public interface HttpClientProvider {
+		/**
+		 * Get a reference to an {@link HttpClient}
+		 * 
+		 * @return the HttpClient
+		 */
 		public HttpClient getHttpClient();
 	}
 
 	/**
 	 * Implementation is thread safe.
 	 */
-	public static class DefaultHttpClientProvider implements HttpClientProvider {
+	public static final class DefaultHttpClientProvider implements
+			HttpClientProvider {
 		private static final Log LOG = LogFactory
 				.getLog(DefaultHttpClientProvider.class);
 
-		public DefaultHttpClientProvider() {
-			LOG.debug("new DefaultHttpClientProvider()");
-			// nothing to do
-		}
-
 		/**
-		 * @see org.sakaiproject.hybrid.util.api.HttpClientProvider#getHttpGet()
+		 * @see HttpClientProvider#getHttpClient()
 		 */
 		@Override
 		public HttpClient getHttpClient() {

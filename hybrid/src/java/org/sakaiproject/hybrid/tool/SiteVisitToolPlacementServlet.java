@@ -240,7 +240,7 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 	 * can access at least one of those tools.
 	 * 
 	 * @param site
-	 * @return
+	 * @return true if at least one tool can be accessed.
 	 */
 	protected boolean canAccessAtLeastOneTool(final Site site,
 			final List<SitePage> pages) {
