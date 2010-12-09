@@ -17,6 +17,13 @@
   <inceptionYear>2009</inceptionYear>
   <packaging>war</packaging>
 
+  <distributionManagement>
+  	<site>
+  		<id>sakai-site</id>
+  		<name>Sakai release Site</name>
+  		<url>${url.localsite}/sakai-hybrid</url>
+  	</site>
+  </distributionManagement>
   <dependencies>
     <dependency>
       <groupId>org.sakaiproject.kernel</groupId>

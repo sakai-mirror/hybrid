@@ -19,6 +19,13 @@
     <inceptionYear>2009</inceptionYear>
     <packaging>pom</packaging>
 
+    <distributionManagement>
+    	<site>
+    		<id>sakai-site</id>
+    		<name>Sakai release Site</name>
+    		<url>${url.localsite}/hybrid-assembly</url>
+    	</site>
+    </distributionManagement>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

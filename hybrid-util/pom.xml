@@ -17,6 +17,13 @@
   <inceptionYear>2009</inceptionYear>
   <packaging>jar</packaging>
 
+  <distributionManagement>
+  	<site>
+  		<id>sakai-site</id>
+  		<name>Sakai release Site</name>
+  		<url>${url.localsite}/sakai-hybrid-util</url>
+  	</site>
+  </distributionManagement>
   <build>
     <resources>
       <resource>
