@@ -17,10 +17,8 @@
  */
 package org.sakaiproject.hybrid.tool;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sakaiproject.hybrid.test.TestHelper.disableLog4jDebug;
@@ -117,7 +115,6 @@ public class SitesServletTest {
 		enableLog4jDebug();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
 		when(sessionManager.getCurrentSession()).thenReturn(session);
@@ -182,114 +179,114 @@ public class SitesServletTest {
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testDoGetNormalBehavior() {
-		try {
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+	public void testDoGetNormalBehavior() throws ServletException, IOException {
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 	}
 
 	/**
 	 * Increases cobertura coverage report. Tests
 	 * {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testDoGetNormalBehaviorLogDebugDisabled() {
+	public void testDoGetNormalBehaviorLogDebugDisabled()
+			throws ServletException, IOException {
 		disableLog4jDebug();
-		try {
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 		enableLog4jDebug();
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testDoGetNullEid() {
+	public void testDoGetNullEid() throws ServletException, IOException {
 		when(session.getUserEid()).thenReturn(null);
-		try {
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testDoGetEmptyEid() {
+	public void testDoGetEmptyEid() throws ServletException, IOException {
 		when(session.getUserEid()).thenReturn("");
-		try {
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testDoGetLocaleLanguage() {
+	public void testDoGetLocaleLanguage() throws ServletException, IOException {
 		when(request.getParameter(SitesServlet.LOCALE)).thenReturn("es");
-		try {
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testDoGetLocaleWithVariant() {
+	public void testDoGetLocaleWithVariant() throws ServletException,
+			IOException {
 		when(request.getParameter(SitesServlet.LOCALE)).thenReturn(
 				"es_ES_Traditional");
-		try {
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testDoGetLocaleWithVariant2() {
+	public void testDoGetLocaleWithVariant2() throws ServletException,
+			IOException {
 		/*
 		 * While multiple variants is not currently supported in the get
 		 * parameter parser, they should not break anything.
 		 */
 		when(request.getParameter(SitesServlet.LOCALE)).thenReturn(
 				"es_ES_Traditional_MAC");
-		try {
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testDoGetLocaleWithVariant2LogDebugDisabled() {
+	public void testDoGetLocaleWithVariant2LogDebugDisabled()
+			throws ServletException, IOException {
 		disableLog4jDebug();
 		/*
 		 * While multiple variants is not currently supported in the get
@@ -297,29 +294,21 @@ public class SitesServletTest {
 		 */
 		when(request.getParameter(SitesServlet.LOCALE)).thenReturn(
 				"es_ES_Traditional_MAC");
-		try {
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 		enableLog4jDebug();
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
-	@Test
-	public void testIOException() {
-		try {
-			when(response.getWriter()).thenThrow(new IOException());
-			sitesServlet.doGet(request, response);
-			fail("Should not be reached");
-		} catch (ServletException e) {
-			assertNull("ServletException should not be thrown: " + e, e);
-		} catch (IOException e) {
-			assertNotNull("IOException should be thrown", e);
-		}
+	@Test(expected = IOException.class)
+	public void testIOException() throws ServletException, IOException {
+		when(response.getWriter()).thenThrow(new IOException());
+		sitesServlet.doGet(request, response);
 	}
 
 	/**
@@ -345,272 +334,241 @@ public class SitesServletTest {
 
 	/**
 	 * Tests {@link SitesServlet#init(ServletConfig)}
+	 * 
+	 * @throws ServletException
 	 */
-	@Test
-	public void testInitNullSessionManager() {
+	@Test(expected = IllegalStateException.class)
+	public void testInitNullSessionManager() throws ServletException {
 		when(componentManager.get(SessionManager.class)).thenReturn(null);
-		try {
-			sitesServlet.init(config);
-			fail("IllegalStateException should be thrown");
-		} catch (IllegalStateException e) {
-			assertNotNull(e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		sitesServlet.init(config);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#init(ServletConfig)}
+	 * 
+	 * @throws ServletException
 	 */
-	@Test
-	public void testInitNullSiteService() {
+	@Test(expected = IllegalStateException.class)
+	public void testInitNullSiteService() throws ServletException {
 		when(componentManager.get(SiteService.class)).thenReturn(null);
-		try {
-			sitesServlet.init(config);
-			fail("IllegalStateException should be thrown");
-		} catch (IllegalStateException e) {
-			assertNotNull(e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		sitesServlet.init(config);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#init(ServletConfig)}
+	 * 
+	 * @throws ServletException
 	 */
-	@Test
-	public void testInitNullServerConfigurationService() {
+	@Test(expected = IllegalStateException.class)
+	public void testInitNullServerConfigurationService()
+			throws ServletException {
 		when(componentManager.get(ServerConfigurationService.class))
 				.thenReturn(null);
-		try {
-			sitesServlet.init(config);
-			fail("IllegalStateException should be thrown");
-		} catch (IllegalStateException e) {
-			assertNotNull(e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		sitesServlet.init(config);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#init(ServletConfig)}
+	 * 
+	 * @throws ServletException
 	 */
-	@Test
-	public void testInitNullSynopticMsgcntrManager() {
+	@Test(expected = IllegalStateException.class)
+	public void testInitNullSynopticMsgcntrManager() throws ServletException {
 		when(componentManager.get(SynopticMsgcntrManager.class)).thenReturn(
 				null);
-		try {
-			sitesServlet.init(config);
-			fail("IllegalStateException should be thrown");
-		} catch (IllegalStateException e) {
-			assertNotNull(e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		sitesServlet.init(config);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#init(ServletConfig)}
+	 * 
+	 * @throws ServletException
 	 */
-	@Test
-	public void testInitNullPreferencesService() {
+	@Test(expected = IllegalStateException.class)
+	public void testInitNullPreferencesService() throws ServletException {
 		when(componentManager.get(PreferencesService.class)).thenReturn(null);
-		try {
-			sitesServlet.init(config);
-			fail("IllegalStateException should be thrown");
-		} catch (IllegalStateException e) {
-			assertNotNull(e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		sitesServlet.init(config);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#setupTestCase(ComponentManager)}
 	 */
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public void testSetupTestCase() {
-		try {
-			sitesServlet.setupTestCase(null);
-			fail("IllegalArgumentException should be thrown");
-		} catch (IllegalArgumentException e) {
-			assertNotNull(e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		sitesServlet.setupTestCase(null);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
+	 * @throws EntityPropertyTypeException
+	 * @throws EntityPropertyNotDefinedException
 	 */
 	@Test
-	public void testEntityPropertyNotDefinedException() {
-		try {
-			when(resourceProperties.getLongProperty("tabs")).thenThrow(
-					new EntityPropertyNotDefinedException());
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+	public void testEntityPropertyNotDefinedException()
+			throws ServletException, IOException,
+			EntityPropertyNotDefinedException, EntityPropertyTypeException {
+		when(resourceProperties.getLongProperty("tabs")).thenThrow(
+				new EntityPropertyNotDefinedException());
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
+	 * @throws EntityPropertyTypeException
+	 * @throws EntityPropertyNotDefinedException
 	 */
-	@Test
-	public void testEntityPropertyTypeException() {
-		try {
-			when(resourceProperties.getLongProperty("tabs")).thenThrow(
-					new EntityPropertyTypeException("message"));
-			sitesServlet.doGet(request, response);
-			fail("IllegalStateException should be thrown");
-		} catch (IllegalStateException e) {
-			assertNotNull("IllegalStateException should be thrown: " + e, e);
-		} catch (Throwable e) {
-			fail("IllegalStateException should be thrown");
-		}
+	@Test(expected = IllegalStateException.class)
+	public void testEntityPropertyTypeException() throws ServletException,
+			IOException, EntityPropertyNotDefinedException,
+			EntityPropertyTypeException {
+		when(resourceProperties.getLongProperty("tabs")).thenThrow(
+				new EntityPropertyTypeException("message"));
+		sitesServlet.doGet(request, response);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testNullPreferences() {
+	public void testNullPreferences() throws ServletException, IOException {
 		when(preferencesService.getPreferences(UID)).thenReturn(null);
-		try {
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
+	 * @throws IdUnusedException
 	 */
 	@Test
-	public void testIdUnusedException() {
-		try {
-			when(siteService.getSite("~admin")).thenThrow(
-					new IdUnusedException("message"));
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+	public void testIdUnusedException() throws ServletException, IOException,
+			IdUnusedException {
+		when(siteService.getSite("~admin")).thenThrow(
+				new IdUnusedException("message"));
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IdUnusedException
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testIdUnusedException2() {
+	public void testIdUnusedException2() throws IdUnusedException,
+			ServletException, IOException {
 		disableLog4jDebug();
-		try {
-			when(siteService.getSite("~admin")).thenThrow(
-					new IdUnusedException("message"));
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+		when(siteService.getSite("~admin")).thenThrow(
+				new IdUnusedException("message"));
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 		enableLog4jDebug();
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testDoGetNotCategorized() {
+	public void testDoGetNotCategorized() throws ServletException, IOException {
 		when(request.getParameter(SitesServlet.CATEGORIZED))
 				.thenReturn("false");
-		try {
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testDoGetNoUnread() {
+	public void testDoGetNoUnread() throws ServletException, IOException {
 		when(request.getParameter(SitesServlet.UNREAD)).thenReturn("false");
-		try {
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testDoGetNoLocale() {
+	public void testDoGetNoLocale() throws ServletException, IOException {
 		when(request.getParameter(SitesServlet.LOCALE)).thenReturn(null);
-		try {
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testDoGetZeroCountSynoptic() {
+	public void testDoGetZeroCountSynoptic() throws ServletException,
+			IOException {
 		when(synopticMsgcntrItem1.getNewForumCount()).thenReturn(0);
 		when(synopticMsgcntrItem1.getNewMessagesCount()).thenReturn(0);
-		try {
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testDoGetNullSiteList() {
-		try {
-			when(
-					siteService
-							.getSites(
-									org.sakaiproject.site.api.SiteService.SelectionType.ACCESS,
-									null,
-									null,
-									null,
-									org.sakaiproject.site.api.SiteService.SortType.TITLE_ASC,
-									null)).thenReturn(null);
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+	public void testDoGetNullSiteList() throws ServletException, IOException {
+		when(
+				siteService
+						.getSites(
+								org.sakaiproject.site.api.SiteService.SelectionType.ACCESS,
+								null,
+								null,
+								null,
+								org.sakaiproject.site.api.SiteService.SortType.TITLE_ASC,
+								null)).thenReturn(null);
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 	}
 
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+	 * 
+	 * @throws IOException
+	 * @throws ServletException
 	 */
 	@Test
-	public void testDoGetNullSynopticMsgcntrItems() {
+	public void testDoGetNullSynopticMsgcntrItems() throws ServletException,
+			IOException {
 		when(synopticMsgcntrManager.getWorkspaceSynopticMsgcntrItems(UID))
 				.thenReturn(null);
-		try {
-			sitesServlet.doGet(request, response);
-			verifyDoGet(response);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown: " + e, e);
-		}
+		sitesServlet.doGet(request, response);
+		verifyDoGet(response);
 	}
 
 	/**
@@ -642,9 +600,9 @@ public class SitesServletTest {
 	 */
 	private void verifyDoGet(final HttpServletResponse response)
 			throws IOException {
-		verify(response).setContentType("application/json");
-		verify(response).setCharacterEncoding("UTF-8");
-		verify(response).setStatus(HttpServletResponse.SC_OK);
-		verify(response).getWriter();
+		verify(response, times(1)).setContentType("application/json");
+		verify(response, times(1)).setCharacterEncoding("UTF-8");
+		verify(response, times(1)).setStatus(HttpServletResponse.SC_OK);
+		verify(response, times(1)).getWriter();
 	}
 }

@@ -149,11 +149,7 @@ public class TrustedLoginFilterTest extends TestCase {
 	@Test
 	public void testDoFilterDefaultBehaviorNewSession() throws IOException,
 			ServletException {
-		try {
-			trustedLoginFilter.doFilter(request, response, chain);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		trustedLoginFilter.doFilter(request, response, chain);
 		verify(sessionManager).startSession();
 		verify(sessionManager, times(1)).setCurrentSession(newSession);
 		verify(sessionManager, times(1)).setCurrentSession(existingSession);
@@ -178,11 +174,7 @@ public class TrustedLoginFilterTest extends TestCase {
 			throws IOException, ServletException {
 		final ToolRequestWrapper toolRequestWrapper = new ToolRequestWrapper(
 				request, "username");
-		try {
-			trustedLoginFilter.doFilter(toolRequestWrapper, response, chain);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		trustedLoginFilter.doFilter(toolRequestWrapper, response, chain);
 		verify(sessionManager).startSession();
 		verify(sessionManager, times(1)).setCurrentSession(newSession);
 		verify(sessionManager, times(1)).setCurrentSession(existingSession);
@@ -206,11 +198,7 @@ public class TrustedLoginFilterTest extends TestCase {
 			throws IOException, ServletException {
 		// eid of existing session should match; i.e. reuse existing session.
 		when(existingSession.getUserEid()).thenReturn("username");
-		try {
-			trustedLoginFilter.doFilter(request, response, chain);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		trustedLoginFilter.doFilter(request, response, chain);
 		verify(sessionManager, never()).startSession();
 		verify(sessionManager, never()).setCurrentSession(newSession);
 		verify(sessionManager).setCurrentSession(existingSession);
@@ -228,11 +216,7 @@ public class TrustedLoginFilterTest extends TestCase {
 	@Test
 	public void testDoFilterUnsafeHost() throws IOException, ServletException {
 		when(request.getRemoteHost()).thenReturn("big.bad.hacker.com");
-		try {
-			trustedLoginFilter.doFilter(request, response, chain);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		trustedLoginFilter.doFilter(request, response, chain);
 		verify(sessionManager, never()).startSession();
 		verify(sessionManager, never()).setCurrentSession(newSession);
 		verify(sessionManager, never()).setCurrentSession(existingSession);
@@ -250,11 +234,7 @@ public class TrustedLoginFilterTest extends TestCase {
 	@Test
 	public void testDoFilterNullToken() throws IOException, ServletException {
 		when(request.getHeader("x-sakai-token")).thenReturn(null);
-		try {
-			trustedLoginFilter.doFilter(request, response, chain);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		trustedLoginFilter.doFilter(request, response, chain);
 		verify(sessionManager, never()).startSession();
 		verify(sessionManager, never()).setCurrentSession(newSession);
 		verify(sessionManager, never()).setCurrentSession(existingSession);
@@ -274,11 +254,7 @@ public class TrustedLoginFilterTest extends TestCase {
 		// missing nonce (i.e. not three part token)
 		when(request.getHeader("x-sakai-token")).thenReturn(
 				"sw9TTTqlEbGQkELqQuQPq92ydr4=;username");
-		try {
-			trustedLoginFilter.doFilter(request, response, chain);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		trustedLoginFilter.doFilter(request, response, chain);
 		verify(sessionManager, never()).startSession();
 		verify(sessionManager, never()).setCurrentSession(newSession);
 		verify(sessionManager, never()).setCurrentSession(existingSession);
@@ -297,11 +273,7 @@ public class TrustedLoginFilterTest extends TestCase {
 	public void testDoFilterBadHmac() throws IOException, ServletException {
 		when(request.getHeader("x-sakai-token")).thenReturn(
 				"badhash;username;nonce");
-		try {
-			trustedLoginFilter.doFilter(request, response, chain);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		trustedLoginFilter.doFilter(request, response, chain);
 		verify(sessionManager, never()).startSession();
 		verify(sessionManager, never()).setCurrentSession(newSession);
 		verify(sessionManager, never()).setCurrentSession(existingSession);
@@ -315,17 +287,14 @@ public class TrustedLoginFilterTest extends TestCase {
 	 * 
 	 * @throws ServletException
 	 * @throws IOException
+	 * @throws UserNotDefinedException
 	 */
 	@Test
 	public void testDoFilterUserNotDefinedException() throws IOException,
-			ServletException {
-		try {
-			when(userDirectoryService.getUserByEid("username")).thenThrow(
-					new UserNotDefinedException("username"));
-			trustedLoginFilter.doFilter(request, response, chain);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+			ServletException, UserNotDefinedException {
+		when(userDirectoryService.getUserByEid("username")).thenThrow(
+				new UserNotDefinedException("username"));
+		trustedLoginFilter.doFilter(request, response, chain);
 		verify(sessionManager, never()).startSession();
 		verify(sessionManager, never()).setCurrentSession(newSession);
 		verify(chain).doFilter(request, response);
@@ -342,11 +311,7 @@ public class TrustedLoginFilterTest extends TestCase {
 	@Test
 	public void testDoFilterDisabled() throws IOException, ServletException {
 		trustedLoginFilter.enabled = false;
-		try {
-			trustedLoginFilter.doFilter(request, response, chain);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		trustedLoginFilter.doFilter(request, response, chain);
 		verify(sessionManager, never()).startSession();
 		verify(sessionManager, never()).setCurrentSession(newSession);
 		verify(sessionManager, never()).setCurrentSession(existingSession);
@@ -365,11 +330,7 @@ public class TrustedLoginFilterTest extends TestCase {
 	@Test
 	public void testDoFilterServletRequest() throws IOException,
 			ServletException {
-		try {
-			trustedLoginFilter.doFilter(servletRequest, response, chain);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		trustedLoginFilter.doFilter(servletRequest, response, chain);
 		verify(sessionManager, never()).startSession();
 		verify(sessionManager, never()).setCurrentSession(newSession);
 		verify(sessionManager, never()).setCurrentSession(existingSession);
@@ -377,70 +338,42 @@ public class TrustedLoginFilterTest extends TestCase {
 	}
 
 	/**
+	 * @throws ServletException
 	 * @see TrustedLoginFilter#init(FilterConfig)
 	 */
-	@Test
-	public void testNullServerConfigurationService() {
+	@Test(expected = IllegalStateException.class)
+	public void testNullServerConfigurationService() throws ServletException {
 		when(componentManager.get(ServerConfigurationService.class))
 				.thenReturn(null);
-		try {
-			trustedLoginFilter.init(config);
-			fail("IllegalStateException should be thrown");
-		} catch (IllegalStateException e) {
-			assertNotNull(e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
-
+		trustedLoginFilter.init(config);
 	}
 
 	/**
+	 * @throws ServletException
 	 * @see TrustedLoginFilter#init(FilterConfig)
 	 */
-	@Test
-	public void testNullSessionManager() {
+	@Test(expected = IllegalStateException.class)
+	public void testNullSessionManager() throws ServletException {
 		when(componentManager.get(SessionManager.class)).thenReturn(null);
-		try {
-			trustedLoginFilter.init(config);
-			fail("IllegalStateException should be thrown");
-		} catch (IllegalStateException e) {
-			assertNotNull("IllegalStateException should be thrown", e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
-
+		trustedLoginFilter.init(config);
 	}
 
 	/**
+	 * @throws ServletException
 	 * @see TrustedLoginFilter#init(FilterConfig)
 	 */
-	@Test
-	public void testNullUserDirectoryService() {
+	@Test(expected = IllegalStateException.class)
+	public void testNullUserDirectoryService() throws ServletException {
 		when(componentManager.get(UserDirectoryService.class)).thenReturn(null);
-		try {
-			trustedLoginFilter.init(config);
-			fail("IllegalStateException should be thrown");
-		} catch (IllegalStateException e) {
-			assertNotNull("IllegalStateException should be thrown", e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
-
+		trustedLoginFilter.init(config);
 	}
 
 	/**
 	 * @see TrustedLoginFilter#setupTestCase(ComponentManager)
 	 */
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public void testSetupTestCase() {
-		try {
-			trustedLoginFilter.setupTestCase(null);
-			fail("IllegalArgumentException should be thrown");
-		} catch (IllegalArgumentException e) {
-			assertNotNull("IllegalStateException should be thrown", e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		trustedLoginFilter.setupTestCase(null);
 	}
 
 	/**
@@ -448,11 +381,7 @@ public class TrustedLoginFilterTest extends TestCase {
 	 */
 	@Test
 	public void testDestroy() {
-		try {
-			trustedLoginFilter.destroy();
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		trustedLoginFilter.destroy();
 	}
 
 	/**
