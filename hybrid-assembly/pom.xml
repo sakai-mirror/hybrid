@@ -23,7 +23,7 @@
     	<site>
     		<id>sakai-site</id>
     		<name>Sakai release Site</name>
-    		<url>${url.localsite}/hybrid-assembly</url>
+    		<url>${url.localsite}/${project.artifactId}</url>
     	</site>
     </distributionManagement>
     <dependencies>

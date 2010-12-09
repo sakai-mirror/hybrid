@@ -21,7 +21,7 @@
   	<site>
   		<id>sakai-site</id>
   		<name>Sakai release Site</name>
-  		<url>${url.localsite}/sakai-hybrid-util</url>
+  		<url>${url.localsite}/${project.artifactId}</url>
   	</site>
   </distributionManagement>
   <build>
