@@ -402,7 +402,7 @@ public class SiteVisitToolPlacementServletTest {
 	}
 
 	/**
-	 * @see ResponseCommittedException#ResponseCommittedException(String)
+	 * @see ResponseCommittedException
 	 */
 	@Test
 	public void testResponseCommittedException() {
@@ -566,7 +566,7 @@ public class SiteVisitToolPlacementServletTest {
 	}
 
 	/**
-	 * @see SiteVisitToolPlacementServlet#canAccessAtLeastOneTool(Site)
+	 * @see SiteVisitToolPlacementServlet#canAccessAtLeastOneTool(Site, List)
 	 */
 	@Test
 	public void testCanAccessAtLeastOneToolNoPages() {

@@ -141,9 +141,6 @@ public class NakamuraAuthenticationHelperTest {
 		enableLog4jDebug();
 	}
 
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@Before
 	public void setUp() throws Exception {
 		when(componentManager.get(ThreadLocalManager.class)).thenReturn(
@@ -180,8 +177,8 @@ public class NakamuraAuthenticationHelperTest {
 	}
 
 	/**
-	 * @see NakamuraAuthenticationHelper#NakamuraAuthenticationHelper(ThreadLocalManager,
-	 *      ServerConfigurationService, String, String, String)
+	 * @see NakamuraAuthenticationHelper#NakamuraAuthenticationHelper(ComponentManager,
+	 *      String, String, String)
 	 */
 	@Test
 	public void testConstructor() {
@@ -558,7 +555,7 @@ public class NakamuraAuthenticationHelperTest {
 	}
 
 	/**
-	 * @see DefaultHttpClientProvider#DefaultHttpClientProvider()
+	 * @see DefaultHttpClientProvider
 	 */
 	@Test
 	public void testDefaultHttpClientProvider() {

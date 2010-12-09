@@ -35,7 +35,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -324,7 +323,7 @@ public class SitesServletTest {
 	}
 
 	/**
-	 * @see SitesServlet#init(FilterConfig)
+	 * @see SitesServlet#init(ServletConfig)
 	 * @throws ServletException
 	 */
 	@Test
@@ -335,7 +334,7 @@ public class SitesServletTest {
 	}
 
 	/**
-	 * @see SitesServlet#init(FilterConfig)
+	 * @see SitesServlet#init(ServletConfig)
 	 * @throws ServletException
 	 */
 	@Test(expected = NoClassDefFoundError.class)
