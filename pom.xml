@@ -23,14 +23,14 @@
 		<url>http://sakaiproject.org/</url>
 	</organization>
 	<description>A set of simple integration points which enables Sakai 2/3 Hybrid mode operation.</description>
-	<url>http://github.com/sakaiproject/nakamura/tree/master/hybrid/</url>
+	<url>https://source.sakaiproject.org/svn/hybrid/</url>
 	<issueManagement>
 		<system>JIRA</system>
-		<url>http://jira.sakaiproject.org/browse/KERN</url>
+		<url>http://jira.sakaiproject.org/browse/HYB</url>
 	</issueManagement>
 	<ciManagement>
 		<system>Hudson</system>
-		<url>http://builds.sakaiproject.org:8080/job/Hybrid/</url>
+		<url>http://builds.sakaiproject.org:8080/job/hybrid%20trunk/</url>
 	</ciManagement>
 	<inceptionYear>2009</inceptionYear>
 	<packaging>pom</packaging>
