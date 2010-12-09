@@ -80,6 +80,10 @@
       	<groupId>org.codehaus.mojo</groupId>
       	<artifactId>findbugs-maven-plugin</artifactId>
       	<version>2.3.1</version>
+		<configuration>
+			<effort>Max</effort>
+			<threshold>Low</threshold>
+		</configuration>
       </plugin>
       <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -167,7 +171,7 @@
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
-      <url>http://source.sakaiproject.org/maven2/</url>
+      <url>http://source.sakaiproject.org/maven2</url>
     </repository>
     <repository>
       <id>sakai-snapshots</id>
@@ -240,6 +244,10 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
 				<version>2.3.1</version>
+    			<configuration>
+    				<effort>Max</effort>
+	    			<threshold>Low</threshold>
+    			</configuration>
 			</plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -282,7 +290,7 @@
 		</plugins>
 	</reporting>
 	<distributionManagement>
-		<downloadUrl>http://source.sakaiproject.org/maven2/</downloadUrl>
+		<downloadUrl>http://source.sakaiproject.org/maven2</downloadUrl>
 		<snapshotRepository>
 			<uniqueVersion>false</uniqueVersion>
 			<id>sakai-maven-snapshots-scp</id>
