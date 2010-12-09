@@ -19,7 +19,6 @@ package org.sakaiproject.hybrid.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import java.security.InvalidKeyException;
 import java.util.Properties;
@@ -71,70 +70,83 @@ public class SignatureTest {
 	 * Test method for
 	 * {@link org.sakaiproject.hybrid.util.Signature#calculateRFC2104HMAC(java.lang.String, java.lang.String)}
 	 * .
+	 * 
+	 * @throws InvalidKeyException
 	 */
 	@Test
-	public void testCalculateRFC2104HMAC() {
-		// good parameters
-		try {
-			final String hmac = signature.calculateRFC2104HMAC(MOCK_DATA,
-					MOCK_KEY);
-			assertNotNull(hmac);
-			assertEquals(TEST_HMAC, hmac);
-		} catch (InvalidKeyException e) {
-			fail("No exception should be thrown: " + e);
-		}
-		// bad parameters
-		try {
-			signature.calculateRFC2104HMAC(null, MOCK_KEY);
-			fail("IllegalArgumentException should be thrown");
-		} catch (IllegalArgumentException e) {
-			assertNotNull("IllegalArgumentException should be thrown", e);
-		} catch (Throwable e) {
-			fail("IllegalArgumentException should be thrown");
-		}
-		try {
-			signature.calculateRFC2104HMAC(MOCK_DATA, null);
-			fail("IllegalArgumentException should be thrown");
-		} catch (IllegalArgumentException e) {
-			assertNotNull("IllegalArgumentException should be thrown", e);
-		} catch (Throwable e) {
-			fail("IllegalArgumentException should be thrown");
-		}
+	public void testCalculateRFC2104HMACStringString()
+			throws InvalidKeyException {
+		final String hmac = signature.calculateRFC2104HMAC(MOCK_DATA, MOCK_KEY);
+		assertNotNull(hmac);
+		assertEquals(TEST_HMAC, hmac);
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.sakaiproject.hybrid.util.Signature#calculateRFC2104HMAC(java.lang.String, java.lang.String)}
+	 * .
+	 * 
+	 * @throws InvalidKeyException
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void testCalculateRFC2104HMACStringStringNullData()
+			throws InvalidKeyException {
+		signature.calculateRFC2104HMAC(null, MOCK_KEY);
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.sakaiproject.hybrid.util.Signature#calculateRFC2104HMAC(java.lang.String, java.lang.String)}
+	 * .
+	 * 
+	 * @throws InvalidKeyException
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void testCalculateRFC2104HMACStringStringNullKey()
+			throws InvalidKeyException {
+		signature.calculateRFC2104HMAC(MOCK_DATA, null);
 	}
 
 	/**
 	 * Test method for
 	 * {@link org.sakaiproject.hybrid.util.Signature#calculateRFC2104HMACWithEncoding(java.lang.String, java.lang.String, boolean)}
 	 * .
+	 * 
+	 * @throws InvalidKeyException
 	 */
 	@Test
-	public void testCalculateRFC2104HMACWithEncoding() {
-		// good parameters
-		try {
-			final String hmac = signature.calculateRFC2104HMACWithEncoding(
-					MOCK_DATA, MOCK_KEY, true);
-			assertNotNull(hmac);
-			assertEquals(TEST_HMAC_URLSAFE, hmac);
-		} catch (InvalidKeyException e) {
-			fail("No exception should be thrown: " + e);
-		}
-		// bad parameters
-		try {
-			signature.calculateRFC2104HMACWithEncoding(null, MOCK_KEY, true);
-			fail("IllegalArgumentException should be thrown");
-		} catch (IllegalArgumentException e) {
-			assertNotNull("IllegalArgumentException should be thrown", e);
-		} catch (Throwable e) {
-			fail("IllegalArgumentException should be thrown");
-		}
-		try {
-			signature.calculateRFC2104HMACWithEncoding(MOCK_DATA, null, true);
-			fail("IllegalArgumentException should be thrown");
-		} catch (IllegalArgumentException e) {
-			assertNotNull("IllegalArgumentException should be thrown", e);
-		} catch (Throwable e) {
-			fail("IllegalArgumentException should be thrown");
-		}
+	public void testCalculateRFC2104HMACStringStringBoolean()
+			throws InvalidKeyException {
+		final String hmac = signature.calculateRFC2104HMACWithEncoding(
+				MOCK_DATA, MOCK_KEY, true);
+		assertNotNull(hmac);
+		assertEquals(TEST_HMAC_URLSAFE, hmac);
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.sakaiproject.hybrid.util.Signature#calculateRFC2104HMACWithEncoding(java.lang.String, java.lang.String, boolean)}
+	 * .
+	 * 
+	 * @throws InvalidKeyException
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void testCalculateRFC2104HMACStringStringBooleanNullData()
+			throws InvalidKeyException {
+		signature.calculateRFC2104HMACWithEncoding(null, MOCK_KEY, true);
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.sakaiproject.hybrid.util.Signature#calculateRFC2104HMACWithEncoding(java.lang.String, java.lang.String, boolean)}
+	 * .
+	 * 
+	 * @throws InvalidKeyException
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void testCalculateRFC2104HMACStringStringBooleanNullKey()
+			throws InvalidKeyException {
+		signature.calculateRFC2104HMACWithEncoding(MOCK_DATA, null, true);
 	}
 
 	/**

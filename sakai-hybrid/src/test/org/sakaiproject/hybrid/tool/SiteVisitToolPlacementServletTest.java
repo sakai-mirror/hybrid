@@ -19,8 +19,6 @@ package org.sakaiproject.hybrid.tool;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -30,6 +28,7 @@ import static org.mockito.Mockito.when;
 import static org.sakaiproject.hybrid.test.TestHelper.disableLog4jDebug;
 import static org.sakaiproject.hybrid.test.TestHelper.enableLog4jDebug;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -175,244 +174,222 @@ public class SiteVisitToolPlacementServletTest {
 	}
 
 	/**
+	 * @throws IOException
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
 	@Test
-	public void testNullSiteId() {
-		try {
-			when(request.getParameter("siteId")).thenReturn(null);
-			siteVisitToolPlacementServlet.doGet(request, response);
-			verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown", e);
-		}
+	public void testNullSiteId() throws ServletException, IOException {
+		when(request.getParameter("siteId")).thenReturn(null);
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
 	}
 
 	/**
+	 * @throws IOException
+	 * @throws ServletException
+	 * @throws PermissionException
+	 * @throws IdUnusedException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
 	@Test
-	public void testNullSite() {
-		try {
-			when(siteService.getSiteVisit("!admin")).thenReturn(null);
-			siteVisitToolPlacementServlet.doGet(request, response);
-			verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown", e);
-		}
+	public void testNullSite() throws ServletException, IOException,
+			IdUnusedException, PermissionException {
+		when(siteService.getSiteVisit("!admin")).thenReturn(null);
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
 	}
 
 	/**
+	 * @throws IOException
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
 	@Test
-	public void testNormalBehavior() {
-		try {
-			siteVisitToolPlacementServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			assertNull("Exception should not be thrown", e);
-		}
+	public void testNormalBehavior() throws ServletException, IOException {
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(response).setStatus(HttpServletResponse.SC_OK);
 	}
 
 	/**
+	 * @throws IOException
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
 	@Test
-	public void testNormalBehaviorAllowToolFalse() {
+	public void testNormalBehaviorAllowToolFalse() throws ServletException,
+			IOException {
 		when(toolHelper.allowTool(any(Site.class), any(Placement.class)))
 				.thenReturn(false);
-		try {
-			siteVisitToolPlacementServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			assertNull("Exception should not be thrown", e);
-		}
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(response).setStatus(HttpServletResponse.SC_OK);
 	}
 
 	/**
+	 * @throws IOException
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
 	@Test
-	public void testNormalBehaviorLogDebugDisabled() {
+	public void testNormalBehaviorLogDebugDisabled() throws ServletException,
+			IOException {
 		disableLog4jDebug();
-		try {
-			siteVisitToolPlacementServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			assertNull("Exception should not be thrown", e);
-		}
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(response).setStatus(HttpServletResponse.SC_OK);
 		enableLog4jDebug();
 	}
 
 	/**
+	 * @throws IOException
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
 	@Test
-	public void testNormalBehaviorNullTool() {
+	public void testNormalBehaviorNullTool() throws ServletException,
+			IOException {
 		when(toolConfig.getTool()).thenReturn(null);
-		try {
-			siteVisitToolPlacementServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			assertNull("Exception should not be thrown", e);
-		}
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(response).setStatus(HttpServletResponse.SC_OK);
 	}
 
 	/**
+	 * @throws IOException
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
 	@Test
-	public void testNormalBehaviorNullToolId() {
+	public void testNormalBehaviorNullToolId() throws ServletException,
+			IOException {
 		when(tool.getId()).thenReturn(null);
-		try {
-			siteVisitToolPlacementServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			assertNull("Exception should not be thrown", e);
-		}
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(response).setStatus(HttpServletResponse.SC_OK);
 	}
 
 	/**
+	 * @throws IOException
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
 	@Test
-	public void testNormalBehaviorNullOrderedPages() {
+	public void testNormalBehaviorNullOrderedPages() throws ServletException,
+			IOException {
 		when(site.getOrderedPages()).thenReturn(null);
-		try {
-			siteVisitToolPlacementServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			assertNull("Exception should not be thrown", e);
-		}
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(response).setStatus(HttpServletResponse.SC_OK);
 	}
 
 	/**
+	 * @throws IOException
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
 	@Test
-	public void testNormalBehaviorNullTools() {
+	public void testNormalBehaviorNullTools() throws ServletException,
+			IOException {
 		when(page.getTools()).thenReturn(null);
-		try {
-			siteVisitToolPlacementServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			assertNull("Exception should not be thrown", e);
-		}
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(response).setStatus(HttpServletResponse.SC_OK);
 	}
 
 	/**
+	 * @throws IOException
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
 	@Test
-	public void testNormalBehaviorEmptyTools() {
+	public void testNormalBehaviorEmptyTools() throws ServletException,
+			IOException {
 		final List<ToolConfiguration> list = Collections.emptyList();
 		when(page.getTools()).thenReturn(list);
-		try {
-			siteVisitToolPlacementServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			assertNull("Exception should not be thrown", e);
-		}
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(response).setStatus(HttpServletResponse.SC_OK);
 	}
 
 	/**
+	 * @throws IOException
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
 	@Test
-	public void testNormalBehaviorWriteEvent() {
+	public void testNormalBehaviorWriteEvent() throws ServletException,
+			IOException {
 		when(request.getParameter("writeEvent")).thenReturn("true");
 		when(
 				eventTrackingService.newEvent(anyString(), anyString(),
 						anyBoolean())).thenReturn(event);
-		try {
-			siteVisitToolPlacementServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			assertNull("Exception should not be thrown", e);
-		}
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(response).setStatus(HttpServletResponse.SC_OK);
 	}
 
 	/**
+	 * @throws IOException
+	 * @throws ServletException
+	 * @throws PermissionException
+	 * @throws IdUnusedException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
 	@Test
-	public void testIdUnusedException() {
-		try {
-			when(siteService.getSiteVisit("!admin")).thenThrow(
-					new IdUnusedException("!admin"));
-			siteVisitToolPlacementServlet.doGet(request, response);
-			verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown", e);
-		}
+	public void testIdUnusedException() throws ServletException, IOException,
+			IdUnusedException, PermissionException {
+		when(siteService.getSiteVisit("!admin")).thenThrow(
+				new IdUnusedException("!admin"));
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
 	}
 
 	/**
+	 * @throws PermissionException
+	 * @throws IdUnusedException
+	 * @throws IOException
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
 	@Test
-	public void testPermissionException() {
-		try {
-			when(siteService.getSiteVisit("!admin")).thenThrow(
-					new PermissionException("w", "w", "w"));
-			siteVisitToolPlacementServlet.doGet(request, response);
-			verify(response).sendError(HttpServletResponse.SC_FORBIDDEN);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown", e);
-		}
+	public void testPermissionException() throws IdUnusedException,
+			PermissionException, ServletException, IOException {
+		when(siteService.getSiteVisit("!admin")).thenThrow(
+				new PermissionException("w", "w", "w"));
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(response).sendError(HttpServletResponse.SC_FORBIDDEN);
 	}
 
 	/**
+	 * @throws IOException
+	 * @throws ServletException
+	 * @throws GroupNotDefinedException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
 	@Test
-	public void testGroupNotDefinedException() {
-		try {
-			when(authzGroupService.getAuthzGroup(anyString())).thenThrow(
-					new GroupNotDefinedException(""));
-			siteVisitToolPlacementServlet.doGet(request, response);
-			verify(response).setStatus(HttpServletResponse.SC_OK);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown", e);
-		}
+	public void testGroupNotDefinedException() throws ServletException,
+			IOException, GroupNotDefinedException {
+		when(authzGroupService.getAuthzGroup(anyString())).thenThrow(
+				new GroupNotDefinedException(""));
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(response).setStatus(HttpServletResponse.SC_OK);
 	}
 
 	/**
-	 * @see ResponseCommittedException#ResponseCommittedException(String)
+	 * @see ResponseCommittedException
 	 */
 	@Test
 	public void testResponseCommittedException() {
-		try {
-			final ResponseCommittedException responseCommittedException = new ResponseCommittedException(
-					"message");
-			assertNotNull(responseCommittedException);
-		} catch (Throwable e) {
-			assertNull("Exception should not be thrown", e);
-		}
+		final ResponseCommittedException responseCommittedException = new ResponseCommittedException(
+				"message");
+		assertNotNull(responseCommittedException);
 	}
 
 	/**
@@ -437,136 +414,90 @@ public class SiteVisitToolPlacementServletTest {
 	}
 
 	/**
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#init(ServletConfig)
 	 */
-	@Test
-	public void testInitNullSessionManager() {
+	@Test(expected = IllegalStateException.class)
+	public void testInitNullSessionManager() throws ServletException {
 		when(componentManager.get(SessionManager.class)).thenReturn(null);
-		try {
-			siteVisitToolPlacementServlet.init(config);
-			fail("IllegalStateException should be thrown");
-		} catch (IllegalStateException e) {
-			assertNotNull(e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		siteVisitToolPlacementServlet.init(config);
 	}
 
 	/**
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#init(ServletConfig)
 	 */
-	@Test
-	public void testInitNullSiteService() {
+	@Test(expected = IllegalStateException.class)
+	public void testInitNullSiteService() throws ServletException {
 		when(componentManager.get(SiteService.class)).thenReturn(null);
-		try {
-			siteVisitToolPlacementServlet.init(config);
-			fail("IllegalStateException should be thrown");
-		} catch (IllegalStateException e) {
-			assertNotNull(e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		siteVisitToolPlacementServlet.init(config);
 	}
 
 	/**
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#init(ServletConfig)
 	 */
-	@Test
-	public void testInitNullEventTrackingService() {
+	@Test(expected = IllegalStateException.class)
+	public void testInitNullEventTrackingService() throws ServletException {
 		when(componentManager.get(EventTrackingService.class)).thenReturn(null);
-		try {
-			siteVisitToolPlacementServlet.init(config);
-			fail("IllegalStateException should be thrown");
-		} catch (IllegalStateException e) {
-			assertNotNull(e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		siteVisitToolPlacementServlet.init(config);
 	}
 
 	/**
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#init(ServletConfig)
 	 */
-	@Test
-	public void testInitNullAuthzGroupService() {
+	@Test(expected = IllegalStateException.class)
+	public void testInitNullAuthzGroupService() throws ServletException {
 		when(componentManager.get(AuthzGroupService.class)).thenReturn(null);
-		try {
-			siteVisitToolPlacementServlet.init(config);
-			fail("IllegalStateException should be thrown");
-		} catch (IllegalStateException e) {
-			assertNotNull(e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		siteVisitToolPlacementServlet.init(config);
 	}
 
 	/**
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#init(ServletConfig)
 	 */
-	@Test
-	public void testInitNullSecurityService() {
+	@Test(expected = IllegalStateException.class)
+	public void testInitNullSecurityService() throws ServletException {
 		when(componentManager.get(SecurityService.class)).thenReturn(null);
-		try {
-			siteVisitToolPlacementServlet.init(config);
-			fail("IllegalStateException should be thrown");
-		} catch (IllegalStateException e) {
-			assertNotNull(e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		siteVisitToolPlacementServlet.init(config);
 	}
 
 	/**
 	 * @see SiteVisitToolPlacementServlet#init(ServletConfig)
 	 */
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public void testSetupTestCase() {
-		try {
-			siteVisitToolPlacementServlet.setupTestCase(null);
-			fail("IllegalArgumentException should be thrown");
-		} catch (IllegalArgumentException e) {
-			assertNotNull(e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		siteVisitToolPlacementServlet.setupTestCase(null);
 	}
 
 	/**
+	 * @throws IOException
 	 * @see SiteVisitToolPlacementServlet#sendError(HttpServletResponse, int,
 	 *      String)
 	 */
 	@Test
-	public void testSendError() {
-		try {
-			siteVisitToolPlacementServlet.sendError(response,
-					HttpServletResponse.SC_BAD_REQUEST, "message");
-			verify(response, times(1)).sendError(
-					HttpServletResponse.SC_BAD_REQUEST);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+	public void testSendError() throws IOException {
+		siteVisitToolPlacementServlet.sendError(response,
+				HttpServletResponse.SC_BAD_REQUEST, "message");
+		verify(response, times(1))
+				.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	}
 
 	/**
+	 * @throws IOException
 	 * @see SiteVisitToolPlacementServlet#sendError(HttpServletResponse, int,
 	 *      String)
 	 */
-	@Test
-	public void testSendErrorWhenResponseCommitted() {
+	@Test(expected = ResponseCommittedException.class)
+	public void testSendErrorWhenResponseCommitted() throws IOException {
 		when(response.isCommitted()).thenReturn(true);
-		try {
-			siteVisitToolPlacementServlet.sendError(response,
-					HttpServletResponse.SC_BAD_REQUEST, "message");
-			fail("ResponseCommittedException should be thrown");
-		} catch (ResponseCommittedException e) {
-			assertNotNull(e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		siteVisitToolPlacementServlet.sendError(response,
+				HttpServletResponse.SC_BAD_REQUEST, "message");
 	}
 
 	/**
-	 * @see SiteVisitToolPlacementServlet#canAccessAtLeastOneTool(Site)
+	 * @see SiteVisitToolPlacementServlet#canAccessAtLeastOneTool(Site, List)
 	 */
 	@Test
 	public void testCanAccessAtLeastOneToolNoPages() {
@@ -576,39 +507,31 @@ public class SiteVisitToolPlacementServletTest {
 	}
 
 	/**
+	 * @throws IOException
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
-	@Test
-	public void testNormalBehaviorNullSiteIdCommittedResponse() {
+	@Test(expected = IllegalAccessError.class)
+	public void testNormalBehaviorNullSiteIdCommittedResponse()
+			throws ServletException, IOException {
 		when(request.getParameter("siteId")).thenReturn(null);
 		when(response.isCommitted()).thenReturn(true);
-		try {
-			siteVisitToolPlacementServlet.doGet(request, response);
-			fail("IllegalAccessError should be thrown");
-		} catch (IllegalAccessError e) {
-			assertNotNull("IllegalAccessError should be thrown", e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		siteVisitToolPlacementServlet.doGet(request, response);
 	}
 
 	/**
+	 * @throws IOException
+	 * @throws ServletException
 	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
 	 *      HttpServletResponse)
 	 */
-	@Test
-	public void testNormalBehaviorEmptySiteIdCommittedResponse() {
+	@Test(expected = IllegalAccessError.class)
+	public void testNormalBehaviorEmptySiteIdCommittedResponse()
+			throws ServletException, IOException {
 		when(request.getParameter("siteId")).thenReturn("");
 		when(response.isCommitted()).thenReturn(true);
-		try {
-			siteVisitToolPlacementServlet.doGet(request, response);
-			fail("IllegalAccessError should be thrown");
-		} catch (IllegalAccessError e) {
-			assertNotNull("IllegalAccessError should be thrown", e);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		siteVisitToolPlacementServlet.doGet(request, response);
 	}
 
 }

@@ -17,9 +17,7 @@
  */
 package org.sakaiproject.hybrid.tool;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -183,14 +181,9 @@ public class ToolHelperImplTest {
 	/**
 	 * @see ToolHelperImpl#ToolHelperImpl(SecurityService)
 	 */
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public void testConstructor() {
-		try {
-			toolHelperImpl = new ToolHelperImpl(null);
-			fail("Should not be reached");
-		} catch (IllegalArgumentException e) {
-			assertNotNull(e);
-		}
+		toolHelperImpl = new ToolHelperImpl(null);
 	}
 
 }

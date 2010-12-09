@@ -114,11 +114,7 @@ public class MoreSiteViewImplTest {
 	 */
 	@Test
 	public void testMoreSiteViewImpl() {
-		try {
-			moreSiteViewImpl = new MoreSiteViewImpl(serverConfigurationService);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		moreSiteViewImpl = new MoreSiteViewImpl(serverConfigurationService);
 	}
 
 	/**
@@ -129,11 +125,7 @@ public class MoreSiteViewImplTest {
 	@Test
 	public void testMoreSiteViewImplLogDebugDisabled() {
 		disableLog4jDebug();
-		try {
-			moreSiteViewImpl = new MoreSiteViewImpl(serverConfigurationService);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		moreSiteViewImpl = new MoreSiteViewImpl(serverConfigurationService);
 		enableLog4jDebug();
 	}
 
@@ -142,16 +134,9 @@ public class MoreSiteViewImplTest {
 	 * {@link org.sakaiproject.hybrid.tool.MoreSiteViewImpl#MoreSiteViewImpl(org.sakaiproject.component.api.ServerConfigurationService)}
 	 * .
 	 */
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public void testMoreSiteViewImplNullServerConfigurationService() {
-		try {
-			moreSiteViewImpl = new MoreSiteViewImpl(null);
-			fail("IllegalArgumentException should be thrown");
-		} catch (IllegalArgumentException e) {
-			assertNotNull("IllegalArgumentException should be thrown", e);
-		} catch (Throwable e) {
-			fail("IllegalArgumentException should be thrown");
-		}
+		moreSiteViewImpl = new MoreSiteViewImpl(null);
 	}
 
 	/**
@@ -162,11 +147,7 @@ public class MoreSiteViewImplTest {
 	@Test
 	public void testCategorizeSites() {
 		List<Map<String, List<Site>>> categorizedSites = null;
-		try {
-			categorizedSites = moreSiteViewImpl.categorizeSites(siteList);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		categorizedSites = moreSiteViewImpl.categorizeSites(siteList);
 		assertNotNull(categorizedSites);
 		assertTrue("categorizedSites.size() should equal 7; "
 				+ "All Sites + one academic term + Five different site types.",
@@ -249,11 +230,7 @@ public class MoreSiteViewImplTest {
 		when(serverConfigurationService.getStrings("portal.term.order"))
 				.thenReturn(null);
 		List<Map<String, List<Site>>> categorizedSites = null;
-		try {
-			categorizedSites = moreSiteViewImpl.categorizeSites(siteList);
-		} catch (Throwable e) {
-			fail("Throwable should not be thrown");
-		}
+		categorizedSites = moreSiteViewImpl.categorizeSites(siteList);
 		assertNotNull(categorizedSites);
 		assertTrue("categorizedSites.size() should equal 7; "
 				+ "All Sites + one academic term + Five different site types.",
@@ -331,16 +308,9 @@ public class MoreSiteViewImplTest {
 	 * {@link org.sakaiproject.hybrid.tool.MoreSiteViewImpl#categorizeSites(java.util.List)}
 	 * .
 	 */
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public void testCategorizeSitesNullSiteList() {
-		try {
-			moreSiteViewImpl.categorizeSites(null);
-			fail("IllegalArgumentException should be thrown");
-		} catch (IllegalArgumentException e) {
-			assertNotNull("IllegalArgumentException should be thrown", e);
-		} catch (Throwable e) {
-			fail("IllegalArgumentException should be thrown");
-		}
+		moreSiteViewImpl.categorizeSites(null);
 	}
 
 	/**
@@ -348,17 +318,10 @@ public class MoreSiteViewImplTest {
 	 * {@link org.sakaiproject.hybrid.tool.MoreSiteViewImpl#categorizeSites(java.util.List)}
 	 * .
 	 */
-	@Test
+	@Test(expected = IllegalStateException.class)
 	public void testCategorizeSitesNullServerConfigurationService() {
 		moreSiteViewImpl.serverConfigurationService = null;
-		try {
-			moreSiteViewImpl.categorizeSites(siteList);
-			fail("IllegalStateException should be thrown");
-		} catch (IllegalStateException e) {
-			assertNotNull("IllegalStateException should be thrown", e);
-		} catch (Throwable e) {
-			fail("IllegalStateException should be thrown");
-		}
+		moreSiteViewImpl.categorizeSites(siteList);
 	}
 
 }
