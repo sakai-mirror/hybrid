@@ -380,4 +380,37 @@
             <timezone>America/New_York</timezone>
         </developer>
 	</developers>
+	<mailingLists>
+	    <mailingList>
+	        <name>Sakai CLE Developer List</name>
+	        <subscribe>http://collab.sakaiproject.org/mailman/listinfo/sakai-dev</subscribe>
+	        <unsubscribe>http://collab.sakaiproject.org/mailman/listinfo/sakai-dev</unsubscribe>
+	        <post>sakai-dev@collab.sakaiproject.org</post>
+	        <archive>http://collab.sakaiproject.org/pipermail/sakai-dev/</archive>
+	        <otherArchives>
+	            <otherArchive>http://sakai-project-mail-list-archives.1343168.n2.nabble.com/DG-Development-Buidling-Sakai-sakai-dev-collab-sakaiproject-org-f669516.html</otherArchive>
+	            <otherArchive>http://old.nabble.com/Sakai---Development-f18040.html</otherArchive>
+	            <otherArchive>http://blog.gmane.org/gmane.comp.cms.sakai.devel</otherArchive>
+            </otherArchives>
+        </mailingList>
+	    <mailingList>
+	        <name>Sakai OAE Nakamura Developer List</name>
+	        <subscribe>http://groups.google.com/group/sakai-kernel/subscribe</subscribe>
+	        <unsubscribe>http://groups.google.com/group/sakai-kernel/subscribe</unsubscribe>
+	        <post>sakai-kernel@googlegroups.com</post>
+	        <archive>http://groups.google.com/group/sakai-kernel/topics</archive>
+        </mailingList>
+	    <mailingList>
+	        <name>Sakai User List</name>
+	        <subscribe>http://collab.sakaiproject.org/mailman/listinfo/sakai-user</subscribe>
+	        <unsubscribe>http://collab.sakaiproject.org/mailman/listinfo/sakai-user</unsubscribe>
+	        <post>sakai-user@collab.sakaiproject.org</post>
+	        <archive>http://collab.sakaiproject.org/pipermail/sakai-user/</archive>
+	        <otherArchives>
+	            <otherArchive>http://sakai-project-mail-list-archives.1343168.n2.nabble.com/DG-User-Using-Sakai-sakai-user-collab-sakaiproject-org-f1647745.html</otherArchive>
+	            <otherArchive>http://old.nabble.com/Sakai---User-f34116.html</otherArchive>
+	            <otherArchive>http://blog.gmane.org/gmane.comp.cms.sakai.user</otherArchive>
+            </otherArchives>
+        </mailingList>
+    </mailingLists>
 </project>
