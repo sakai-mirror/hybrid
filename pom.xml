@@ -36,8 +36,8 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>hybrid</module>
-		<module>hybrid-util</module>
+		<module>sakai-hybrid</module>
+		<module>sakai-hybrid-util</module>
 		<module>hybrid-assembly</module>
 	</modules>
 	<properties>
