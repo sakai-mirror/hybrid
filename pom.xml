@@ -34,6 +34,16 @@
 	<ciManagement>
 		<system>Hudson</system>
 		<url>http://builds.sakaiproject.org:8080/job/hybrid%20trunk/</url>
+		<notifiers>
+		    <notifier>
+		        <type>mail</type>
+                <sendOnError>true</sendOnError>
+                <sendOnFailure>true</sendOnFailure>
+                <sendOnSuccess>false</sendOnSuccess>
+                <sendOnWarning>false</sendOnWarning>
+                <address>arwhyte@umich.edu</address>
+	        </notifier>
+	    </notifiers>
 	</ciManagement>
 	<inceptionYear>2009</inceptionYear>
 	<packaging>pom</packaging>
