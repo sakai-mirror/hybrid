@@ -34,7 +34,7 @@
 	</issueManagement>
 	<ciManagement>
 		<system>Hudson</system>
-		<url>http://builds.sakaiproject.org:8080/job/hybrid%20trunk/</url>
+		<url>http://builds.sakaiproject.org:8080/job/hybrid-1.1.x/</url>
 		<notifiers>
 		    <notifier>
 		        <type>mail</type>
