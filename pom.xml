@@ -376,7 +376,7 @@
 			<roles>
 				<role>Lead Engineer</role>
 			</roles>
-			<timezone>America/Indiana/Indianapolis</timezone>
+			<timezone>America/New_York</timezone>
 		</developer>
         <developer>
             <id>arwhyte</id>
