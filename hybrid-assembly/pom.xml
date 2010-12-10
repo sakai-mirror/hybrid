@@ -9,7 +9,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <name>Sakai Nakamura :: sakai-hybrid tomcat overlay assembly</name>
+    <name>Sakai 2/3 Hybrid Tomcat Overlay Assembly</name>
     <groupId>org.sakaiproject.hybrid</groupId>
     <artifactId>hybrid-assembly</artifactId>
    <organization>
