@@ -202,8 +202,15 @@ public class SitesServlet extends HttpServlet {
 						final String category = entry.getKey();
 						final List<Site> sortedSites = entry.getValue();
 						final JSONObject categoryJson = new JSONObject();
-						categoryJson.element("category",
-								resourceBundle.getString(category));
+						if (MoreSiteViewImpl.DEFAULT_SORT_ORDER
+								.contains(category)) {
+							// well known resourceBundle key
+							categoryJson.element("category",
+									resourceBundle.getString(category));
+						} else {
+							// not well known and cannot be i18n
+							categoryJson.element("category", category);
+						}
 						final JSONArray sitesArrayJson = new JSONArray();
 						for (final Site site : sortedSites) {
 							sitesArrayJson.add(renderSiteJson(site,
