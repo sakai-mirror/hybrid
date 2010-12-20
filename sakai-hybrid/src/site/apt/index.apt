@@ -35,9 +35,9 @@ Sakai Hybrid Web Application
 * Usage
 
    The following servlets provide the necessary REST endpoints to deliver 
-   Sakai 2/3 Hybrid functionality. Note: the Sakai 3 server uses x-sakai-token
-   semantics when calling these endpoints so that the current user can be 
-   identified.
+   Sakai 2/3 Hybrid functionality. Note: the Sakai 3 server uses 
+   {{{../sakai-hybrid-util/apidocs/org/sakaiproject/hybrid/util/XSakaiToken.html}x-sakai-token}} 
+   semantics when calling these endpoints so that the current user can be identified.
 
 * Servlets
 
