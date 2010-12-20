@@ -49,18 +49,19 @@ SitesServlet
     
   * <<categorized>>
   
-    Optional. Parsed as a Boolean (e.g. <<<?categorized=true>>>). Categorizes the list of sites into All Sites, 
+    Optional. <<<Boolean>>> (e.g. <<<?categorized=true>>>). Categorizes the list of sites into All Sites, 
     academic terms, Portfolio Sites, Project Sites, Administration, and Other Sites. Matches the functionality 
     provided by the Charon portal <More Sites> drop-down.
     
   * <<unread>>
   
-    Optional. Parsed as a Boolean (e.g. <<<?unread=true>>>). Includes number of unread forums and messages in each site.
+    Optional. <<<Boolean>>> (e.g. <<<?unread=true>>>). Includes number of unread forums and messages in each site.
     
   * <<l>>
   
-    Optional. Parsed as a Java Locale (e.g. <<<?l=en_US>>>). The servlet will by default use a locale derived from
-    the <<<Accept-Language>>> header. However, if you need to override the locale, you can do so with this parameter.
+    Optional. <<<String>>> Parsed as a Java Locale (e.g. <<<?l=en_US>>>). The servlet will by default use a 
+    locale derived from the <<<Accept-Language>>> header. However, if you need to override the locale, you 
+    can do so with this parameter.
 
 *** Status Codes
 
