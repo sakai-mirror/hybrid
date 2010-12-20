@@ -26,7 +26,7 @@
   ~~ NOTE: For help with the syntax of this file, see:
   ~~ http://maven.apache.org/doxia/references/apt-format.html
 
-Sites Servlet
+SitesServlet
 
   Retrieves the list of sites that can be accessed by the current user. A few optional parameters are available
   for different use cases.
