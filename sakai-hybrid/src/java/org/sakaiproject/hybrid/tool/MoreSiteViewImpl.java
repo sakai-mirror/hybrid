@@ -85,6 +85,7 @@ class MoreSiteViewImpl {
 	public static final List<String> DEFAULT_SORT_ORDER;
 	static {
 		final List<String> defaultSortOrder = new ArrayList<String>(5);
+		defaultSortOrder.add(I18N_ALL_SITES);
 		defaultSortOrder.add(I18N_UNKNOWN_COURSE_TERM_SITES);
 		defaultSortOrder.add(I18N_PORTFOLIO_SITES);
 		defaultSortOrder.add(I18N_PROJECT_SITES);
