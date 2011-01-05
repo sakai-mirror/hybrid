@@ -90,6 +90,10 @@ public class SitesServletTest {
 	protected Session session;
 	@Mock(name = "!admin")
 	protected Site site;
+	@Mock(name = "courseSiteGoodTerm")
+	protected transient Site courseSiteGoodTerm;
+	@Mock
+	protected transient ResourceProperties courseSiteGoodProperties;
 	@Mock(name = "My Workspace")
 	protected Site myWorkSpace;
 	@Mock
@@ -109,6 +113,7 @@ public class SitesServletTest {
 	List<Map<String, List<Site>>> categorizedSitesList = null;
 	@Mock
 	Map<String, List<Site>> map;
+	protected transient String[] termOrder = null;
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -135,6 +140,16 @@ public class SitesServletTest {
 		when(site.getCreatedDate()).thenReturn(new Date());
 		List<Site> siteList = new ArrayList<Site>();
 		siteList.add(site);
+		termOrder = new String[] { "FALL 2010", "SUMMER 2010", "SPRING 2010" };
+		when(serverConfigurationService.getStrings("portal.term.order"))
+				.thenReturn(termOrder);
+		when(courseSiteGoodTerm.getId()).thenReturn("1q2w3e4r");
+		when(courseSiteGoodTerm.getType()).thenReturn("course");
+		when(courseSiteGoodTerm.getProperties()).thenReturn(
+				courseSiteGoodProperties);
+		when(courseSiteGoodProperties.getProperty("term")).thenReturn(
+				termOrder[0]);
+		siteList.add(courseSiteGoodTerm);
 		when(
 				siteService
 						.getSites(
