@@ -183,31 +183,31 @@ public class MoreSiteViewImplTest {
 				case 2:
 					assertTrue(
 							"Unknown course term sites should be third in list",
-							DEFAULT_SORT_ORDER.get(0).equals(key));
+							DEFAULT_SORT_ORDER.get(1).equals(key));
 					assertTrue(sites.size() == 1);
 					assertTrue(sites.contains(courseSiteNullTerm));
 					break;
 				case 3:
 					assertTrue("Portfolio sites should be third in list",
-							DEFAULT_SORT_ORDER.get(1).equals(key));
+							DEFAULT_SORT_ORDER.get(2).equals(key));
 					assertTrue(sites.size() == 1);
 					assertTrue(sites.contains(portfolioSite));
 					break;
 				case 4:
 					assertTrue("Project sites should be third in list",
-							DEFAULT_SORT_ORDER.get(2).equals(key));
+							DEFAULT_SORT_ORDER.get(3).equals(key));
 					assertTrue(sites.size() == 1);
 					assertTrue(sites.contains(projectSite));
 					break;
 				case 5:
 					assertTrue("Other sites should be third in list",
-							DEFAULT_SORT_ORDER.get(3).equals(key));
+							DEFAULT_SORT_ORDER.get(4).equals(key));
 					assertTrue(sites.size() == 1);
 					assertTrue(sites.contains(otherSite));
 					break;
 				case 6:
 					assertTrue("Admin sites should be third in list",
-							DEFAULT_SORT_ORDER.get(4).equals(key));
+							DEFAULT_SORT_ORDER.get(5).equals(key));
 					assertTrue(sites.size() == 1);
 					assertTrue(sites.contains(adminSite));
 					break;
@@ -267,31 +267,31 @@ public class MoreSiteViewImplTest {
 				case 2:
 					assertTrue(
 							"Unknown course term sites should be third in list",
-							DEFAULT_SORT_ORDER.get(0).equals(key));
+							DEFAULT_SORT_ORDER.get(1).equals(key));
 					assertTrue(sites.size() == 1);
 					assertTrue(sites.contains(courseSiteNullTerm));
 					break;
 				case 3:
 					assertTrue("Portfolio sites should be third in list",
-							DEFAULT_SORT_ORDER.get(1).equals(key));
+							DEFAULT_SORT_ORDER.get(2).equals(key));
 					assertTrue(sites.size() == 1);
 					assertTrue(sites.contains(portfolioSite));
 					break;
 				case 4:
 					assertTrue("Project sites should be third in list",
-							DEFAULT_SORT_ORDER.get(2).equals(key));
+							DEFAULT_SORT_ORDER.get(3).equals(key));
 					assertTrue(sites.size() == 1);
 					assertTrue(sites.contains(projectSite));
 					break;
 				case 5:
 					assertTrue("Other sites should be third in list",
-							DEFAULT_SORT_ORDER.get(3).equals(key));
+							DEFAULT_SORT_ORDER.get(4).equals(key));
 					assertTrue(sites.size() == 1);
 					assertTrue(sites.contains(otherSite));
 					break;
 				case 6:
 					assertTrue("Admin sites should be third in list",
-							DEFAULT_SORT_ORDER.get(4).equals(key));
+							DEFAULT_SORT_ORDER.get(5).equals(key));
 					assertTrue(sites.size() == 1);
 					assertTrue(sites.contains(adminSite));
 					break;
