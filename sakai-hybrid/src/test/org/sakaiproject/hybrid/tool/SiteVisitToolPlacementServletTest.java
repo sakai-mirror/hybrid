@@ -109,6 +109,7 @@ public class SiteVisitToolPlacementServletTest {
 	protected Event event;
 	@Mock
 	protected ServletConfig config;
+	protected List<ToolConfiguration> tools = new ArrayList<ToolConfiguration>();
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -149,7 +150,6 @@ public class SiteVisitToolPlacementServletTest {
 		when(page.getTitle()).thenReturn("Home");
 		when(page.getLayout()).thenReturn(0);
 		when(page.isPopUp()).thenReturn(false);
-		List<ToolConfiguration> tools = new ArrayList<ToolConfiguration>();
 		when(toolConfig.getToolId()).thenReturn("sakai.motd");
 		when(toolConfig.getId()).thenReturn("!admin-110");
 		when(tool.getId()).thenReturn("!admin-110");
@@ -236,6 +236,21 @@ public class SiteVisitToolPlacementServletTest {
 	 *      HttpServletResponse)
 	 */
 	@Test
+	public void testNormalBehaviorAllowToolTrueFalse() throws ServletException,
+			IOException {
+		when(toolHelper.allowTool(any(Site.class), any(Placement.class)))
+				.thenReturn(true).thenReturn(false);
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(response).setStatus(HttpServletResponse.SC_OK);
+	}
+
+	/**
+	 * @throws IOException
+	 * @throws ServletException
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
 	public void testNormalBehaviorLogDebugDisabled() throws ServletException,
 			IOException {
 		disableLog4jDebug();
@@ -297,6 +312,26 @@ public class SiteVisitToolPlacementServletTest {
 			IOException {
 		when(page.getTools()).thenReturn(null);
 		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(toolConfig, times(0)).getId();
+		verify(toolConfig, times(0)).getTool();
+		verify(toolConfig, times(0)).getLayoutHints();
+		verify(response).setStatus(HttpServletResponse.SC_OK);
+	}
+
+	/**
+	 * @throws IOException
+	 * @throws ServletException
+	 * @see SiteVisitToolPlacementServlet#doGet(HttpServletRequest,
+	 *      HttpServletResponse)
+	 */
+	@Test
+	public void testNormalBehaviorNullToolsVariant() throws ServletException,
+			IOException {
+		when(page.getTools()).thenReturn(tools).thenReturn(null);
+		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(toolConfig, times(0)).getId();
+		verify(toolConfig, times(0)).getTool();
+		verify(toolConfig, times(0)).getLayoutHints();
 		verify(response).setStatus(HttpServletResponse.SC_OK);
 	}
 
@@ -310,8 +345,11 @@ public class SiteVisitToolPlacementServletTest {
 	public void testNormalBehaviorEmptyTools() throws ServletException,
 			IOException {
 		final List<ToolConfiguration> list = Collections.emptyList();
-		when(page.getTools()).thenReturn(list);
+		when(page.getTools()).thenReturn(tools).thenReturn(list);
 		siteVisitToolPlacementServlet.doGet(request, response);
+		verify(toolConfig, times(0)).getId();
+		verify(toolConfig, times(0)).getTool();
+		verify(toolConfig, times(0)).getLayoutHints();
 		verify(response).setStatus(HttpServletResponse.SC_OK);
 	}
 
