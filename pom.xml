@@ -12,11 +12,11 @@
 	<name>Sakai 2/3 Hybrid Project</name>
 	<groupId>org.sakaiproject.hybrid</groupId>
 	<artifactId>hybrid</artifactId>
-	<version>1.1.2-b05-SNAPSHOT</version>
+	<version>1.1.2-b05</version>
 	<scm>
-		<connection>scm:svn:https://source.sakaiproject.org/svn/hybrid/branches/hybrid-1.1.x/</connection>
-		<developerConnection>scm:svn:https://source.sakaiproject.org/svn/hybrid/branches/hybrid-1.1.x/</developerConnection>
-		<url>https://source.sakaiproject.org/svn/hybrid/branches/hybrid-1.1</url>
+		<connection>scm:svn:https://source.sakaiproject.org/svn/hybrid/tags/hybrid-1.1.2-b05</connection>
+		<developerConnection>scm:svn:https://source.sakaiproject.org/svn/hybrid/tags/hybrid-1.1.2-b05</developerConnection>
+		<url>https://source.sakaiproject.org/svn/hybrid/tags/hybrid-1.1.2-b05</url>
 	</scm>
 	<organization>
 		<name>The Sakai Foundation</name>
