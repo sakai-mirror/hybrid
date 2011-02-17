@@ -17,7 +17,7 @@
  */
 package org.sakaiproject.hybrid.util;
 
-import java.nio.charset.Charset;
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -25,6 +25,8 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Copied from <a href=
@@ -36,7 +38,8 @@ import org.apache.commons.codec.binary.Base64;
  */
 @SuppressWarnings("PMD.LongVariable")
 public class Signature {
-	protected transient String hmacSha1Algorithm = "HmacSHA1";
+  private static final Log LOG = LogFactory.getLog(Signature.class);
+  protected transient String hmacSha1Algorithm = "HmacSHA1";
 	private transient Mac mac;
 
 	/**
@@ -113,22 +116,25 @@ public class Signature {
 		if (key == null) {
 			throw new IllegalArgumentException("String key == null");
 		}
-		// Get an hmac_sha1 key from the raw key bytes
-		final byte[] keyBytes = key.getBytes(Charset.forName("UTF-8"));
-		final SecretKeySpec signingKey = new SecretKeySpec(keyBytes,
-				hmacSha1Algorithm);
+		String result = null;
+    try {
+      // Get an hmac_sha1 key from the raw key bytes
+      final byte[] keyBytes = key.getBytes("UTF-8");
+      final SecretKeySpec signingKey = new SecretKeySpec(keyBytes,
+      		hmacSha1Algorithm);
 
-		// initialize with the signing key
-		mac.init(signingKey);
+      // initialize with the signing key
+      mac.init(signingKey);
 
-		// Compute the hmac on input data bytes
-		final byte[] rawHmac = mac.doFinal(data.getBytes(Charset
-				.forName("UTF-8")));
+      // Compute the hmac on input data bytes
+      final byte[] rawHmac = mac.doFinal(data.getBytes("UTF-8"));
 
-		// Convert raw bytes to encoding
-		final byte[] base64Bytes = Base64.encodeBase64(rawHmac, false, urlSafe);
-		final String result = new String(base64Bytes, Charset.forName("UTF-8"));
-
+      // Convert raw bytes to encoding
+      final byte[] base64Bytes = Base64.encodeBase64(rawHmac, false, urlSafe);
+      result = new String(base64Bytes, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      LOG.error(e.getMessage(), e);
+    }
 		return result;
 	}
 }
