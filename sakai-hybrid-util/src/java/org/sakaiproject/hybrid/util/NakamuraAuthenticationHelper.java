@@ -361,7 +361,6 @@ public class NakamuraAuthenticationHelper {
 		/**
 		 * @see HttpClientProvider#getHttpClient()
 		 */
-		@Override
 		public HttpClient getHttpClient() {
 			LOG.debug("getHttpClient()");
 			return new DefaultHttpClient();

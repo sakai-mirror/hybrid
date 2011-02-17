@@ -508,7 +508,6 @@ public class NakamuraAuthenticationHelperTest {
 		/**
 		 * @see org.sakaiproject.hybrid.util.api.HttpClientProvider#getHttpGet()
 		 */
-		@Override
 		public HttpClient getHttpClient() {
 			return httpClient;
 		}
