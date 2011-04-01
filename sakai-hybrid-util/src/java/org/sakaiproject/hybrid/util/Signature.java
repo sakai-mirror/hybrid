@@ -108,6 +108,7 @@ public class Signature {
 	 *             This is the exception for invalid Keys (invalid encoding,
 	 *             wrong length, uninitialized, etc).
 	 */
+	@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 	public String calculateRFC2104HMACWithEncoding(final String data,
 			final String key, final boolean urlSafe) throws InvalidKeyException {
 		if (data == null) {
