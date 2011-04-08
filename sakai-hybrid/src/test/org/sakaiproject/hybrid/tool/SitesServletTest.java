@@ -571,6 +571,27 @@ public class SitesServletTest {
 		verifyDoGet(response);
 	}
 
+  /**
+   * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
+   * 
+   * @throws IOException
+   * @throws ServletException
+   */
+  @Test
+  public void testDoGetEmptySiteList() throws ServletException, IOException {
+    when(
+        siteService
+            .getSites(
+                org.sakaiproject.site.api.SiteService.SelectionType.ACCESS,
+                null,
+                null,
+                null,
+                org.sakaiproject.site.api.SiteService.SortType.TITLE_ASC,
+                null)).thenReturn(new ArrayList<Site>());
+    sitesServlet.doGet(request, response);
+    verifyDoGet(response);
+  }
+
 	/**
 	 * Tests {@link SitesServlet#doGet(HttpServletRequest, HttpServletResponse)}
 	 * 
