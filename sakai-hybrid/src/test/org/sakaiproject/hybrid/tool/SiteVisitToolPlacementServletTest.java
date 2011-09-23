@@ -541,7 +541,7 @@ public class SiteVisitToolPlacementServletTest {
 	public void testCanAccessAtLeastOneToolNoPages() {
 		when(site.getOrderedPages()).thenReturn(null);
 		assertFalse(siteVisitToolPlacementServlet.canAccessAtLeastOneTool(site,
-				null));
+				new ArrayList<SitePage>()));
 	}
 
 	/**
