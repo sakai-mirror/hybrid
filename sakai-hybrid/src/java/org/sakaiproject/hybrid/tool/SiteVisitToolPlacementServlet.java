@@ -157,6 +157,9 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 			if (pages != null && canAccessAtLeastOneTool(site, pages)) {
 				final JSONArray pagesArray = new JSONArray();
 				for (SitePage page : pages) { // for each page
+					if (!canAccessAtLeastOneTool(site, page)) {
+						continue;
+					}
 					final JSONObject pageJson = new JSONObject();
 					pageJson.element("id", page.getId());
 					pageJson.element("name", page.getTitle());
@@ -253,6 +256,26 @@ public class SiteVisitToolPlacementServlet extends HttpServlet {
 							return true;
 						}
 					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Goes through any tools on a single particular page to see if the current
+	 * user can access at least one of the tools.
+	 * 
+	 * @param site The site we're using.
+	 * @param page The page whose tools to check.
+	 * @return true if at least one tool can be accessed.
+	 */
+	protected boolean canAccessAtLeastOneTool(final Site site, final SitePage page) {
+		final List<ToolConfiguration> tools = page.getTools();
+		if (tools != null) {
+			for (ToolConfiguration tool : tools) {
+				if (toolHelper.allowTool(site, tool)) {
+					return true;
 				}
 			}
 		}
