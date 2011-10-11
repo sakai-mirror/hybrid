@@ -56,8 +56,9 @@
 	<properties>
 		<url.localsite>scp://source.sakaiproject.org/var/www/html/release/hybrid/${project.version}</url.localsite>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
-    <compileSource>1.5</compileSource>
+        <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+        <compileSource>1.5</compileSource>
+        <sakai.msgcntr.version>3.0-SNAPSHOT</sakai.msgcntr.version>
 	</properties>
   <build>
     <defaultGoal>install</defaultGoal>
