@@ -1,13 +1,10 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-    <prerequisites>
-      <maven>2.2.1</maven>
-    </prerequisites>
 	<parent>
 		<artifactId>sakai-standard-tool</artifactId>
 		<groupId>org.sakaiproject.purepoms</groupId>
-		<version>2.9-SNAPSHOT</version>
+		<version>2.9.0-a01</version>
 		<!-- 
 			<version>M2</version> <relativePath>../master/pom.xml</relativePath>
 		-->
@@ -21,6 +18,9 @@
 		<developerConnection>scm:svn:https://source.sakaiproject.org/svn/hybrid/trunk</developerConnection>
 		<url>https://source.sakaiproject.org/svn/hybrid/trunk</url>
 	</scm>
+    <prerequisites>
+      <maven>2.2.1</maven>
+    </prerequisites>
 	<organization>
 		<name>The Sakai Foundation</name>
 		<url>http://sakaiproject.org/</url>
@@ -58,7 +58,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
         <compileSource>1.5</compileSource>
-        <sakai.msgcntr.version>3.0-SNAPSHOT</sakai.msgcntr.version>
+        <sakai.msgcntr.version>3.0.0-a01</sakai.msgcntr.version>
 	</properties>
   <build>
     <defaultGoal>install</defaultGoal>
