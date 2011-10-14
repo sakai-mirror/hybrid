@@ -12,11 +12,11 @@
 	<name>Sakai 2/3 Hybrid Project</name>
 	<groupId>org.sakaiproject.hybrid</groupId>
 	<artifactId>hybrid</artifactId>
-	<version>1.2-SNAPSHOT</version>
+	<version>1.2.0-a01</version>
 	<scm>
-		<connection>scm:svn:https://source.sakaiproject.org/svn/hybrid/trunk</connection>
-		<developerConnection>scm:svn:https://source.sakaiproject.org/svn/hybrid/trunk</developerConnection>
-		<url>https://source.sakaiproject.org/svn/hybrid/trunk</url>
+		<connection>scm:svn:https://source.sakaiproject.org/svn/hybrid/tags/hybrid-1.2.0-a01</connection>
+		<developerConnection>scm:svn:https://source.sakaiproject.org/svn/hybrid/tags/hybrid-1.2.0-a01</developerConnection>
+		<url>https://source.sakaiproject.org/svn/hybrid/tags/hybrid-1.2.0-a01</url>
 	</scm>
     <prerequisites>
       <maven>2.2.1</maven>
