@@ -151,7 +151,7 @@ public class SitesServlet extends HttpServlet {
 				org.sakaiproject.site.api.SiteService.SelectionType.ACCESS,
 				null, null, null,
 				org.sakaiproject.site.api.SiteService.SortType.TITLE_ASC, null);
-		if (siteList != null && siteList.size() > 0) {
+		if (siteList != null && !siteList.isEmpty()) {
 			// add My Workspace to beginning of list
 			if (myWorkSpace != null) {
 				siteList.add(0, myWorkSpace);
