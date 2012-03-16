@@ -313,13 +313,6 @@
             -->
 		</plugins>
 	</reporting>
-	<distributionManagement>
-        <site>
-            <id>sakai-site</id>
-            <name>Sakai release Site</name>
-            <url>scpexe://source.sakaiproject.org/var/www/html/release/hybrid/${project.version}</url>
-        </site>
-    </distributionManagement>
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
