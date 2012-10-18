@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.sakaiproject</groupId>
 		<artifactId>master</artifactId>
-		<version>2.9-SNAPSHOT</version>
+		<version>2.9.0-rc02</version>
 		<relativePath>../master/pom.xml</relativePath>
 		<!-- 
 			<version>M2</version> 
@@ -13,11 +13,11 @@
 	<name>Sakai 2/3 Hybrid Project</name>
 	<groupId>org.sakaiproject.hybrid</groupId>
 	<artifactId>hybrid</artifactId>
-	<version>1.2-SNAPSHOT</version>
+	<version>1.2.0-rc02</version>
 	<scm>
-		<connection>scm:svn:https://source.sakaiproject.org/svn/hybrid/branches/hybrid-1.2.x</connection>
-		<developerConnection>scm:svn:https://source.sakaiproject.org/svn/hybrid/branches/hybrid-1.2.x</developerConnection>
-		<url>https://source.sakaiproject.org/svn/hybrid/branches/hybrid-1.2.x</url>
+		<connection>scm:svn:https://source.sakaiproject.org/svn/hybrid/tags/hybrid-1.2.0-rc02</connection>
+		<developerConnection>scm:svn:https://source.sakaiproject.org/svn/hybrid/tags/hybrid-1.2.0-rc02</developerConnection>
+		<url>https://source.sakaiproject.org/svn/hybrid/tags/hybrid-1.2.0-rc02</url>
 	</scm>
     <prerequisites>
       <maven>2.2.1</maven>
